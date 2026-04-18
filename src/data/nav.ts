@@ -1,24 +1,55 @@
-export interface NavItem { label: string; href: string; children?: NavItem[]; }
+export interface NavLeaf { label: string; href: string; description?: string; }
+export interface NavGroup { heading: string; items: NavLeaf[]; }
+export interface NavEntry {
+  label: string;
+  href: string;
+  children?: NavLeaf[];
+  groups?: NavGroup[];
+  description?: string;
+}
 
-export const PRIMARY_NAV: NavItem[] = [
-  { label: 'Products', href: '#', children: [
-    { label: 'InstaAccess', href: '/instaaccess' },
-    { label: 'InstaAccess Use Cases', href: '/instaaccess-use-cases' },
-    { label: 'InstaWorkforce', href: '/instaworkforce' },
-    { label: 'InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
-  ]},
-  { label: 'Use Cases', href: '#', children: [
-    { label: 'InstaAccess Use Cases', href: '/instaaccess-use-cases' },
-    { label: 'InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
-    { label: 'Credential Compromise', href: '/credential-compromise' },
-    { label: 'Cloud Zero-Day Attack', href: '/cloud-zero-day-attack-solution' },
-    { label: 'Data Perimeter on AWS', href: '/data-perimeter-on-aws' },
-    { label: 'Close Compliance Gap', href: '/close-compliance-gap' },
-    { label: 'Fix Risks Before Pentest', href: '/fix-risks-before-pentest' },
-    { label: 'Who Really Has Access', href: '/who-really-has-access' },
-    { label: 'Stop Paying for Cloud', href: '/stop-paying-for-cloud' },
-    { label: 'Walk Into Your Next Audit', href: '/walk-into-your-next-user-access-audit' },
-  ]},
+export const PRIMARY_NAV: NavEntry[] = [
+  {
+    label: 'Products',
+    href: '#',
+    children: [
+      { label: 'InstaAccess', href: '/instaaccess', description: 'Harden non-human identities' },
+      { label: 'InstaAccess Use Cases', href: '/instaaccess-use-cases' },
+      { label: 'InstaWorkforce', href: '/instaworkforce', description: 'Secure human access' },
+      { label: 'InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
+    ],
+  },
+  {
+    label: 'Use Cases',
+    href: '#',
+    groups: [
+      {
+        heading: 'By Product',
+        items: [
+          { label: 'InstaAccess Use Cases', href: '/instaaccess-use-cases', description: '10 non-human identity use cases' },
+          { label: 'InstaWorkforce Use Cases', href: '/instaworkforce-use-cases', description: '10 human-access use cases' },
+        ],
+      },
+      {
+        heading: 'Stop Cloud Attacks',
+        items: [
+          { label: 'Credential Compromise', href: '/credential-compromise', description: 'Block stolen-credential attacks' },
+          { label: 'Cloud Zero-Day Attack', href: '/cloud-zero-day-attack-solution', description: 'Defend against unknown exploits' },
+          { label: 'Data Perimeter on AWS', href: '/data-perimeter-on-aws', description: 'Trusted identities, resources, networks' },
+        ],
+      },
+      {
+        heading: 'Govern Identity & Access',
+        items: [
+          { label: 'Close Compliance Gap', href: '/close-compliance-gap', description: 'Prove compliance instantly' },
+          { label: 'Fix Risks Before Pentest', href: '/fix-risks-before-pentest', description: 'Pen-test prep' },
+          { label: 'Who Really Has Access', href: '/who-really-has-access', description: 'Instant visibility' },
+          { label: 'Stop Paying for Cloud', href: '/stop-paying-for-cloud', description: 'Right-size and save' },
+          { label: 'Walk Into Your Next Audit', href: '/walk-into-your-next-user-access-audit', description: 'Audit-ready evidence' },
+        ],
+      },
+    ],
+  },
   { label: 'How It Works', href: '/howitworks' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Blog', href: '/blog' },

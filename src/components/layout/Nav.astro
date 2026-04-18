@@ -4,21 +4,58 @@ import { PRIMARY_NAV, CTA_NAV } from '@/data/nav';
 <header class="border-b border-black/5 sticky top-0 bg-white/90 backdrop-blur z-50">
   <nav class="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
     <a href="/" class="font-bold text-xl">InstaSecure</a>
-    <ul class="hidden md:flex gap-6 items-center">
+    <ul class="hidden md:flex gap-8 items-center">
       {PRIMARY_NAV.map(item => (
         <li class="relative group">
-          <a href={item.href} class="hover:text-[var(--color-brand)]">{item.label}</a>
+          <a href={item.href} class="inline-flex items-center gap-1 py-2 text-[15px] font-medium text-[var(--color-text)] hover:text-[var(--color-brand)] transition">
+            {item.label}
+            {(item.children || item.groups) && (
+              <svg class="w-3.5 h-3.5 opacity-60 group-hover:rotate-180 transition" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            )}
+          </a>
+
           {item.children && (
-            <ul class="absolute hidden group-hover:block bg-white shadow-lg rounded-lg p-2 min-w-[220px]">
-              {item.children.map(c => (
-                <li><a href={c.href} class="block px-3 py-2 rounded hover:bg-slate-50">{c.label}</a></li>
-              ))}
-            </ul>
+            <div class="absolute left-0 top-full hidden group-hover:block pt-2">
+              <ul class="bg-white shadow-xl rounded-xl border border-black/5 p-2 min-w-[260px]">
+                {item.children.map(c => (
+                  <li>
+                    <a href={c.href} class="block px-4 py-3 rounded-lg hover:bg-slate-50 transition">
+                      <div class="font-semibold text-[var(--color-text)]">{c.label}</div>
+                      {c.description && <div class="text-xs text-slate-600 mt-0.5">{c.description}</div>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {item.groups && (
+            <div class="absolute left-1/2 -translate-x-1/2 top-full hidden group-hover:block pt-2">
+              <div class="bg-white shadow-xl rounded-xl border border-black/5 p-6 w-[760px]">
+                <div class="grid grid-cols-3 gap-6">
+                  {item.groups.map(g => (
+                    <div>
+                      <div class="text-xs uppercase tracking-[0.12em] font-bold text-[var(--color-brand)] mb-3">{g.heading}</div>
+                      <ul class="space-y-1">
+                        {g.items.map(it => (
+                          <li>
+                            <a href={it.href} class="block -mx-2 px-3 py-2 rounded-lg hover:bg-slate-50 transition">
+                              <div class="font-semibold text-[14px] text-[var(--color-text)] leading-snug">{it.label}</div>
+                              {it.description && <div class="text-xs text-slate-600 mt-0.5 leading-snug">{it.description}</div>}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
         </li>
       ))}
     </ul>
-    <a href={CTA_NAV.href} class="rounded-full px-5 py-2 bg-[var(--color-brand)] text-white font-medium">
+    <a href={CTA_NAV.href} class="rounded-full px-5 py-2 bg-[var(--color-brand)] text-white font-semibold text-[14px] hover:opacity-90 transition shadow-sm">
       {CTA_NAV.label}
     </a>
   </nav>
