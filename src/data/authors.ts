@@ -3,6 +3,7 @@ export interface Author {
   name: string;
   title: string;
   bio: string;
+  avatar?: string;
   linkedin?: string;
   twitter?: string;
 }
@@ -13,6 +14,7 @@ export const AUTHORS: Record<string, Author> = {
     name: 'Rupesh Mishra',
     title: 'Founder & CEO, InstaSecure',
     bio: 'Building the preventive-cloud-security platform. Previously led cloud security and identity platforms at Netflix and LinkedIn.',
-    linkedin: 'https://www.linkedin.com/in/mishra-rupesh/',
+    avatar: '/authors/rupesh-mishra.jpg',
+    linkedin: 'https://www.linkedin.com/in/rupeshmishra/',
   },
 };
