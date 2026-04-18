@@ -12,7 +12,9 @@
     "check": "astro check",
     "visual:baseline": "TARGET_URL=https://instasecure.ai MODE=baseline playwright test tests/visual/capture.spec.ts",
     "visual:current": "MODE=current playwright test tests/visual/capture.spec.ts",
-    "visual:diff": "node tests/visual/diff.mjs"
+    "visual:diff": "node tests/visual/diff.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +23,8 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "pixelmatch": "^7.1.0",
-    "pngjs": "^7.0.0"
+    "pngjs": "^7.0.0",
+    "vitest": "^4.1.4"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
