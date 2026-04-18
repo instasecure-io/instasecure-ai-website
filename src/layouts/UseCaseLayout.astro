@@ -1,0 +1,53 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  eyebrow?: string;
+  heroTitle: string;
+  heroDescription: string;
+  heroPrimaryCta?: { label: string; href: string };
+  heroSecondaryCta?: { label: string; href: string };
+  heroImage?: { src: string; alt: string };
+  closingCtaTitle?: string;
+  closingCtaDescription?: string;
+}
+const {
+  title,
+  description,
+  eyebrow = 'Use Case',
+  heroTitle,
+  heroDescription,
+  heroPrimaryCta,
+  heroSecondaryCta,
+  heroImage,
+  closingCtaTitle = 'Ready to Build a Safer Cloud?',
+  closingCtaDescription = 'Cloud teams like yours are already seeing results in weeks. You could be next.',
+} = Astro.props;
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+---
+<BaseLayout {title} {description}>
+  <Hero
+    eyebrow={eyebrow}
+    title={heroTitle}
+    description={heroDescription}
+    primaryCta={heroPrimaryCta ?? { label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={heroSecondaryCta ?? { label: 'Book a Demo', href: CALENDLY }}
+    image={heroImage}
+  />
+
+  <slot />
+
+  <CTAStripe
+    title={closingCtaTitle}
+    description={closingCtaDescription}
+    supporting="Choose your path — self-serve on AWS Marketplace or schedule a personalized walkthrough."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+</BaseLayout>

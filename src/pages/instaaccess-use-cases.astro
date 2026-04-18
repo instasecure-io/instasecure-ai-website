@@ -1,0 +1,159 @@
+---
+import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
+import IconBadge from '@/components/ui/IconBadge.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+
+const useCases = [
+  {
+    icon: 'lucide:download',
+    iconColor: 'accent' as const,
+    title: 'Data Exfiltration via Machine Roles',
+    risk: 'Lambda functions, EC2 roles, or pipelines with excessive access to S3 or KMS can be exploited to exfiltrate sensitive data.',
+    solutions: [
+      'Identify non-human identities with direct or indirect access to sensitive data stores',
+      'Detect encryption gaps and flag roles with unscoped KMS decrypt permissions',
+      'Recommend policy conditions (VPC, IP, PrincipalOrgID) and integrate with CloudTrail for actual usage',
+    ],
+  },
+  {
+    icon: 'lucide:git-branch',
+    iconColor: 'brand' as const,
+    title: 'Lateral Movement Across Environments',
+    risk: 'Workloads with cross-account trust can be used to move laterally from dev to prod — or from a compromised environment to a production one.',
+    solutions: [
+      'Map trust policies and surface cross-account role assumption paths',
+      'Flag risky role assumptions with wildcard or overly broad principal conditions',
+      'Enforce tighter trust policies with SCPs and PrincipalOrgID conditions',
+    ],
+  },
+  {
+    icon: 'lucide:activity',
+    iconColor: 'accent' as const,
+    title: 'Unauthorized API Activity via Service Roles',
+    risk: 'Machine roles with broad access to AWS services may be abused to manipulate infrastructure — spin up resources, delete logs, modify config.',
+    solutions: [
+      'Analyze API call patterns per role via CloudTrail',
+      'Flag over-provisioned roles where granted ≫ used permissions',
+      'Right-size access to observed usage',
+    ],
+  },
+  {
+    icon: 'lucide:split',
+    iconColor: 'brand' as const,
+    title: 'Segregation of Duties in Automation Pipelines',
+    risk: 'A single machine identity with build, deploy, and modify permissions violates separation of duties and creates a dangerous single point of compromise.',
+    solutions: [
+      'Detect conflicting permission combinations in one identity',
+      'Recommend role decomposition into narrower functions',
+      'Enforce pipeline isolation using accounts and SCPs',
+    ],
+  },
+  {
+    icon: 'lucide:file-check',
+    iconColor: 'accent' as const,
+    title: 'Compliance-Ready Controls for Non-Human Access',
+    risk: 'Regulatory frameworks (SOC 2, PCI-DSS, HIPAA) increasingly require machine identity governance — not just human access reviews.',
+    solutions: [
+      'Audit trails for every machine identity and its permissions',
+      'Evidence generation for compliance auditors on demand',
+      'Compliance mapping from each control to the relevant framework clause',
+    ],
+  },
+  {
+    icon: 'lucide:arrow-up-right',
+    iconColor: 'brand' as const,
+    title: 'Privilege Escalation in Workloads',
+    risk: 'A compromised or misconfigured machine identity may assume admin roles or grant itself more permissions.',
+    solutions: [
+      'Detect toxic combinations (iam:CreateRole + iam:AttachPolicy, PassRole + lambda:CreateFunction)',
+      'Alert on assume-role permissions with wildcard principals',
+      'Apply permission boundaries to all machine identities',
+    ],
+  },
+  {
+    icon: 'lucide:key',
+    iconColor: 'accent' as const,
+    title: 'Credential Exposure in CI/CD and Runtime',
+    risk: 'Hardcoded or long-lived credentials in pipelines or containers can be exploited by attackers who access logs, images, or source.',
+    solutions: [
+      'Detect IAM users and static access keys still in use',
+      'Recommend migration to IAM roles with short-lived tokens (IRSA, IMDS v2, OIDC)',
+      'Monitor CloudTrail for key usage patterns and flag anomalies',
+    ],
+  },
+  {
+    icon: 'lucide:sparkles',
+    iconColor: 'brand' as const,
+    title: 'Governance and Policy Hygiene for Machine Access',
+    risk: 'Stale, duplicate, or orphaned roles introduce unnecessary risk and complexity — cluttering your IAM and creating attack paths.',
+    solutions: [
+      'Identify unused roles based on CloudTrail activity',
+      'Track proliferation: how many roles, how many duplicates, where ownership is missing',
+      'Suggest cleanup with safe archival before delete',
+    ],
+  },
+  {
+    icon: 'lucide:shield',
+    iconColor: 'accent' as const,
+    title: 'Blast Radius Reduction for Workload Compromise',
+    risk: 'A compromised function or container role can access multiple services, regions, or accounts unless its reach is explicitly limited.',
+    solutions: [
+      'Enforce regional conditions and service-specific resource ARNs',
+      'Detect high-privilege roles attached to low-trust workloads',
+      'Apply SCPs to contain compromise within a blast-radius boundary',
+    ],
+  },
+  {
+    icon: 'lucide:minimize-2',
+    iconColor: 'brand' as const,
+    title: 'Reducing Attack Surface of Non-Human Identities',
+    risk: 'Default or legacy roles often carry permissions no longer needed — wildcards from faster-times that never got pruned.',
+    solutions: [
+      'Scan for unused permissions per role',
+      'Highlight wildcards (Action: *, Resource: *) that could be scoped',
+      'Provide actionable, testable right-sizing recommendations',
+    ],
+  },
+];
+---
+<UseCaseLayout
+  title="InstaAccess Use Cases | InstaSecure"
+  description="Ways InstaAccess solves real customer problems — data exfiltration, lateral movement, privilege escalation, compliance, credential exposure, and more across non-human cloud identity."
+  eyebrow="Use Cases"
+  heroTitle="InstaAccess Use Cases"
+  heroDescription="Non-human identities are the backbone of modern cloud operations — but they're also a silent and scalable risk. Here's how InstaAccess tackles the ten most common IAM risks we see."
+  closingCtaTitle="Secure your non-human identities"
+  closingCtaDescription="Book a demo to see InstaAccess against your AWS environment, or start free on the Marketplace."
+>
+  <section class="mx-auto max-w-7xl px-6 py-14">
+    <div class="space-y-6">
+      {useCases.map((uc, i) => (
+        <article class="p-8 rounded-2xl bg-white border border-black/5 shadow-sm hover:shadow-md transition">
+          <div class="flex gap-5 items-start">
+            <IconBadge name={uc.icon} color={uc.iconColor} size="md" />
+            <div class="flex-1">
+              <div class="text-xs font-bold text-slate-500 tracking-[0.15em] uppercase">Use Case {String(i + 1).padStart(2, '0')}</div>
+              <h2 class="text-xl md:text-2xl font-bold text-[var(--color-text)] mt-1 leading-tight tracking-tight">{uc.title}</h2>
+              <p class="mt-4 text-[16px] text-slate-700 leading-relaxed"><span class="font-semibold text-[var(--color-accent)]">Risk:</span> {uc.risk}</p>
+              <ul class="mt-4 space-y-2">
+                {uc.solutions.map(s => (
+                  <li class="flex gap-3 text-[15px] text-slate-800 leading-relaxed">
+                    <span class="text-[var(--color-brand)] font-bold shrink-0">▸</span>
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-6 py-12 text-center">
+    <SectionHeader
+      title="Ready to explore InstaAccess?"
+      subtitle="Each use case above is a live capability in the platform. Book a demo or try it directly on AWS Marketplace."
+    />
+  </section>
+</UseCaseLayout>

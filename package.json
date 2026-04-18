@@ -31,6 +31,7 @@
     "@iconify-json/lucide": "^1.2.102",
     "@tailwindcss/vite": "^4.2.2",
     "astro": "^5.18.1",
+    "astro-embed": "^0.13.0",
     "astro-icon": "^1.1.5",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3"

@@ -1,0 +1,162 @@
+---
+import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
+import IconBadge from '@/components/ui/IconBadge.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+
+const useCases = [
+  {
+    icon: 'lucide:download',
+    iconColor: 'accent' as const,
+    title: 'Data Exfiltration Prevention',
+    risk: 'Over-permissioned human identities may access and export sensitive data from services like S3 or RDS — intentionally or after compromise.',
+    solutions: [
+      'Identify human identities with direct access to sensitive data stores',
+      'Flag unused or excessive permissions (e.g., wildcard S3 permissions)',
+      'Automate permission right-sizing to enforce least privilege',
+      'Integrate with KMS key policies so only approved identities can decrypt data',
+    ],
+  },
+  {
+    icon: 'lucide:key',
+    iconColor: 'brand' as const,
+    title: 'Credential Compromise',
+    risk: 'Stolen or leaked IAM credentials can be used to access critical AWS services.',
+    solutions: [
+      'Detect long-lived IAM users and encourage short-lived session-based access',
+      'Highlight dormant users or credentials for deactivation',
+      'Enforce MFA via Identity Center integration',
+      'Support policy conditions like IP or device-based restrictions',
+    ],
+  },
+  {
+    icon: 'lucide:arrow-up-right',
+    iconColor: 'accent' as const,
+    title: 'Privilege Escalation Prevention',
+    risk: 'Misconfigured roles or policies allow users to grant themselves or others elevated access.',
+    solutions: [
+      'Detect toxic combinations (e.g., iam:CreateRole + iam:AttachPolicy)',
+      'Recommend permissions boundaries and SCPs to close escalation paths',
+      'Provide alerts and remediation for privilege anomalies',
+    ],
+  },
+  {
+    icon: 'lucide:minimize-2',
+    iconColor: 'brand' as const,
+    title: 'Attack Surface Reduction',
+    risk: 'Broad or excessive permissions increase the likelihood of accidental or malicious misuse.',
+    solutions: [
+      'Surface least-used permissions for review',
+      'Enable periodic right-sizing based on CloudTrail activity',
+      'Reduce high-risk permissions like admin access unless justified',
+    ],
+  },
+  {
+    icon: 'lucide:shield',
+    iconColor: 'accent' as const,
+    title: 'Blast Radius Containment',
+    risk: 'A compromised identity has excessive reach, impacting multiple services or accounts.',
+    solutions: [
+      'Restrict roles to specific accounts or services',
+      'Limit access scope using IAM conditions and SCPs',
+      'Support organization-wide policies for safe defaults',
+    ],
+  },
+  {
+    icon: 'lucide:git-branch',
+    iconColor: 'brand' as const,
+    title: 'Lateral Movement Risk',
+    risk: 'Compromised users with cross-account trust or broad IAM privileges may pivot into other environments.',
+    solutions: [
+      'Visualize cross-account role assumptions and access paths',
+      'Detect overly permissive trust relationships',
+      'Recommend and enforce tighter trust policies',
+      'Support SCPs to restrict role assumption across accounts',
+    ],
+  },
+  {
+    icon: 'lucide:cpu',
+    iconColor: 'accent' as const,
+    title: 'Crypto Mining Detection & Mitigation',
+    risk: 'Attackers exploit compromised identities to launch unauthorized EC2 or container workloads for cryptocurrency mining.',
+    solutions: [
+      'Detect permission sets with EC2:RunInstances or EKS:RunPod',
+      'Flag suspicious usage patterns via CloudTrail analysis',
+      'Suggest SCPs to restrict service usage in non-prod or sensitive accounts',
+    ],
+  },
+  {
+    icon: 'lucide:sparkles',
+    iconColor: 'brand' as const,
+    title: 'Governance & Policy Hygiene for Human Access',
+    risk: 'Inconsistent or outdated access policies lead to audit failures and security drift.',
+    solutions: [
+      'Enable automated access reviews and evidence collection',
+      'Provide access visibility across AWS accounts and identity providers',
+      'Enforce naming and tagging standards for IAM roles and users',
+    ],
+  },
+  {
+    icon: 'lucide:file-check',
+    iconColor: 'accent' as const,
+    title: 'Compliance Framework Alignment',
+    risk: 'Failure to meet access governance requirements for frameworks like SOC 2, ISO 27001, or HIPAA.',
+    solutions: [
+      'Map controls to compliance standards (least privilege, MFA, access reviews)',
+      'Automate evidence generation and export',
+      'Enforce preventive controls aligned with compliance requirements',
+    ],
+  },
+  {
+    icon: 'lucide:split',
+    iconColor: 'brand' as const,
+    title: 'Segregation of Duties',
+    risk: 'A single user holds permissions that should be split across multiple roles for control and oversight.',
+    solutions: [
+      'Detect roles with conflicting responsibilities (e.g., deploy + approve)',
+      'Recommend role decomposition',
+      'Enforce separation via permission design and cross-role limitations',
+    ],
+  },
+];
+---
+<UseCaseLayout
+  title="InstaWorkforce Use Cases | InstaSecure"
+  description="Ways InstaWorkforce solves real human-access problems: data exfiltration, credential compromise, privilege escalation, compliance, blast-radius containment, and more."
+  eyebrow="Use Cases"
+  heroTitle="InstaWorkforce Use Cases"
+  heroDescription="Proactively govern human access in AWS and reduce cloud identity risks. Here's how InstaWorkforce tackles the ten most common workforce-IAM risks we see."
+  closingCtaTitle="Govern your workforce access"
+  closingCtaDescription="Book a demo to see InstaWorkforce map your actual access paths, or start free on the Marketplace."
+>
+  <section class="mx-auto max-w-7xl px-6 py-14">
+    <div class="space-y-6">
+      {useCases.map((uc, i) => (
+        <article class="p-8 rounded-2xl bg-white border border-black/5 shadow-sm hover:shadow-md transition">
+          <div class="flex gap-5 items-start">
+            <IconBadge name={uc.icon} color={uc.iconColor} size="md" />
+            <div class="flex-1">
+              <div class="text-xs font-bold text-slate-500 tracking-[0.15em] uppercase">Use Case {String(i + 1).padStart(2, '0')}</div>
+              <h2 class="text-xl md:text-2xl font-bold text-[var(--color-text)] mt-1 leading-tight tracking-tight">{uc.title}</h2>
+              <p class="mt-4 text-[16px] text-slate-700 leading-relaxed"><span class="font-semibold text-[var(--color-accent)]">Risk:</span> {uc.risk}</p>
+              <ul class="mt-4 space-y-2">
+                {uc.solutions.map(s => (
+                  <li class="flex gap-3 text-[15px] text-slate-800 leading-relaxed">
+                    <span class="text-[var(--color-brand)] font-bold shrink-0">▸</span>
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-6 py-12 text-center">
+    <SectionHeader
+      title="Ready to explore InstaWorkforce?"
+      subtitle="Each use case above is a live capability. Book a demo or try it directly on AWS Marketplace."
+    />
+  </section>
+</UseCaseLayout>

@@ -1,0 +1,49 @@
+---
+import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import Video from '@/components/ui/Video.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import { SHARED_PROBLEM, SHARED_SOLUTION, SHARED_WHY_MATTERS } from '@/data/workforce-landing-shared';
+---
+<UseCaseLayout
+  title="Own Your Next User Access Audit | InstaSecure"
+  description="Generate least-privilege proof, automate access reviews, and walk into SOC 2, ISO 27001, and HIPAA audits with evidence ready — not scrambling."
+  eyebrow="Own Your Next Audit"
+  heroTitle="Walk Into Your Next User Access Audit With Proof"
+  heroDescription="Generate least-privilege evidence and automate access reviews. Go into SOC 2, ISO 27001, HIPAA, and internal audits with the report already written."
+>
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <Video id="D3pmyxFWmC4" />
+  </section>
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-4xl px-6 py-20">
+      <SectionHeader eyebrow={SHARED_PROBLEM.eyebrow} title={SHARED_PROBLEM.title} subtitle={SHARED_PROBLEM.description} />
+      <ul class="max-w-2xl mx-auto mt-10 space-y-3">
+        {SHARED_PROBLEM.points.map(p => (
+          <li class="flex gap-3 items-start p-5 bg-white rounded-xl border border-black/5">
+            <span class="text-[var(--color-accent)] text-xl font-bold leading-none shrink-0">⚠</span>
+            <span class="text-[16px] text-slate-800 leading-relaxed">{p}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+
+  <FeatureGrid
+    eyebrow="The Solution"
+    title="Three capabilities that make audits boring"
+    subtitle="Baseline posture, investigate access, right-size permissions — and print the evidence."
+    features={SHARED_SOLUTION}
+    columns={3}
+  />
+
+  <div class="bg-slate-50">
+    <FeatureGrid
+      eyebrow="Why It Matters"
+      title="The outcomes auditors actually check for"
+      features={SHARED_WHY_MATTERS}
+      columns={2}
+    />
+  </div>
+</UseCaseLayout>

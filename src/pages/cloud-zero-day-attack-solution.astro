@@ -1,0 +1,73 @@
+---
+import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+
+import zeroDayChart from '@/assets/use-cases/zero-day-cost-chart.png';
+import zeroDayDiagram from '@/assets/use-cases/zero-day-diagram.png';
+
+const speedStats = [
+  { value: '12 hrs', label: 'Attacker time-to-exploit', description: 'Attackers discover and weaponize vulnerabilities in 12 hours or less (Palo Alto Networks)' },
+  { value: '4+ days', label: 'Defender response time', description: '60% of organizations resolve security alerts in 4 or more days — an eternity compared to attackers' },
+  { value: '$4.45M', label: 'Average cost of zero-day breach', description: '11% of all breaches involve zero-day exploits, with the highest average cost per incident' },
+];
+
+const protectionPoints = [
+  { icon: 'lucide:shield-check', iconColor: 'brand' as const, title: 'Isolation from public exposure', description: 'Preventive Cloud Controls ensure internet-exposed surfaces are minimized by default. Zero-day exploits need an exposed target — we remove the target.' },
+  { icon: 'lucide:unlock', iconColor: 'accent' as const, title: 'Isolation from multi-tenancy', description: 'Cross-account and cross-tenant access paths are closed at the organization level. A zero-day in another tenant cannot traverse.' },
+  { icon: 'lucide:scan-eye', iconColor: 'brand' as const, title: 'Reduced attack surface', description: 'Not just zero-days — the entire count of internet-exposed vulnerabilities drops dramatically when trust boundaries are enforced at the control plane.' },
+];
+---
+<UseCaseLayout
+  title="Defend Against Cloud Zero-Day Attacks | InstaSecure"
+  description="Zero-day attackers exploit vulnerabilities 12x faster than teams can patch. InstaSecure's Preventive Cloud Controls close the window by enforcing trust boundaries before the exploit lands — even on unknown vulnerabilities."
+  eyebrow="Solution · Cloud Zero-Day"
+  heroTitle="The Growing Threat of Zero-Day Attacks"
+  heroDescription="Zero-day breaches are one of the most formidable attack vectors facing cloud environments. They exploit unknown vulnerabilities in software and misconfigurations — breaching systems before developers can create patches."
+>
+  <section class="mx-auto max-w-7xl px-6 py-20">
+    <SectionHeader
+      eyebrow="The Problem"
+      title="Attackers are moving faster than ever"
+      subtitle="The most alarming aspect of zero-day attacks is their surprising speed — current defense solutions are too slow to act before the exploit lands."
+    />
+    <div class="grid md:grid-cols-3 gap-8 mt-14">
+      {speedStats.map(s => (
+        <div class="p-8 rounded-2xl border border-black/5 bg-white text-center">
+          <div class="text-5xl font-bold text-[var(--color-accent)] leading-none tracking-tight">{s.value}</div>
+          <div class="mt-3 font-bold text-lg text-[var(--color-text)]">{s.label}</div>
+          <p class="mt-3 text-[15px] text-slate-700 leading-relaxed">{s.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-5xl px-6 py-20">
+      <SectionHeader
+        eyebrow="The Cost"
+        title="Zero-day breaches are expensive"
+        subtitle="Unknown, zero-day vulnerabilities account for 11% of breaches at the highest average cost per incident — roughly 7% more costly than known-unpatched issues."
+      />
+      <img src={zeroDayChart.src} alt="Bar chart: known unpatched vulnerability costs $4.17M (6% of breaches); unknown zero-day vulnerability costs $4.45M (11% of breaches)." class="mt-12 w-full max-w-3xl mx-auto" />
+    </section>
+  </div>
+
+  <section class="mx-auto max-w-5xl px-6 py-20">
+    <SectionHeader
+      eyebrow="The Solution"
+      title="Prevent the attack, despite unknown vulnerabilities"
+      subtitle="InstaSecure's Preventive Cloud Controls work on any attack path — not just the ones we know about. By enforcing trust boundaries at the control plane, even unknown vulnerabilities have nowhere to pivot to."
+    />
+    <img src={zeroDayDiagram.src} alt="Multi-layer cloud security diagram: accounts isolated from the internet, with protect measures blocking attackers from reaching cloud workloads." class="mt-12 w-full max-w-4xl mx-auto" />
+  </section>
+
+  <div class="bg-slate-50">
+    <FeatureGrid
+      eyebrow="Three Preventive Layers"
+      title="Only trusted identities access trusted resources from expected networks"
+      features={protectionPoints}
+      columns={3}
+    />
+  </div>
+</UseCaseLayout>

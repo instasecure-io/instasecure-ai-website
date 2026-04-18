@@ -1,0 +1,76 @@
+---
+import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import IconBadge from '@/components/ui/IconBadge.astro';
+
+const whatDoesntWork = [
+  'Least Privilege & Zero-Trust Microsegmentation only narrows the scope of access — they reduce blast radius but do not remove the attacker with valid stolen credentials',
+  'One-off fixes to misconfigurations and known vulnerabilities are labor-intensive, reactive, and never-ending',
+  'These approaches cover less than 5% of attack surface and carry authorization longer than needed',
+];
+
+const pillars = [
+  { icon: 'lucide:user-check', iconColor: 'brand' as const, title: 'Trusted Identities', description: 'Only identities your organization recognizes — active, owned, assigned. Orphaned IAM users and expired service roles do not qualify.' },
+  { icon: 'lucide:database', iconColor: 'accent' as const, title: 'Trusted Resources', description: 'Privileged actions can only target approved AWS resources. S3 buckets outside your organization, unknown KMS keys, or arbitrary external services are blocked.' },
+  { icon: 'lucide:globe', iconColor: 'brand' as const, title: 'Expected Networks', description: 'Access must come from networks your organization has blessed — corporate VPCs, Identity Center endpoints, known CI/CD runners.' },
+];
+
+const features = [
+  { icon: 'lucide:key-round', iconColor: 'brand' as const, title: 'Credential Theft Protection', description: 'Stolen credentials used from rogue networks or against unapproved resources are denied at the control plane — regardless of valid authentication.' },
+  { icon: 'lucide:shield-alert', iconColor: 'accent' as const, title: 'Zero-Day Defense', description: 'Unknown vulnerabilities have nowhere to pivot. The perimeter works on any attack, not just known CVEs.' },
+  { icon: 'lucide:zap', iconColor: 'brand' as const, title: 'Reactive → Proactive', description: 'Shift from chasing findings to enforcing boundaries. Alerts stop recurring once a perimeter class is enforced.' },
+  { icon: 'lucide:gauge', iconColor: 'accent' as const, title: 'Release Velocity', description: 'Replace dev-blocking security gates with organization-level guardrails. Developers ship; the perimeter holds.' },
+  { icon: 'lucide:eye-off', iconColor: 'brand' as const, title: 'Defense Against the Unknown', description: 'Attacks you have not seen yet — lateral movement, novel privilege escalation — are all stopped by the same three boundary rules.' },
+];
+---
+<UseCaseLayout
+  title="Build an AWS Data Perimeter | InstaSecure"
+  description="InstaSecure's Data Perimeter ensures only trusted identities access trusted resources from expected networks — a closed perimeter that blocks credential theft and zero-day exploits even with valid keys."
+  eyebrow="Solution · AWS Data Perimeter"
+  heroTitle="The InstaSecure Data Perimeter"
+  heroDescription="Ensure only trusted parties have access to what they need — and prevent all other access. The closed perimeter approach that blocks stolen credentials and zero-day exploits, even when attackers have valid keys."
+>
+  <section class="mx-auto max-w-5xl px-6 py-20">
+    <SectionHeader
+      eyebrow="The Problem"
+      title="What does NOT work against credential theft and zero-day attacks?"
+    />
+    <ul class="max-w-3xl mx-auto mt-10 space-y-3">
+      {whatDoesntWork.map(t => (
+        <li class="flex gap-4 items-start p-5 bg-white rounded-xl border border-black/5">
+          <IconBadge name="lucide:x" color="accent" size="sm" />
+          <span class="text-[16px] text-slate-800 leading-relaxed">{t}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <div class="bg-[var(--color-text)] text-white">
+    <section class="mx-auto max-w-5xl px-6 py-20 text-center">
+      <div class="text-sm uppercase tracking-[0.15em] font-semibold text-white/90 mb-6">The Scale of the Problem</div>
+      <div class="text-6xl md:text-8xl font-bold text-[var(--color-accent)] leading-none tracking-tight">60%</div>
+      <p class="mt-6 text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed">
+        of cloud IAM breaches involve credential issues.
+      </p>
+      <p class="mt-3 text-sm text-white/70">Based on Q1 2023 observations by Google Cloud IR teams.</p>
+    </section>
+  </div>
+
+  <FeatureGrid
+    eyebrow="The Solution"
+    title="Three Pillars of the Data Perimeter"
+    subtitle="Only trusted identities are accessing trusted resources from expected networks. Each pillar is enforced independently — and together they close the perimeter."
+    features={pillars}
+    columns={3}
+  />
+
+  <div class="bg-slate-50">
+    <FeatureGrid
+      eyebrow="What It Solves"
+      title="The outcomes the Data Perimeter delivers"
+      features={features}
+      columns={3}
+    />
+  </div>
+</UseCaseLayout>

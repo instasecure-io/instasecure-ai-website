@@ -1,0 +1,49 @@
+---
+import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import Video from '@/components/ui/Video.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import { SHARED_PROBLEM, SHARED_SOLUTION, SHARED_WHY_MATTERS } from '@/data/workforce-landing-shared';
+---
+<UseCaseLayout
+  title="Close Compliance Gaps, Instantly | InstaSecure"
+  description="Baseline your workforce IAM posture, investigate access, and right-size permissions — proving compliance and reducing cloud spend without the complexity."
+  eyebrow="Prove Compliance, Instantly"
+  heroTitle="Close the Compliance Gap — Without Slowing Down"
+  heroDescription="Use InstaSecure to drive security and compliance while reducing cloud spend. Audit, investigate, and optimize cloud access — without the complexity of manual reviews."
+>
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <Video id="D3pmyxFWmC4" />
+  </section>
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-4xl px-6 py-20">
+      <SectionHeader eyebrow={SHARED_PROBLEM.eyebrow} title={SHARED_PROBLEM.title} subtitle={SHARED_PROBLEM.description} />
+      <ul class="max-w-2xl mx-auto mt-10 space-y-3">
+        {SHARED_PROBLEM.points.map(p => (
+          <li class="flex gap-3 items-start p-5 bg-white rounded-xl border border-black/5">
+            <span class="text-[var(--color-accent)] text-xl font-bold leading-none shrink-0">⚠</span>
+            <span class="text-[16px] text-slate-800 leading-relaxed">{p}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+
+  <FeatureGrid
+    eyebrow="The Solution"
+    title="Three capabilities, one closed loop"
+    subtitle="Assess. Investigate. Optimize. All under one workflow that integrates with your existing AWS environment."
+    features={SHARED_SOLUTION}
+    columns={3}
+  />
+
+  <div class="bg-slate-50">
+    <FeatureGrid
+      eyebrow="Why It Matters"
+      title="The outcomes cloud security teams care about"
+      features={SHARED_WHY_MATTERS}
+      columns={2}
+    />
+  </div>
+</UseCaseLayout>

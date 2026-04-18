@@ -1,0 +1,53 @@
+---
+import { YouTube } from 'astro-embed';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { VIDEOS } from '@/data/videos';
+
+interface Props {
+  id: string;
+  poster?: 'default' | 'hqdefault' | 'mqdefault';
+}
+const { id, poster = 'default' } = Astro.props;
+const meta = VIDEOS[id];
+if (!meta) throw new Error(`VideoMeta missing for YouTube id: ${id}. Add it to src/data/videos.ts.`);
+
+const transcriptPath = path.resolve(process.cwd(), `src/data/transcripts/${id}.txt`);
+let transcript: string | null = null;
+try {
+  transcript = await fs.readFile(transcriptPath, 'utf8');
+} catch {
+  transcript = null;
+}
+
+const thumbnailMap = {
+  default: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`,
+  hqdefault: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+  mqdefault: `https://i.ytimg.com/vi/${id}/mqdefault.jpg`,
+};
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: meta.title,
+  description: meta.description,
+  thumbnailUrl: thumbnailMap[poster],
+  uploadDate: meta.uploadDate,
+  duration: meta.duration,
+  embedUrl: `https://www.youtube-nocookie.com/embed/${id}`,
+  contentUrl: `https://www.youtube.com/watch?v=${id}`,
+};
+---
+<figure class="my-8 max-w-4xl mx-auto">
+  <div class="rounded-2xl overflow-hidden shadow-lg bg-black">
+    <YouTube id={id} params="privacy=1" title={meta.title} />
+  </div>
+  {transcript && (
+    <details class="mt-5 bg-slate-50 rounded-xl p-5 border border-black/5">
+      <summary class="cursor-pointer font-semibold text-[var(--color-text)] hover:text-[var(--color-brand)]">
+        Show transcript
+      </summary>
+      <div class="mt-4 whitespace-pre-wrap text-[15px] text-slate-700 leading-relaxed max-h-96 overflow-y-auto">{transcript}</div>
+    </details>
+  )}
+</figure>
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

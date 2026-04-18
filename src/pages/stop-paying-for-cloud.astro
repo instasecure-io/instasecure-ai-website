@@ -1,0 +1,49 @@
+---
+import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import Video from '@/components/ui/Video.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import { SHARED_PROBLEM, SHARED_SOLUTION, SHARED_WHY_MATTERS } from '@/data/workforce-landing-shared';
+---
+<UseCaseLayout
+  title="Stop Paying for Cloud You Don't Use | InstaSecure"
+  description="Right-size access and eliminate unapproved or over-provisioned cloud resources — reducing both risk and cloud spend without breaking what your team needs to get work done."
+  eyebrow="Right-Size Your Cloud"
+  heroTitle="Stop Paying for Cloud Access You Don't Use"
+  heroDescription="Shadow IT, over-provisioned IAM, and unused services quietly inflate your AWS bill. InstaSecure surfaces them, helps you right-size, and turns the savings back into budget for security."
+>
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <Video id="D3pmyxFWmC4" />
+  </section>
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-4xl px-6 py-20">
+      <SectionHeader eyebrow={SHARED_PROBLEM.eyebrow} title={SHARED_PROBLEM.title} subtitle={SHARED_PROBLEM.description} />
+      <ul class="max-w-2xl mx-auto mt-10 space-y-3">
+        {SHARED_PROBLEM.points.map(p => (
+          <li class="flex gap-3 items-start p-5 bg-white rounded-xl border border-black/5">
+            <span class="text-[var(--color-accent)] text-xl font-bold leading-none shrink-0">⚠</span>
+            <span class="text-[16px] text-slate-800 leading-relaxed">{p}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+
+  <FeatureGrid
+    eyebrow="The Solution"
+    title="Audit, investigate, optimize"
+    subtitle="The same workflow that reduces IAM risk also surfaces the cloud you're paying for but not using."
+    features={SHARED_SOLUTION}
+    columns={3}
+  />
+
+  <div class="bg-slate-50">
+    <FeatureGrid
+      eyebrow="Why It Matters"
+      title="The outcomes that make finance and security both happy"
+      features={SHARED_WHY_MATTERS}
+      columns={2}
+    />
+  </div>
+</UseCaseLayout>
