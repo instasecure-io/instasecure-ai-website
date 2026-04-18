@@ -1,11 +1,12 @@
 ---
 import { FOOTER_SECTIONS, SOCIAL } from '@/data/footer';
+import logo from '@/assets/brand/logo.png';
 ---
 <footer class="bg-slate-50 border-t border-black/5 mt-24">
   <div class="mx-auto max-w-7xl px-6 py-12 grid md:grid-cols-4 gap-8">
     <div>
-      <div class="font-bold text-lg">InstaSecure</div>
-      <p class="text-sm text-slate-600 mt-2">Preventive cloud security for AWS.</p>
+      <img src={logo.src} alt="InstaSecure" class="h-9 w-auto" width={logo.width} height={logo.height} />
+      <p class="text-sm text-slate-600 mt-3 leading-relaxed">Preventive cloud security for AWS.</p>
     </div>
     {FOOTER_SECTIONS.map(section => (
       <div>

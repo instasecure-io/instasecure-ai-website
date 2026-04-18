@@ -1,9 +1,12 @@
 ---
 import { PRIMARY_NAV, CTA_NAV } from '@/data/nav';
+import logo from '@/assets/brand/logo.png';
 ---
 <header class="border-b border-black/5 sticky top-0 bg-white/90 backdrop-blur z-50">
   <nav class="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
-    <a href="/" class="font-bold text-xl">InstaSecure</a>
+    <a href="/" class="flex items-center shrink-0" aria-label="InstaSecure home">
+      <img src={logo.src} alt="InstaSecure" class="h-9 md:h-10 w-auto" width={logo.width} height={logo.height} />
+    </a>
     <ul class="hidden md:flex gap-8 items-center">
       {PRIMARY_NAV.map(item => (
         <li class="relative group">
