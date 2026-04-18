@@ -1,0 +1,123 @@
+ 
+Hi, welcome to Instas Secure's product
+demo. Instas Secure is a proactive cloud
+security platform. We have built cloud
+configuration hardening and remediation
+as a solution. We provide 50 plus AWS
+native primitive guardrails for securing
+AI, data, identity and cloud
+infrastructure. Today as part of this
+demo we are going to focus on Insta
+workforce our solution in solving human
+workforce access to AWS cloud. As part
+of our solution, what we have done is
+unified the access understanding between
+your IDP octa active directory
+and AWS identity center and cloud
+accounts and resources and the
+permission that's connects all of these
+assets together which is built through
+our access authorization graph. Let's
+look into the product directly to
+understand how all these things come
+together.
+Inside the product, first thing you will
+see is the dashboard. Dashboard is a
+place to understand the security posture
+of the entire access. Here you will see
+all the principles, accounts and
+permission sets, all the permission
+configured inside the identity center.
+They are dormant inactive active
+situation for understanding the hygiene
+governance. It also breaks down the
+access in regards to various type of
+risks for both your users groups in your
+IDP accounts and permission sets inside
+the AWS environment. You understand your
+security posture. Then you can
+investigate
+deeper for those access inside our
+inventory tab. Here you'll clearly see
+access for every principle. What type of
+cloud account they have access to? What
+type of permissions you can filter or
+sort in terms of risk score that we use
+fair risk score calculation to calculate
+this risk their activity and their
+permission usage and risk within those
+permissions and the perimeter risk
+associated with every access in the
+environment. Not only it provides you
+this detailed view of every access, you
+can also utilize pre-built filters that
+surfaces lot of risks that we have. We
+provide it as part of this curated list.
+Not only that you can drill down further
+issues by using filter based on your use
+cases around what type of assets a
+particular user has access to what kind
+of access permission they're using
+inside of AWS to access those things how
+much or what kind of access they have
+like read write those access whether in
+terms of risks what kind of risks exist
+with those type of access like network
+protection account boundary when was the
+past activity whether they have certain
+type of sensitive permissions. So this
+is more drill downing of your risk
+within your larger like one of the
+customers that we help is they have like
+5,000 users access to their AWS
+environment. It helps them surface the
+risk very quickly in terms of those risk
+score and all these filters to hone down
+the next set of uh users or groups that
+they want to go and optimize the access
+for. Next once we understand the risk we
+provide ability to take action on those
+access for different type of use cases.
+You can suspend unused service sensory
+permission different type of use cases
+where you will use this controls to
+quickly take action on a particular type
+of access for long-term governance of
+access. We have built permission
+optimizer to understand the permission
+and optimize the access. We'll go to the
+permission sets. Here it clearly
+identifies every type of per access
+that's configured inside the AWS
+identity center. Which IDP users and
+groups have those permissions assigned?
+What how many cloud accounts that
+particular permission allows access to
+their activity? And then you can look
+into optimizing the access for users
+groups within those environment. choose
+different type of algorithms to reduce
+the risk either on account or
+environment type production of staging.
+It automatically takes all this
+information and then generates the list
+privilege policy based on those
+constraints and it lets you deploy the
+access for individual users groups and
+also helps with roll back and policy
+verification of those access. This was a
+quick summary of the capabilities
+provided by
+Instas secure workforce access solution.
+I'm happy to deep dive for every use
+case around separation of duty violation
+in terms of your hygiene governance of
+access compliance requirements uh access
+reviews and right sizing of the access.
+Uh we are available on AWS uh
+marketplace and we have 30-day free
+trial for trying and seeing the value
+that you can derive in your environment.
+Uh thank you for listening uh to me and
+I'm looking forward to uh having a
+conversation. Thank you so much.

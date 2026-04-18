@@ -1,0 +1,165 @@
+ 
+Hi, I'm Rupesh Musha. Today we will see
+Insta Secure, a proactive cloud security
+platform. Insta Secure provides 50 plus
+AWS native preventive guardrails for AI,
+data, identity, and cloud infrastructure
+to prevent misconfigurations
+and access issues across the entire AWS
+platform. Today we'll be focused on
+building an air gapping environment
+called data parameters that will tackle
+the issue of credential theft. More than
+60% of cloud breaches are attributed to
+credential issues. Credentials on the
+cloud are present everywhere in your
+software packages, network shares,
+GitHub repos,
+uh access from your cloud
+infrastructure, your AI genetic
+framework, anything that is deployed on
+the cloud or is accessing the cloud is
+via some of these credentials and the
+source of credentials could be related
+to some sort of human access or your
+workforce access whether directly
+through IM configurations federated uh
+access or through long-term session
+keys, credentials, access keys or there
+are like lot of various formats for
+providing third party web identity and
+other sort of access. As you quickly
+realized cloud is complex and
+understanding the security posture of
+this credentials usage is very
+difficult. Let's see how do we tackle
+this issue of credential theft and
+building some preventive protection
+inside the cloud. To demo the problem,
+let's just assume there's a company
+called ECM which has deployed an
+application inside a VPC which has an
+cloud credential an IM role associated
+with it and accessing an S3 bucket with
+data in the same cloud account. In this
+case, we got a trusted identity
+accessing a trusted resource through an
+expected or trusted network. This access
+should be allowed. The problem happens
+when this trusted identity
+gets stolen and then used by the
+attacker from somewhere random location
+to access cloud infrastructure. In this
+case, sensitive data stored in that S3
+bucket. This is a very common pattern of
+credential abuse in the cloud. A very
+well-known case regarding this issue was
+a Capital One breach of 2019.
+Capital One built a solution around it
+called data parimeter as we discussed.
+They have spoken about it at various
+cloud conferences. Uh let's dive a
+little bit deeper and see how we can
+recognize this problem and solve it.
+This problem is not just for the
+application. In this case, I'm just
+trying to show how your workforce access
+is also impacted by this credential
+portability issue. In this case, the
+workforce users get authenticated
+through an octa and the authenticated
+access then can go through an
+authorization check from your AWS and
+the access is granted. But what happens
+when that authenticated sess uh session
+gets stolen and the access again gets
+launched from an internet location the
+access number five that should be
+blocked but it just goes through because
+post authentication that it's a valid
+session token let's look into insta
+secure and how we solve it in this case
+the demo starts with two terminals an
+application terminal there's an EC2
+instance running inside of of the AWS
+and the attacker ter we have named it as
+Paige Thompson the attacker behind the
+capital one breach in this case the
+attacker is able to exfiltrate the
+session token associated with that IM
+role on that EC2 instance
+and then copy it to uh their own
+personal terminal running on the
+internet and as you see now they have
+copied over the credentials now let's
+see what happens once Once the
+credentials are copied over in this case
+the will show the access from that EC2
+and then uh access from that attacker
+terminal. In this case you can clearly
+see the access from that EC2 instance is
+able to list all the S3 buckets in that
+cloud account. Now from the attacker
+terminal the same credentials which were
+copied now enables the access to the
+same S3 buckets. Essentially proving out
+the credentials are portable and once
+the credentials are in the hand of the
+attackers there is nothing stopping them
+from the access. Let's see how do we
+tackle it inside the insta secure. In
+insta secure I've copied this uh
+snapshot of this dashboard where we
+identify all the credentials which are
+at risk of this particular problem. In
+this case we have 17 IM users, 17 IM
+roles or instance profiles and two third
+party principles which are at risk of
+being abused by credential portability
+issue. Here the dashboard identifies the
+problem and suggests a remediation
+control. In this case the service
+control policy is to create a network
+parameter. In this case let's see once
+we click the network parameter what
+happens here. When you click the network
+parameter it takes to the actual control
+in the library of the controls that we
+maintain
+here. It's recommending to implement
+this trusted network access for cloud
+credentials and the control clearly
+identifies what's the objective say uh
+to limit the network access what
+frameworks applies what is the behavior
+this control is a preventive control
+will be implemented through a service
+control policy on AWS which can impact
+the IM roles and users defined inside
+and as you see it also tells highle goal
+around what these credentials are used
+for like a data parameter, credential
+theft, digital sovereignity. So we come
+here, we'll click the control and it
+takes us through a process of create the
+control. When you start to end, it takes
+no more than 5 minutes to go go end to
+end. And once the control is created and
+deployed to the cloud, let's see what
+happens
+in this case. Again
+we access the same S3 storage in that
+cloud account and everything is
+accessible. And now again page option
+she's trying to access from her personal
+terminal and as you realized the access
+is denied
+and this is what essentially a data
+parameter enforces.
+Trusted identity can only access trusted
+resource only from expected network.
+Again this is with this I finished this
+demo. We are available on AWS
+marketplace and if you would like to see
+actual control creation or more demos
+please reach out to us. Thank you.

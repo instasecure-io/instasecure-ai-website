@@ -1,10 +1,12 @@
-# Media inventory (captured 2026-04-17)
+# Media inventory (captured 2026-04-17; updated 2026-04-17 with corrected IDs)
 
 All 28 URLs returned HTTP 200. Root (`/`) redirects `instasecure.ai` → `www.instasecure.ai` (301) then serves the homepage — content is identical to `/main`.
 
 ## YouTube embeds
 
-Video IDs `Rm7i7jxfWvY` and `zNwS3NZvGcY` returned "Not Found" from the YouTube oEmbed API, indicating they are private or unlisted videos. Titles for `D3pmyxFWmC4` and `ujfjOpjG_zU` were confirmed via oEmbed.
+**Note on stale embed IDs:** The live Squarespace site still references `Rm7i7jxfWvY` and `zNwS3NZvGcY` in iframe `src` attributes. These IDs point to videos that were **deleted** when the owner moved the videos to a different YouTube channel. The correct, live IDs are `ujfjOpjG_zU` (replacing `Rm7i7jxfWvY`) and `D3pmyxFWmC4` (replacing `zNwS3NZvGcY`). The Astro rebuild uses the corrected IDs; transcripts for both were fetched via yt-dlp (`src/data/transcripts/ujfjOpjG_zU.txt`, `src/data/transcripts/D3pmyxFWmC4.txt`).
+
+There are only **2 unique live videos** across the entire site.
 
 | Page | Video ID | Title / context | Needs transcript? |
 |---|---|---|---|
@@ -21,14 +23,14 @@ Video IDs `Rm7i7jxfWvY` and `zNwS3NZvGcY` returned "Not Found" from the YouTube 
 | /instaworkforce | none | — | — |
 | /instaaccess-use-cases | none | — | — |
 | /instaworkforce-use-cases | none | — | — |
-| /credential-compromise | Rm7i7jxfWvY | "The Credential Compromise Problem" (page h1; oEmbed: private/unlisted video) | yes |
+| /credential-compromise | ~~Rm7i7jxfWvY~~ → **ujfjOpjG_zU** (corrected) | "Proactive Cloud Security: Tackling Credential Theft with InstaSecure" | ✅ transcript fetched |
 | /cloud-zero-day-attack-solution | none | — | — |
 | /data-perimeter-on-aws | none | — | — |
-| /close-compliance-gap | zNwS3NZvGcY | Landing page — compliance gap; oEmbed: private/unlisted video | yes |
-| /fix-risks-before-pentest | zNwS3NZvGcY | Same embed as /close-compliance-gap | yes |
-| /who-really-has-access | zNwS3NZvGcY | Same embed as /close-compliance-gap | yes |
-| /stop-paying-for-cloud | zNwS3NZvGcY | Same embed as /close-compliance-gap | yes |
-| /walk-into-your-next-user-access-audit | zNwS3NZvGcY | Same embed as /close-compliance-gap | yes |
+| /close-compliance-gap | ~~zNwS3NZvGcY~~ → **D3pmyxFWmC4** (corrected) | "InstaSecure Enhancing AWS Cloud Security with InstaWorkforce" | ✅ transcript fetched |
+| /fix-risks-before-pentest | ~~zNwS3NZvGcY~~ → **D3pmyxFWmC4** (corrected) | same as /close-compliance-gap | ✅ |
+| /who-really-has-access | ~~zNwS3NZvGcY~~ → **D3pmyxFWmC4** (corrected) | same | ✅ |
+| /stop-paying-for-cloud | ~~zNwS3NZvGcY~~ → **D3pmyxFWmC4** (corrected) | same | ✅ |
+| /walk-into-your-next-user-access-audit | ~~zNwS3NZvGcY~~ → **D3pmyxFWmC4** (corrected) | same | ✅ |
 | /blog | none | — | — |
 | /blog/a-new-era-of-preventive-cloud-security-with-aws | none | — | — |
 | /blog/instaworkforce-in-action-workforce-security-use-cases-and-demo-for-aws | D3pmyxFWmC4 | "InstaSecure Enhancing AWS Cloud Security with InstaWorkforce" (oEmbed confirmed) | yes |
@@ -37,11 +39,17 @@ Video IDs `Rm7i7jxfWvY` and `zNwS3NZvGcY` returned "Not Found" from the YouTube 
 | /blog/preventive-human-access | none | — | — |
 | /blog/instaworkforce | none | — | — |
 
-**Unique video IDs: 4**
-- `Rm7i7jxfWvY` — credential-compromise (private/unlisted)
-- `zNwS3NZvGcY` — 5 landing pages: close-compliance-gap, fix-risks-before-pentest, who-really-has-access, stop-paying-for-cloud, walk-into-your-next-user-access-audit (private/unlisted)
-- `D3pmyxFWmC4` — blog/instaworkforce-in-action (public)
-- `ujfjOpjG_zU` — blog/proactive-cloud-security (public)
+**Unique live video IDs: 2** (down from the 4 stale IDs in the Squarespace HTML)
+
+- **`ujfjOpjG_zU`** — "Proactive Cloud Security: Tackling Credential Theft with InstaSecure"
+  - Used on 2 pages: `/credential-compromise`, `/blog/proactive-cloud-security-...`
+  - Transcript: `src/data/transcripts/ujfjOpjG_zU.txt` (6.0 KB)
+
+- **`D3pmyxFWmC4`** — "InstaSecure Enhancing AWS Cloud Security with InstaWorkforce"
+  - Used on 6 pages: 5 landing pages (`/close-compliance-gap`, `/fix-risks-before-pentest`, `/who-really-has-access`, `/stop-paying-for-cloud`, `/walk-into-your-next-user-access-audit`) + `/blog/instaworkforce-in-action-...`
+  - Transcript: `src/data/transcripts/D3pmyxFWmC4.txt` (4.5 KB)
+
+Stale IDs `Rm7i7jxfWvY` and `zNwS3NZvGcY` still appear in the live Squarespace HTML but reference deleted videos (broken on the live site today). The Astro rebuild uses only the 2 live IDs above.
 
 ## External images / CDN references
 
