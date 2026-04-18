@@ -3,10 +3,40 @@ import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
 import IconBadge from '@/components/ui/IconBadge.astro';
 import SectionHeader from '@/components/sections/SectionHeader.astro';
 
-const useCases = [
+type Category = 'defend' | 'blast-radius' | 'govern';
+
+interface UseCase {
+  category: Category;
+  icon: string;
+  iconColor: 'brand' | 'accent';
+  title: string;
+  risk: string;
+  solutions: string[];
+}
+
+const CATEGORIES: Record<Category, { eyebrow: string; title: string; subtitle: string }> = {
+  defend: {
+    eyebrow: 'Defend Against Attacks',
+    title: 'Stop active cloud threats',
+    subtitle: 'Block data exfiltration, credential compromise, privilege escalation, and lateral movement — with preventive controls that work at the organizational plane.',
+  },
+  'blast-radius': {
+    eyebrow: 'Reduce Blast Radius',
+    title: 'Contain compromise and shrink attack surface',
+    subtitle: 'Make sure a compromised workload can only access what it genuinely needs — and surface unused wildcards for safe right-sizing.',
+  },
+  govern: {
+    eyebrow: 'Govern & Comply',
+    title: 'Evidence-ready IAM governance',
+    subtitle: 'Keep machine identities clean, ownership clear, and compliance frameworks mapped — with audit trails generated automatically.',
+  },
+};
+
+const useCases: UseCase[] = [
   {
+    category: 'defend',
     icon: 'lucide:download',
-    iconColor: 'accent' as const,
+    iconColor: 'accent',
     title: 'Data Exfiltration via Machine Roles',
     risk: 'Lambda functions, EC2 roles, or pipelines with excessive access to S3 or KMS can be exploited to exfiltrate sensitive data.',
     solutions: [
@@ -16,8 +46,9 @@ const useCases = [
     ],
   },
   {
+    category: 'defend',
     icon: 'lucide:git-branch',
-    iconColor: 'brand' as const,
+    iconColor: 'brand',
     title: 'Lateral Movement Across Environments',
     risk: 'Workloads with cross-account trust can be used to move laterally from dev to prod — or from a compromised environment to a production one.',
     solutions: [
@@ -27,41 +58,9 @@ const useCases = [
     ],
   },
   {
-    icon: 'lucide:activity',
-    iconColor: 'accent' as const,
-    title: 'Unauthorized API Activity via Service Roles',
-    risk: 'Machine roles with broad access to AWS services may be abused to manipulate infrastructure — spin up resources, delete logs, modify config.',
-    solutions: [
-      'Analyze API call patterns per role via CloudTrail',
-      'Flag over-provisioned roles where granted ≫ used permissions',
-      'Right-size access to observed usage',
-    ],
-  },
-  {
-    icon: 'lucide:split',
-    iconColor: 'brand' as const,
-    title: 'Segregation of Duties in Automation Pipelines',
-    risk: 'A single machine identity with build, deploy, and modify permissions violates separation of duties and creates a dangerous single point of compromise.',
-    solutions: [
-      'Detect conflicting permission combinations in one identity',
-      'Recommend role decomposition into narrower functions',
-      'Enforce pipeline isolation using accounts and SCPs',
-    ],
-  },
-  {
-    icon: 'lucide:file-check',
-    iconColor: 'accent' as const,
-    title: 'Compliance-Ready Controls for Non-Human Access',
-    risk: 'Regulatory frameworks (SOC 2, PCI-DSS, HIPAA) increasingly require machine identity governance — not just human access reviews.',
-    solutions: [
-      'Audit trails for every machine identity and its permissions',
-      'Evidence generation for compliance auditors on demand',
-      'Compliance mapping from each control to the relevant framework clause',
-    ],
-  },
-  {
+    category: 'defend',
     icon: 'lucide:arrow-up-right',
-    iconColor: 'brand' as const,
+    iconColor: 'accent',
     title: 'Privilege Escalation in Workloads',
     risk: 'A compromised or misconfigured machine identity may assume admin roles or grant itself more permissions.',
     solutions: [
@@ -71,8 +70,9 @@ const useCases = [
     ],
   },
   {
+    category: 'defend',
     icon: 'lucide:key',
-    iconColor: 'accent' as const,
+    iconColor: 'brand',
     title: 'Credential Exposure in CI/CD and Runtime',
     risk: 'Hardcoded or long-lived credentials in pipelines or containers can be exploited by attackers who access logs, images, or source.',
     solutions: [
@@ -82,19 +82,21 @@ const useCases = [
     ],
   },
   {
-    icon: 'lucide:sparkles',
-    iconColor: 'brand' as const,
-    title: 'Governance and Policy Hygiene for Machine Access',
-    risk: 'Stale, duplicate, or orphaned roles introduce unnecessary risk and complexity — cluttering your IAM and creating attack paths.',
+    category: 'blast-radius',
+    icon: 'lucide:activity',
+    iconColor: 'accent',
+    title: 'Unauthorized API Activity via Service Roles',
+    risk: 'Machine roles with broad access to AWS services may be abused to manipulate infrastructure — spin up resources, delete logs, modify config.',
     solutions: [
-      'Identify unused roles based on CloudTrail activity',
-      'Track proliferation: how many roles, how many duplicates, where ownership is missing',
-      'Suggest cleanup with safe archival before delete',
+      'Analyze API call patterns per role via CloudTrail',
+      'Flag over-provisioned roles where granted ≫ used permissions',
+      'Right-size access to observed usage',
     ],
   },
   {
+    category: 'blast-radius',
     icon: 'lucide:shield',
-    iconColor: 'accent' as const,
+    iconColor: 'brand',
     title: 'Blast Radius Reduction for Workload Compromise',
     risk: 'A compromised function or container role can access multiple services, regions, or accounts unless its reach is explicitly limited.',
     solutions: [
@@ -104,8 +106,9 @@ const useCases = [
     ],
   },
   {
+    category: 'blast-radius',
     icon: 'lucide:minimize-2',
-    iconColor: 'brand' as const,
+    iconColor: 'accent',
     title: 'Reducing Attack Surface of Non-Human Identities',
     risk: 'Default or legacy roles often carry permissions no longer needed — wildcards from faster-times that never got pruned.',
     solutions: [
@@ -114,7 +117,50 @@ const useCases = [
       'Provide actionable, testable right-sizing recommendations',
     ],
   },
+  {
+    category: 'govern',
+    icon: 'lucide:split',
+    iconColor: 'brand',
+    title: 'Segregation of Duties in Automation Pipelines',
+    risk: 'A single machine identity with build, deploy, and modify permissions violates separation of duties and creates a dangerous single point of compromise.',
+    solutions: [
+      'Detect conflicting permission combinations in one identity',
+      'Recommend role decomposition into narrower functions',
+      'Enforce pipeline isolation using accounts and SCPs',
+    ],
+  },
+  {
+    category: 'govern',
+    icon: 'lucide:file-check',
+    iconColor: 'accent',
+    title: 'Compliance-Ready Controls for Non-Human Access',
+    risk: 'Regulatory frameworks (SOC 2, PCI-DSS, HIPAA) increasingly require machine identity governance — not just human access reviews.',
+    solutions: [
+      'Audit trails for every machine identity and its permissions',
+      'Evidence generation for compliance auditors on demand',
+      'Compliance mapping from each control to the relevant framework clause',
+    ],
+  },
+  {
+    category: 'govern',
+    icon: 'lucide:sparkles',
+    iconColor: 'brand',
+    title: 'Governance and Policy Hygiene for Machine Access',
+    risk: 'Stale, duplicate, or orphaned roles introduce unnecessary risk and complexity — cluttering your IAM and creating attack paths.',
+    solutions: [
+      'Identify unused roles based on CloudTrail activity',
+      'Track proliferation: how many roles, how many duplicates, where ownership is missing',
+      'Suggest cleanup with safe archival before delete',
+    ],
+  },
 ];
+
+const categoryOrder: Category[] = ['defend', 'blast-radius', 'govern'];
+const grouped = categoryOrder.map(c => ({
+  key: c,
+  meta: CATEGORIES[c],
+  cases: useCases.filter(uc => uc.category === c),
+}));
 ---
 <UseCaseLayout
   title="InstaAccess Use Cases | InstaSecure"
@@ -125,30 +171,32 @@ const useCases = [
   closingCtaTitle="Secure your non-human identities"
   closingCtaDescription="Book a demo to see InstaAccess against your AWS environment, or start free on the Marketplace."
 >
-  <section class="mx-auto max-w-7xl px-6 py-14">
-    <div class="space-y-6">
-      {useCases.map((uc, i) => (
-        <article class="p-8 rounded-2xl bg-white border border-black/5 shadow-sm hover:shadow-md transition">
-          <div class="flex gap-5 items-start">
-            <IconBadge name={uc.icon} color={uc.iconColor} size="md" />
-            <div class="flex-1">
-              <div class="text-xs font-bold text-slate-500 tracking-[0.15em] uppercase">Use Case {String(i + 1).padStart(2, '0')}</div>
-              <h2 class="text-xl md:text-2xl font-bold text-[var(--color-text)] mt-1 leading-tight tracking-tight">{uc.title}</h2>
-              <p class="mt-4 text-[16px] text-slate-700 leading-relaxed"><span class="font-semibold text-[var(--color-accent)]">Risk:</span> {uc.risk}</p>
+  {grouped.map((group, gi) => (
+    <div class={gi % 2 === 1 ? 'bg-slate-50' : ''}>
+      <section class="mx-auto max-w-7xl px-6 py-20">
+        <SectionHeader eyebrow={group.meta.eyebrow} title={group.meta.title} subtitle={group.meta.subtitle} />
+        <div class="grid md:grid-cols-2 gap-6 mt-12">
+          {group.cases.map(uc => (
+            <article class="p-7 rounded-2xl bg-white border border-black/5 shadow-sm hover:shadow-md transition flex flex-col">
+              <div class="flex gap-4 items-start">
+                <IconBadge name={uc.icon} color={uc.iconColor} size="md" />
+                <h3 class="font-bold text-[18px] text-[var(--color-text)] leading-tight tracking-tight flex-1 pt-1">{uc.title}</h3>
+              </div>
+              <p class="mt-4 text-[15px] text-slate-700 leading-relaxed"><span class="font-semibold text-[var(--color-accent)]">Risk:</span> {uc.risk}</p>
               <ul class="mt-4 space-y-2">
                 {uc.solutions.map(s => (
-                  <li class="flex gap-3 text-[15px] text-slate-800 leading-relaxed">
+                  <li class="flex gap-2.5 text-[14px] text-slate-800 leading-relaxed">
                     <span class="text-[var(--color-brand)] font-bold shrink-0">▸</span>
                     <span>{s}</span>
                   </li>
                 ))}
               </ul>
-            </div>
-          </div>
-        </article>
-      ))}
+            </article>
+          ))}
+        </div>
+      </section>
     </div>
-  </section>
+  ))}
 
   <section class="mx-auto max-w-3xl px-6 py-12 text-center">
     <SectionHeader
