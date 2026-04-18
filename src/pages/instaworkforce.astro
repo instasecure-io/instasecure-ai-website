@@ -5,6 +5,8 @@ import SectionHeader from '@/components/sections/SectionHeader.astro';
 import FeatureGrid from '@/components/sections/FeatureGrid.astro';
 import FeatureRow from '@/components/sections/FeatureRow.astro';
 import CTAStripe from '@/components/sections/CTAStripe.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
 
 import heroImg from '@/assets/instaworkforce/hero.png';
 import howItWorks from '@/assets/instaworkforce/how-it-works.png';
@@ -52,6 +54,24 @@ const challenges = [
   title="InstaWorkforce — Secure Human Access to the Cloud | InstaSecure"
   description="Agentless engine connecting your IdP, AWS Identity Center, and AWS accounts to compute true end-to-end permissions — who can actually access what."
 >
+  <StructuredData slot="head" data={{
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'InstaWorkforce',
+    applicationCategory: 'SecurityApplication',
+    operatingSystem: 'AWS',
+    description: 'Agentless workforce-access engine that connects your IdP, AWS Identity Center, and AWS accounts to compute true end-to-end human permissions.',
+    url: 'https://instasecure.ai/instaworkforce',
+    publisher: { '@type': 'Organization', name: 'InstaSecure', url: 'https://instasecure.ai' },
+    offers: { '@type': 'Offer', availability: 'https://schema.org/InStock', url: 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs' },
+  }} />
+
+  <Breadcrumbs crumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Products' },
+    { label: 'InstaWorkforce' },
+  ]} />
+
   <Hero
     eyebrow="InstaWorkforce"
     title="Who Can Actually Access What?"

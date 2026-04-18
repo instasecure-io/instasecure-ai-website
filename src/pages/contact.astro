@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/sections/Hero.astro';
 import ContactForm from '@/components/forms/ContactForm.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
 
 const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
 ---
@@ -9,6 +10,21 @@ const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
   title="Contact | InstaSecure"
   description="Get in touch with the InstaSecure team. Questions about cloud security, preventive controls, or InstaAccess and InstaWorkforce — we're here to help."
 >
+  <StructuredData slot="head" data={{
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'Contact InstaSecure',
+    url: 'https://instasecure.ai/contact',
+    mainEntityOfPage: {
+      '@type': 'Organization',
+      name: 'InstaSecure',
+      contactPoint: [
+        { '@type': 'ContactPoint', contactType: 'sales', url: 'https://instasecure.ai/contact' },
+        { '@type': 'ContactPoint', contactType: 'security', email: 'security@instasecure.io' },
+      ],
+    },
+  }} />
+
   <Hero
     eyebrow="Contact"
     title="Let's Collaborate"

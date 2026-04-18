@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/sections/Hero.astro';
 import CTAStripe from '@/components/sections/CTAStripe.astro';
+import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
 
 interface Props {
   title: string;
@@ -14,6 +15,7 @@ interface Props {
   heroImage?: { src: string; alt: string };
   closingCtaTitle?: string;
   closingCtaDescription?: string;
+  breadcrumbCategory?: { label: string; href?: string };
 }
 const {
   title,
@@ -26,12 +28,21 @@ const {
   heroImage,
   closingCtaTitle = 'Ready to Build a Safer Cloud?',
   closingCtaDescription = 'Cloud teams like yours are already seeing results in weeks. You could be next.',
+  breadcrumbCategory = { label: 'Use Cases' },
 } = Astro.props;
 
 const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
 const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const crumbs = [
+  { label: 'Home', href: '/' },
+  breadcrumbCategory,
+  { label: heroTitle },
+];
 ---
 <BaseLayout {title} {description}>
+  <Breadcrumbs crumbs={crumbs} />
+
   <Hero
     eyebrow={eyebrow}
     title={heroTitle}
