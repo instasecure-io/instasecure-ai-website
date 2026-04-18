@@ -1,0 +1,183 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import FeatureRow from '@/components/sections/FeatureRow.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+
+import heroImg from '@/assets/instaworkforce/hero.png';
+import howItWorks from '@/assets/instaworkforce/how-it-works.png';
+import ft01 from '@/assets/instaworkforce/ft01.png';
+import ft02 from '@/assets/instaworkforce/ft02.png';
+import ft03 from '@/assets/instaworkforce/ft03.png';
+import ft04 from '@/assets/instaworkforce/ft04.png';
+import ft05 from '@/assets/instaworkforce/ft05.png';
+import ft06 from '@/assets/instaworkforce/ft06.png';
+import ft07 from '@/assets/instaworkforce/ft07.png';
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const coreCapabilities = [
+  {
+    icon: 'lucide:search',
+    iconColor: 'brand' as const,
+    title: 'Instantly Uncover Hidden Access Risks',
+    bullets: [
+      'Hidden admins — trace nested groups and complex access paths',
+      'Latent permissions — find unused carry-over rights',
+      'Excessive access — quantify reach to sensitive data',
+    ],
+  },
+  {
+    icon: 'lucide:wand-sparkles',
+    iconColor: 'accent' as const,
+    title: 'Automate Remediation & Least Privilege',
+    bullets: [
+      'IdP hygiene — data-driven regrouping and ownership',
+      'Automated right-sizing — "Net New Permissions" based on actual usage',
+      'Replace broad permission sets with least-privilege in a single click',
+    ],
+  },
+];
+
+const challenges = [
+  { icon: 'lucide:eye', iconColor: 'accent' as const, title: 'Gain Visibility and Control', description: 'Gain precise insight into user and group permissions across cloud environments to prevent excessive authorization. Analyze CloudTrail logs and organizational access to identify unauthorized or high-risk activities before they become security threats.' },
+  { icon: 'lucide:users', iconColor: 'brand' as const, title: 'Insufficient Identity Management', description: 'Optimize permission sets based on real access and usage patterns to align with business needs. Automate compliance reviews, making it easy to suspend or restrict access while minimizing manual effort.' },
+  { icon: 'lucide:shield-alert', iconColor: 'accent' as const, title: 'Excessive Identity Access', description: 'Prevent unauthorized privilege escalation, data exfiltration, and exposure of sensitive resources. Identify toxic permission combinations, dormant access, and third-party risks using prebuilt and custom risk filters.' },
+];
+---
+<BaseLayout
+  title="InstaWorkforce — Secure Human Access to the Cloud | InstaSecure"
+  description="Agentless engine connecting your IdP, AWS Identity Center, and AWS accounts to compute true end-to-end permissions — who can actually access what."
+>
+  <Hero
+    eyebrow="InstaWorkforce"
+    title="Who Can Actually Access What?"
+    description="Agentless engine that connects your IdP (Okta / Azure AD), AWS Identity Center, and AWS accounts to compute true end-to-end permissions — finally answering who can actually access what across your cloud."
+    primaryCta={{ label: 'See a Graph for Your Environment', href: CALENDLY }}
+    secondaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    image={{ src: heroImg.src, alt: 'InstaWorkforce dashboard: user access levels and activity, with metrics for direct access, no assignment, and suspended users over an orange network pattern.' }}
+  />
+
+  <FeatureGrid
+    eyebrow="Core Capabilities"
+    title="What InstaWorkforce Does"
+    features={coreCapabilities}
+    columns={2}
+  />
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-7xl px-6 py-20">
+      <div class="mb-12">
+        <SectionHeader
+          eyebrow="How It Works"
+          title="The Unified Access Authorization Graph"
+          subtitle="At the core of InstaWorkforce is the Access Authorization Graph. The agentless engine connects your IdP, AWS Identity Center, and AWS accounts to map every potential access path — then calculates the net residual access, the true end-to-end permissions for every user and group."
+        />
+      </div>
+      <img src={howItWorks.src} alt="Three icons labeled 'IdP', 'AWS Identity Center', and 'AWS Account' all connecting to a central 'Access Authorization Graph Engine'." class="w-full max-w-4xl mx-auto" />
+    </section>
+  </div>
+
+  <FeatureGrid
+    eyebrow="Identity Management Challenges We Solve"
+    title="Three problems InstaWorkforce takes off your plate"
+    features={challenges}
+    columns={3}
+  />
+
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <div class="mb-8 max-w-3xl">
+      <SectionHeader align="left" eyebrow="How InstaWorkforce Makes It Easy" title="Seven ways we simplify human access to the cloud" />
+    </div>
+  </section>
+
+  <FeatureRow
+    eyebrow="Capability 01"
+    title="Gain Control Over Human Identity Access"
+    description="Clearly understand and control user and group permissions across your entire cloud environment."
+    bullets={[
+      'Identify and eliminate excessive permissions by analyzing CloudTrail logs and historical usage patterns',
+      'Track identity activities and detect anomalies with real-time monitoring',
+      'Historical trend analysis to surface drift and long-tail access',
+    ]}
+    image={{ src: ft01.src, alt: 'Flowchart showing user identity flowing through group membership into effective access.' }}
+    imagePosition="right"
+  />
+  <FeatureRow
+    eyebrow="Capability 02"
+    title="Identity Management, Made Analyzable"
+    bullets={[
+      'Effortlessly analyze organizational access, CloudTrail logs, and usage trends for comprehensive visibility',
+      'Accurately assess actual permission usage and detect dormant or excessive access',
+      'Integrate with AWS Identity Center and existing workflows (Terraform, CI/CD, Jira, GitHub)',
+    ]}
+    image={{ src: ft02.src, alt: 'Central user node connected to multiple resource nodes via dashed access lines.' }}
+    imagePosition="left"
+  />
+  <FeatureRow
+    eyebrow="Capability 03"
+    title="Identify Key Risk Categories"
+    bullets={[
+      'Quickly detect lateral movement threats, toxic permission combinations, and Identity Provider bypass vulnerabilities',
+      'Identify and stop unauthorized privilege escalation across cloud accounts',
+      'Continuously scan identity provider vulnerabilities to protect cloud identities',
+    ]}
+    image={{ src: ft03.src, alt: 'Colorful pie chart showing risk distribution across five categories.' }}
+    imagePosition="right"
+  />
+  <FeatureRow
+    eyebrow="Capability 04"
+    title="Smart Risk Prioritization"
+    bullets={[
+      'Over 30 prebuilt toxic permission combinations to highlight high-risk scenarios instantly',
+      'Intelligent risk scoring with visual insights into active vs. inactive accounts',
+      'Identify idle and dormant access, third-party exposure, and toxic permission patterns proactively',
+    ]}
+    image={{ src: ft04.src, alt: 'Arrow-shaped infographic showing risk levels for database access — high, medium, low.' }}
+    imagePosition="left"
+  />
+  <FeatureRow
+    eyebrow="Capability 05"
+    title="Automated Permission Management"
+    bullets={[
+      'Automate and streamline permission management with workflows built around actual usage',
+      'Dynamically adjust access based on business needs, data classifications, and account types',
+      'Integrate with existing workflows — Terraform, CI/CD pipelines, Jira, GitHub',
+    ]}
+    image={{ src: ft05.src, alt: 'Form / questionnaire illustration depicting access review workflows.' }}
+    imagePosition="right"
+  />
+  <FeatureRow
+    eyebrow="Capability 06"
+    title="Reduce Identity Security Risk"
+    bullets={[
+      'Restrict unauthorized access, enforce AWS account boundaries, and prevent privilege escalation',
+      'Guard against credential exposure, sensitive permission abuse, and unauthorized resource changes',
+      'Minimize lateral movement and enforce strict account boundaries across your cloud',
+    ]}
+    image={{ src: ft06.src, alt: 'Line graph showing identity-risk trending downward over time.' }}
+    imagePosition="left"
+  />
+  <FeatureRow
+    eyebrow="Capability 07"
+    title="Effortless Compliance"
+    bullets={[
+      'Streamline user and group access reviews with minimal manual effort',
+      'Generate compliance documentation with one-click reports',
+      'Visualize compliance posture and apply new policies through flexible opt-in integration',
+    ]}
+    image={{ src: ft07.src, alt: 'Checkmark inside a circle — compliance confirmation graphic.' }}
+    imagePosition="right"
+  />
+
+  <CTAStripe
+    title="Ready to Build a Safer Cloud?"
+    description="InstaWorkforce maps your real access in hours — not months of consulting."
+    supporting="Choose your path — self-serve on AWS Marketplace or schedule a personalized walkthrough."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+</BaseLayout>

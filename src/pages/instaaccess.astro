@@ -1,0 +1,200 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import FeatureRow from '@/components/sections/FeatureRow.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+
+import heroImg from '@/assets/instaaccess/hero.png';
+import howItWorks from '@/assets/instaaccess/how-it-works.png';
+import ch1 from '@/assets/instaaccess/challenge1-visibility.png';
+import ch2 from '@/assets/instaaccess/challenge2-iam.png';
+import ch3 from '@/assets/instaaccess/challenge3-best-practices.png';
+import ft01 from '@/assets/instaaccess/ft01.png';
+import ft02 from '@/assets/instaaccess/ft02.png';
+import ft03 from '@/assets/instaaccess/ft03.png';
+import ft04 from '@/assets/instaaccess/ft04.png';
+import ft05 from '@/assets/instaaccess/ft05.png';
+import ft06 from '@/assets/instaaccess/ft06.png';
+import ft07 from '@/assets/instaaccess/ft07.png';
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const coreCapabilities = [
+  {
+    icon: 'lucide:lock-keyhole',
+    iconColor: 'brand' as const,
+    title: 'Proactive Hardening & Governance',
+    bullets: [
+      'Map objectives to frameworks (SOC 2, HIPAA, CIS)',
+      'Reduce attack surface (public access, encryption, admin restrictions)',
+      'Close architecture gaps with organization-level policies',
+    ],
+  },
+  {
+    icon: 'lucide:zap',
+    iconColor: 'accent' as const,
+    title: 'Automated Remediation of Findings',
+    bullets: [
+      'Ingest CNAPP / CIEM / DSPM alerts automatically',
+      'Map each alert to its preventive control (right-size over-permissive IAM, quarantine public S3, restrict privileged actions)',
+      'Virtual Patching: enforce at the control plane — minutes, not days',
+    ],
+  },
+];
+
+const challenges = [
+  { icon: 'lucide:eye', iconColor: 'accent' as const, title: 'Gain Visibility and Control', description: 'Understand which service accounts, applications, and automated processes have access to your cloud environment. Restrict access to only what is necessary — reducing the risk of privilege escalation and unauthorized use.' },
+  { icon: 'lucide:shield-alert', iconColor: 'brand' as const, title: 'Address IAM Risks', description: 'Detect and remediate inactive or dormant permissions that could become attack vectors. Minimize credential compromise, cross-account access, excessive permissions, and unauthorized infrastructure modifications.' },
+  { icon: 'lucide:lock', iconColor: 'accent' as const, title: 'Enforce Best Practices', description: 'Ensure every identity has a clear owner and follows strict encryption policies. Maintain alignment with industry standards and compliance mandates.' },
+];
+
+const managementOptions = [
+  { icon: 'lucide:wand', iconColor: 'brand' as const, title: 'Fully Managed by InstaSecure', description: 'Let our platform handle the full lifecycle of guardrail creation, deployment, and management based on your objectives — delivering the fastest path to a hardened security posture.' },
+  { icon: 'lucide:git-branch', iconColor: 'accent' as const, title: 'Co-Managed via CI/CD Integration', description: 'InstaSecure provides Infrastructure-as-Code and cloud-native configuration suggestions. Teams can take these verified policy recommendations and embed them directly into the CI/CD pipeline.' },
+];
+---
+<BaseLayout
+  title="InstaAccess — Cloud Configuration Hardening & Automated Remediation | InstaSecure"
+  description="InstaAccess turns high-level security objectives into preventive, automated cloud controls — then continuously remediates findings without impacting workloads."
+>
+  <Hero
+    eyebrow="InstaAccess"
+    title="Preventive Cloud Controls, Continuously Remediated."
+    description="InstaAccess turns high-level security objectives into preventive, automated cloud controls — then continuously remediates findings from your CNAPP, CIEM, and DSPM tools without impacting workloads."
+    primaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+    secondaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    image={{ src: heroImg.src, alt: 'InstaAccess dashboard: "Riskiest Assets by Type" line graph with a "Baseline Boundary" card on a teal background with a network pattern.' }}
+  />
+
+  <FeatureGrid
+    eyebrow="Core Capabilities"
+    title="What InstaAccess Does"
+    features={coreCapabilities}
+    columns={2}
+  />
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-7xl px-6 py-20">
+      <div class="mb-12">
+        <SectionHeader
+          eyebrow="How It Works"
+          title="Preventive Cloud Controls for Complete Coverage"
+          subtitle="InstaAccess establishes a strong, compliant, and resilient cloud posture — translating strategic goals into tangible, automated controls. It integrates with your existing security stack to create a closed-loop remediation system: detection becomes immediate prevention."
+        />
+      </div>
+      <img src={howItWorks.src} alt="Diagram showing CNAPP findings automatically grouped and mapped to preventive cloud controls." class="w-full max-w-5xl mx-auto" />
+    </section>
+  </div>
+
+  <FeatureGrid
+    eyebrow="Your Cloud, Your Rules"
+    title="Flexible Management That Fits Your Team"
+    subtitle="Every organization operates differently. InstaSecure supports your preferred workflow — whether you want a fully managed solution or prefer to integrate security into your development lifecycle."
+    features={managementOptions}
+    columns={2}
+  />
+
+  <div class="bg-slate-50">
+    <FeatureGrid
+      eyebrow="Key IAM Challenges We Solve"
+      title="Three problems InstaAccess takes off your plate"
+      features={challenges}
+      columns={3}
+    />
+  </div>
+
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <div class="mb-8 max-w-3xl">
+      <SectionHeader align="left" eyebrow="How InstaAccess Makes It Easy" title="Seven capabilities that turn objectives into enforced controls" subtitle="The tools and integrations you need to simplify cloud identity management while enhancing security." />
+    </div>
+  </section>
+
+  <FeatureRow
+    eyebrow="Capability 01"
+    title="Deep Identity Insights & Actionable Intelligence"
+    bullets={[
+      'Easy-to-read dashboards and reports that help you quickly understand access risks',
+      'Spot inactive or dormant permissions that should be revoked',
+      'Detect untrusted third-party network access, excessive permissions, privilege escalation risks, and toxic permission combinations',
+    ]}
+    image={{ src: ft01.src, alt: 'Line graph with scattered data points showing identity access risk signals over time.' }}
+    imagePosition="right"
+  />
+  <FeatureRow
+    eyebrow="Capability 02"
+    title="Smart Prioritization & Risk-Based Filtering"
+    bullets={[
+      'Prebuilt and customizable filters help you focus on the highest-risk IAM issues',
+      'Findings from external CNAPP tools are integrated to highlight the most risky permission combinations',
+      'Focus on the security issues that matter most to your organization',
+    ]}
+    image={{ src: ft02.src, alt: 'Risk-priority diagram showing three risk levels: high (cross-account access), medium (sensitive permissions), high (write access).' }}
+    imagePosition="left"
+  />
+  <FeatureRow
+    eyebrow="Capability 03"
+    title="Comprehensive Policy Analysis"
+    bullets={[
+      'Assess net-effective permissions at multiple levels: Service Control Policies, Resource Control Policies, and individual permission policies',
+      'Analyze permission boundaries, conditions, and tags',
+      'Identify complex permission interactions and inheritance patterns',
+    ]}
+    image={{ src: ft03.src, alt: 'Venn diagram with three overlapping circles representing layered policy analysis.' }}
+    imagePosition="right"
+  />
+  <FeatureRow
+    eyebrow="Capability 04"
+    title="Enterprise-Wide Cloud Controls"
+    bullets={[
+      'Create and enforce security policies across your organization',
+      'Implement Data Perimeters and Sensitive Permission Restrictions to define access boundaries and limit critical resource exposure',
+      'Scale access controls consistently across teams and business units',
+    ]}
+    image={{ src: ft04.src, alt: 'Digital interface showing an enterprise-wide control rollout.' }}
+    imagePosition="left"
+  />
+  <FeatureRow
+    eyebrow="Capability 05"
+    title="Safe & Seamless Deployment of Controls"
+    bullets={[
+      'Apply new security policies with flexible opt-in / opt-out mechanisms',
+      'Works with Jira, Terraform, CI/CD pipelines, GitHub, and AWS for easy automation',
+      'Tag-based deployment reduces time to enforcement significantly',
+    ]}
+    image={{ src: ft05.src, alt: 'Icons representing cloud, GitHub, Terraform, and AWS — deployment integration surfaces.' }}
+    imagePosition="right"
+  />
+  <FeatureRow
+    eyebrow="Capability 06"
+    title="Proactive Impact Assessment"
+    bullets={[
+      'Assess policy impact with organizational access mapping and net-effective permissions analysis',
+      'Validate access events and usage with CloudTrail logs, Last Used Activity insights, and historical data',
+      'Identify untrusted access risks — exposed credentials, third-party access, toxic permission combos',
+    ]}
+    image={{ src: ft06.src, alt: 'Checklist illustration with green check marks and red minus signs — impact assessment report.' }}
+    imagePosition="left"
+  />
+  <FeatureRow
+    eyebrow="Capability 07"
+    title="Exception Management"
+    bullets={[
+      'Handle and track exceptions for actively deployed IAM controls',
+      'Enhance security while ensuring business continuity and operational efficiency',
+      'Support business requirements with fine-tuned permissions that balance security and productivity',
+    ]}
+    image={{ src: ft07.src, alt: 'Bar chart with active and pending exceptions tracked over time.' }}
+    imagePosition="right"
+  />
+
+  <CTAStripe
+    title="Ready to Build a Safer Cloud?"
+    description="InstaAccess deploys in hours and starts resolving alert classes immediately."
+    supporting="Choose your path — self-serve on AWS Marketplace or schedule a personalized walkthrough."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+</BaseLayout>
