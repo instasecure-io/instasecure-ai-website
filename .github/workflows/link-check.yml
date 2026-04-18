@@ -1,0 +1,40 @@
+name: Link check
+
+on:
+  pull_request:
+    branches: [main, migration]
+  schedule:
+    - cron: '0 4 * * 1'  # weekly, Monday 04:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: link-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config .lychee.toml --base ./dist ./dist
+          fail: true
+          output: lychee-report.md
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lychee-report
+          path: lychee-report.md
+          retention-days: 14
