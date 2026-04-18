@@ -2,6 +2,10 @@
 import BaseHead from '@/components/layout/BaseHead.astro';
 import Nav from '@/components/layout/Nav.astro';
 import Footer from '@/components/layout/Footer.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
+import { ClientRouter } from 'astro:transitions';
+import SpeedInsights from '@vercel/speed-insights/astro';
+import Analytics from '@vercel/analytics/astro';
 import '@/styles/global.css';
 
 interface Props {
@@ -12,15 +16,46 @@ interface Props {
   noindex?: boolean;
 }
 const props = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://instasecure.ai';
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'InstaSecure',
+  url: siteUrl,
+  logo: `${siteUrl}/favicon.png`,
+  description: 'Preventive cloud security platform for AWS. Enforces 50+ AWS-native preventive guardrails, automates remediation of CNAPP findings, and builds closed Data Perimeters for identity, resource, and network trust.',
+  sameAs: [
+    'https://www.linkedin.com/company/instasecure/',
+  ],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'security@instasecure.io',
+    contactType: 'security',
+    url: `${siteUrl}/.well-known/security.txt`,
+  },
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'InstaSecure',
+  url: siteUrl,
+};
 ---
 <html lang="en">
   <head>
     <BaseHead {...props} />
+    <StructuredData data={organizationSchema} />
+    <StructuredData data={websiteSchema} />
+    <ClientRouter />
     <slot name="head" />
   </head>
   <body>
     <Nav />
     <main><slot /></main>
     <Footer />
+    <SpeedInsights />
+    <Analytics />
   </body>
 </html>

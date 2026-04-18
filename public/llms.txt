@@ -1,0 +1,64 @@
+# InstaSecure
+
+> Preventive cloud security platform for AWS. Shifts cloud security from reactive alert triage to preventive, automated controls enforced at the organizational level — so misconfigurations, credential theft, and zero-day exploits are blocked before they cause breaches.
+
+## Products
+
+- [InstaAccess](https://instasecure.ai/instaaccess): Preventive cloud configuration hardening and automated remediation for **non-human identities** — service roles, automation agents, third-party integrations. Maps high-level security objectives to 50+ AWS-native preventive guardrails, then closes the loop on findings from CNAPP / CIEM / DSPM tools.
+- [InstaWorkforce](https://instasecure.ai/instaworkforce): Secure **human access** to AWS — least-privilege, just-in-time, policy-aligned. Agentless engine connects IdP (Okta / Azure AD), AWS Identity Center, and AWS accounts to compute true end-to-end permissions ("who can actually access what"), detect dormant admins, and automate right-sizing.
+
+## Core Value Proposition
+
+- **50+ AWS-native preventive guardrails** for AI, data, and identity — applied organization-wide, not asset-by-asset.
+- **Real-time remediation** via virtual patches — policy changes enforced at the control plane in minutes, not days.
+- **Closed-loop integration** with existing CNAPP, IdP, and IaC tools — no pipeline changes, no developer involvement required.
+- **Three-pillar Data Perimeter** for AWS: trusted identities, trusted resources, expected networks — blocks stolen credentials even with valid keys.
+
+## Key Pages
+
+- [How It Works](https://instasecure.ai/howitworks) — the whole-house-water-filter analogy: preventive controls at organizational entry points protect everything downstream.
+- [Pricing](https://instasecure.ai/pricing) — contact-based pricing; free trial on AWS Marketplace.
+- [Blog](https://instasecure.ai/blog) — threat research, product deep-dives, AWS IAM technical content.
+- [About](https://instasecure.ai/about) — founding team + 4-person technical advisory board (veterans from JPMorgan, Netflix, fwd:cloudsec).
+- [Contact](https://instasecure.ai/contact) — sales and demo requests.
+- [News](https://instasecure.ai/news) — press releases and partnerships.
+- [Events](https://instasecure.ai/events) — upcoming conferences (RSAC, Black Hat, DEF CON).
+
+## Use Cases
+
+### Stop Cloud Attacks
+- [Credential Compromise](https://instasecure.ai/credential-compromise) — block stolen-credential attacks via AWS Data Perimeter (trusted identity / resource / network).
+- [Cloud Zero-Day Attack](https://instasecure.ai/cloud-zero-day-attack-solution) — defend against unknown exploits by isolating public exposure and enforcing trust boundaries at the control plane.
+- [Data Perimeter on AWS](https://instasecure.ai/data-perimeter-on-aws) — the three-pillar closed perimeter approach (most detailed of the three).
+
+### Govern Identity & Access
+- [Close Compliance Gap](https://instasecure.ai/close-compliance-gap) — prove compliance instantly via automated access reviews and right-sizing.
+- [Fix Risks Before Pentest](https://instasecure.ai/fix-risks-before-pentest) — find IAM gaps before the pen-test team does.
+- [Who Really Has Access](https://instasecure.ai/who-really-has-access) — instant visibility into admins, unused roles, and risky permission chains.
+- [Stop Paying for Cloud](https://instasecure.ai/stop-paying-for-cloud) — right-size excessive access that inflates cloud spend.
+- [Walk Into Your Next Audit](https://instasecure.ai/walk-into-your-next-user-access-audit) — generate least-privilege proof for SOC 2, ISO 27001, HIPAA.
+
+### Product Use Case Indexes
+- [InstaAccess Use Cases](https://instasecure.ai/instaaccess-use-cases) — 10 non-human identity scenarios: data exfiltration, lateral movement, privilege escalation, etc.
+- [InstaWorkforce Use Cases](https://instasecure.ai/instaworkforce-use-cases) — 10 human-access scenarios: credential compromise, lateral movement, compliance alignment, etc.
+
+## Contact & Marketplace
+
+- AWS Marketplace listing: https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs
+- LinkedIn: https://www.linkedin.com/company/instasecure/
+- Security contact: security@instasecure.io
+
+## Company
+
+Founded by Rupesh Mishra (ex-Netflix, ex-LinkedIn cloud security and identity platforms). Technical advisory board includes leaders from JPMorgan Chase, Netflix, and NightVision Security. Recognized as "best in class" for AWS Data Perimeter at fwd:cloudsec and AWS re:Inforce.
+
+## Blog index (RSS available)
+
+- RSS feed: https://instasecure.ai/rss.xml
+- Recent posts:
+  - [A New Era of Preventive Cloud Security with AWS](https://instasecure.ai/blog/a-new-era-of-preventive-cloud-security-with-aws) — Sep 22 2025
+  - [InstaWorkforce in Action: Workforce Security Use Cases](https://instasecure.ai/blog/instaworkforce-in-action-workforce-security-use-cases-and-demo-for-aws) — Aug 25 2025
+  - [Proactive Cloud Security: Tackling Credential Theft](https://instasecure.ai/blog/proactive-cloud-security-tackling-credential-theft-with-instasecure) — Aug 25 2025
+  - [Understanding Cloud Security Controls](https://instasecure.ai/blog/understanding-cloud-security-controls) — Apr 10 2025
+  - [Preventive Security Controls for Human Access in AWS](https://instasecure.ai/blog/preventive-human-access) — Apr 3 2025
+  - [Introducing InstaWorkforce](https://instasecure.ai/blog/instaworkforce) — Mar 19 2025

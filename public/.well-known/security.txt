@@ -1,0 +1,4 @@
+Contact: mailto:security@instasecure.io
+Expires: 2027-04-17T23:59:59Z
+Preferred-Languages: en
+Canonical: https://instasecure.ai/.well-known/security.txt
