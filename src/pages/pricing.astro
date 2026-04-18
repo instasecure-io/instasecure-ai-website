@@ -1,0 +1,55 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import ContactForm from '@/components/forms/ContactForm.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const whatYouGet = [
+  { icon: 'lucide:shield-check', iconColor: 'brand' as const, title: '50+ Preventive Guardrails', description: 'Complete AWS-native coverage for AI, data, and identity — applied at the organizational level.' },
+  { icon: 'lucide:zap', iconColor: 'accent' as const, title: 'Automated Remediation', description: 'CNAPP and CIEM alerts auto-grouped and mapped to preventive controls — minutes, not days.' },
+  { icon: 'lucide:users', iconColor: 'brand' as const, title: 'Expert Onboarding', description: 'A security engineer walks your team through first deployment — hardened baseline in hours.' },
+];
+---
+<BaseLayout
+  title="Pricing | InstaSecure"
+  description="Flexible pricing for InstaSecure cloud security. Start free on AWS Marketplace, or talk to our team for enterprise-scale deployments."
+>
+  <Hero
+    eyebrow="Pricing"
+    title="Let Us Know How We Can Help"
+    description="Interested in our pricing? Fill out the form and someone from the InstaSecure team will reach out with more information tailored to your AWS environment and team size."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+
+  <FeatureGrid
+    eyebrow="What's Included"
+    title="Every Plan Gives You"
+    features={whatYouGet}
+    columns={3}
+  />
+
+  <section class="mx-auto max-w-7xl px-6 py-12">
+    <div class="max-w-2xl mx-auto text-center mb-10">
+      <h2 class="text-3xl md:text-4xl font-bold text-[var(--color-text)] leading-tight tracking-tight">Get a tailored quote</h2>
+      <p class="mt-4 text-lg text-slate-700">Tell us about your AWS footprint and the cloud security outcomes you're targeting. We'll follow up with pricing within one business day.</p>
+    </div>
+    <ContactForm
+      subject="Pricing inquiry — instasecure.ai/pricing"
+      submitLabel="Request pricing"
+      messagePlaceholder="Roughly how many AWS accounts? Any specific use cases (compliance, remediation, identity hygiene) you're prioritizing?"
+    />
+  </section>
+
+  <CTAStripe
+    title="Or Start Immediately on AWS Marketplace"
+    description="Pay-as-you-go, deploy in hours, cancel anytime."
+    supporting="The fastest path to preventive cloud controls — no form required."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+</BaseLayout>

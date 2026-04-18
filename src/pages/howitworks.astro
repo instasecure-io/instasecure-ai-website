@@ -1,0 +1,117 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import FeatureGrid from '@/components/sections/FeatureGrid.astro';
+import ProductTeaser from '@/components/sections/ProductTeaser.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+import IconBadge from '@/components/ui/IconBadge.astro';
+
+import platformDiagram from '@/assets/home/platform-diagram.png';
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const centralizedPoints = [
+  { icon: 'lucide:target', iconColor: 'brand' as const, title: 'Implement Once, Protect Everywhere', description: 'InstaSecure applies security controls at the organizational level, ensuring all assets are automatically protected — no manual configuration per account or resource.' },
+  { icon: 'lucide:filter', iconColor: 'accent' as const, title: 'Automatic Risk Filtering', description: 'Like a whole-house water filter removing contaminants before they reach any faucet, InstaSecure eliminates security risks before they can impact your cloud resources.' },
+  { icon: 'lucide:shield-check', iconColor: 'brand' as const, title: 'Consistent Protection Standards', description: 'Uniform security policies across your entire infrastructure — no drift, no one-off exceptions that turn into attack surface.' },
+];
+
+const preventiveFeatures = [
+  { icon: 'lucide:bell-off', iconColor: 'brand' as const, title: 'Automatic Alert Resolution', description: 'InstaSecure automatically resolves existing alerts and proactively prevents similar future threats — once a class of risk is guardrailed, the alerts stop recurring.' },
+  { icon: 'lucide:users-round', iconColor: 'accent' as const, title: 'Eliminating Developer Dependency', description: 'Centralized cloud controls are run by the security team. No pull requests to dev teams, no pipeline changes, no blocked releases.' },
+  { icon: 'lucide:scale', iconColor: 'brand' as const, title: 'Scaled Remediation', description: 'Automated remediation quickly reduces security risks at organization-wide scale instead of incremental, asset-level responses.' },
+];
+
+const technologyInAction = [
+  { icon: 'lucide:cloud-cog', iconColor: 'brand' as const, title: 'Applies directly to the cloud', description: 'InstaSecure works directly with your cloud environment — not your code or deployment pipeline. No code scanning required. Applies to previous AND future deployments. Zero development-velocity impact. Instant enforcement and rollback.' },
+  { icon: 'lucide:layers', iconColor: 'accent' as const, title: 'Intelligent Alert Categorization', description: 'Alerts from CNAPP and other tools are automatically categorized by risk type, then matched to a specific Preventive Cloud Control.' },
+  { icon: 'lucide:building-2', iconColor: 'brand' as const, title: 'Instant Organizational Protection', description: 'Preventive Cloud Controls are applied at an organizational level, immediately blocking unintended access across every account and resource.' },
+  { icon: 'lucide:network', iconColor: 'accent' as const, title: 'Effective Net Permissions', description: 'InstaSecure evaluates organizational and asset-level policies to determine accurate, effective permissions — including SCPs, RCPs, boundaries, conditions, and tags.' },
+];
+
+const products = [
+  {
+    name: 'InstaAccess',
+    tagline: 'Cloud Configuration Hardening & Automated Remediation',
+    description: 'Protect non-human identities — service roles, automation agents, third-party integrations. InstaAccess automates the hardening of cloud configurations, prevents untrusted access, and remediates exposure risks in minutes — without disrupting workloads.',
+    primaryCta: { label: 'Learn more', href: '/instaaccess' },
+    secondaryCta: { label: 'View Use Cases', href: '/instaaccess-use-cases' },
+  },
+  {
+    name: 'InstaWorkforce',
+    tagline: 'Secure Human Access to the Cloud',
+    description: 'Ensure least-privilege, just-in-time, and policy-aligned access for your workforce across cloud environments. InstaWorkforce enforces identity-based segmentation, detects privilege creep, and helps eliminate excessive access risks for employees, contractors, and partners.',
+    primaryCta: { label: 'Learn more', href: '/instaworkforce' },
+    secondaryCta: { label: 'View Use Cases', href: '/instaworkforce-use-cases' },
+  },
+];
+---
+<BaseLayout
+  title="How It Works | InstaSecure"
+  description="InstaSecure works like a whole-house water filter for your cloud: preventive controls applied at organizational entry points, so every asset is automatically protected."
+>
+  <Hero
+    eyebrow="How It Works"
+    title="Whole-House Protection for Your Cloud"
+    description="Think of InstaSecure like installing a whole-house water filter that purifies water at the entry point — eliminating the need to manage contaminants at every faucet individually. Security applied once, at the source, protects everything downstream."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+
+  <FeatureGrid
+    eyebrow="Centralized Protection"
+    title="Protect your entire cloud from a single control point"
+    subtitle="Just as a whole-house water filter protects every faucet in your home, InstaSecure protects your entire cloud infrastructure from a single control point."
+    features={centralizedPoints}
+    columns={3}
+  />
+
+  <div class="bg-slate-50">
+    <FeatureGrid
+      eyebrow="Preventive Cloud Controls"
+      title="From Reactive to Proactive Security"
+      subtitle="InstaSecure replaces reactive security with proactive prevention through Preventive Cloud Controls, applied at upstream enforcement points — stopping threats at the source."
+      features={preventiveFeatures}
+      columns={3}
+    />
+  </div>
+
+  <section class="mx-auto max-w-7xl px-6 py-20">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">The InstaSecure Platform</div>
+      <h2 class="text-3xl md:text-5xl font-bold leading-[1.1] tracking-tight text-[var(--color-text)]">The Cloud Identity Firewall Platform</h2>
+      <p class="mt-5 text-lg md:text-xl text-slate-700 leading-relaxed">
+        A security ecosystem that ingests CNAPP findings, runs them through graph-, risk-, and policy-engines, and enforces AWS policies — with Jira and Slack in the loop for your team.
+      </p>
+    </div>
+    <img
+      src={platformDiagram.src}
+      alt="InstaSecure platform architecture: data ingestion from security ecosystem → core engine (graph, risk, policy) → user interface workflows → AWS policies + Jira/Slack integrations"
+      class="w-full max-w-5xl mx-auto"
+    />
+  </section>
+
+  <FeatureGrid
+    eyebrow="Technology in Action"
+    title="Categorize, Automate, and Secure — Without Touching Your Code"
+    subtitle="InstaSecure instantly categorizes risks, automates cloud protection, and secures your environments — without ever touching your code or deployment pipeline."
+    features={technologyInAction}
+    columns={2}
+  />
+
+  <ProductTeaser
+    eyebrow="Our Products"
+    title="Comprehensive Protection for Human and Non-Human Access"
+    products={products}
+  />
+
+  <CTAStripe
+    title="Ready to Build a Safer Cloud?"
+    description="Cloud teams like yours are already seeing results in weeks. You could be next."
+    supporting="Choose your path — self-serve on AWS Marketplace or schedule a personalized walkthrough."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+</BaseLayout>

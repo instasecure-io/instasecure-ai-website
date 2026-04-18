@@ -1,0 +1,33 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import ContactForm from '@/components/forms/ContactForm.astro';
+
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+---
+<BaseLayout
+  title="Contact | InstaSecure"
+  description="Get in touch with the InstaSecure team. Questions about cloud security, preventive controls, or InstaAccess and InstaWorkforce — we're here to help."
+>
+  <Hero
+    eyebrow="Contact"
+    title="Let's Collaborate"
+    description="We look forward to hearing from you. Share a little about your cloud security needs, and someone on the InstaSecure team will reach out within one business day."
+  />
+
+  <section class="mx-auto max-w-7xl px-6 py-12">
+    <ContactForm
+      subject="New contact form submission — instasecure.ai/contact"
+      submitLabel="Send message"
+    />
+  </section>
+
+  <section class="mx-auto max-w-4xl px-6 py-16 text-center">
+    <h2 class="text-2xl md:text-3xl font-bold text-[var(--color-text)]">Prefer a live demo?</h2>
+    <p class="mt-3 text-slate-700 text-lg">Skip the form — pick a time that works for you and we'll walk you through InstaAccess or InstaWorkforce in your AWS environment.</p>
+    <a href={CALENDLY} target="_blank" rel="noopener"
+       class="mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 bg-[var(--color-brand)] text-white font-semibold hover:opacity-90 transition">
+      Book a 20-minute demo →
+    </a>
+  </section>
+</BaseLayout>

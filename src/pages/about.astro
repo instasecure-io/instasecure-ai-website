@@ -1,0 +1,119 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+import { Icon } from 'astro-icon/components';
+
+import teamExpertiseLogos from '@/assets/about/team-expertise-logos.png';
+import industryRecognition from '@/assets/about/industry-recognition.png';
+import investorsLogo from '@/assets/about/investors.jpg';
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const advisoryBoard = [
+  {
+    name: 'Srinath Kuruvadi',
+    title: 'Head of AWS Cloud Security at JPMorgan Chase',
+    linkedin: 'https://www.linkedin.com/in/skuruvadi/',
+  },
+  {
+    name: 'Kinnaird McQuade',
+    title: 'Founder & CTO at NightVision Securities; author',
+    linkedin: 'https://www.linkedin.com/in/kinnairdmcquade/',
+  },
+  {
+    name: 'Nagesh Gummadivalli',
+    title: 'Identity Governance & Risk Partner at Netflix',
+    linkedin: 'https://www.linkedin.com/in/nagesh-gummadivalli-5662401/',
+  },
+  {
+    name: 'Chris Farris',
+    title: 'Cloud Security Evangelist, AWS Security Hero, fwd:cloudsec organizer',
+    linkedin: 'https://www.linkedin.com/in/jcfarris/',
+  },
+];
+
+function initials(name: string) {
+  return name.split(/\s+/).map(n => n[0]).slice(0, 2).join('');
+}
+---
+<BaseLayout
+  title="About | InstaSecure"
+  description="Crafting a breakthrough in cloud security. Meet the team and advisory board behind InstaSecure — veterans from AWS, Netflix, JPMorgan, Meta, and more."
+>
+  <Hero
+    eyebrow="About"
+    title="Crafting a Breakthrough in Cloud Security"
+    description="We believe in a future of cloud security where it is quick and easy to set up, enforce, and manage security controls that significantly reduce organizational risk — empowering central security teams to make widespread changes quickly, without slowing developer or business velocity."
+  />
+
+  <section class="mx-auto max-w-7xl px-6 py-20 text-center">
+    <SectionHeader eyebrow="Our Team" title="Expertise from the industry's best" />
+    <img
+      src={teamExpertiseLogos.src}
+      alt="Logos of companies where our team has previously worked: Twitter, Splunk, Uber, Illumio, Juniper Networks, Meta, and Cisco"
+      class="mt-12 max-w-4xl w-full mx-auto"
+    />
+  </section>
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-5xl px-6 py-20 text-center">
+      <SectionHeader eyebrow="Industry Recognition" title="A 'best in class' solution for AWS Data Perimeter" />
+      <p class="mt-5 max-w-3xl mx-auto text-lg md:text-xl text-slate-700 leading-relaxed">
+        Featured at fwd:cloudsec and AWS re:Inforce cloud security conferences, InstaSecure was recognized as the only solution offering a full Data Perimeter on AWS.
+      </p>
+      <img src={industryRecognition.src} alt="Industry recognition logo" class="mt-10 max-w-xs w-full mx-auto" />
+    </section>
+  </div>
+
+  <section class="mx-auto max-w-7xl px-6 py-20 text-center">
+    <SectionHeader eyebrow="Our Investors" title="Backed by visionaries. Built by experts." />
+    <img
+      src={investorsLogo.src}
+      alt="Logos of our investors: AVISO Ventures and Correction Capital"
+      class="mt-12 max-w-3xl w-full mx-auto"
+    />
+  </section>
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-7xl px-6 py-20">
+      <SectionHeader
+        eyebrow="Technical Advisory Board"
+        title="Guided by cloud security leaders"
+        subtitle="Our advisors shape the product direction and represent decades of combined experience running cloud security at scale."
+      />
+      <div class="grid md:grid-cols-2 gap-6 mt-14">
+        {advisoryBoard.map(m => (
+          <a
+            href={m.linkedin}
+            target="_blank"
+            rel="noopener"
+            class="group flex items-center gap-5 p-6 rounded-2xl bg-white border border-black/5 hover:shadow-md hover:-translate-y-0.5 transition"
+          >
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-accent)] text-white font-bold text-xl flex items-center justify-center shrink-0">
+              {initials(m.name)}
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-lg text-[var(--color-text)]">{m.name}</div>
+              <div class="text-sm text-slate-700 mt-0.5 leading-snug">{m.title}</div>
+              <div class="mt-2 text-sm font-semibold text-[var(--color-brand)] flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                <Icon name="lucide:linkedin" width="16" height="16" />
+                LinkedIn
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <CTAStripe
+    title="Want to work with us?"
+    description="We're always talking to cloud security leaders. If what we're building resonates, get in touch."
+    supporting="Choose your path — self-serve on AWS Marketplace or schedule a personalized walkthrough."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+</BaseLayout>
