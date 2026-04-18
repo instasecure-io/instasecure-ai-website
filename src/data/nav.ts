@@ -3,11 +3,15 @@ export interface NavItem { label: string; href: string; children?: NavItem[]; }
 export const PRIMARY_NAV: NavItem[] = [
   { label: 'Products', href: '#', children: [
     { label: 'InstaAccess', href: '/instaaccess' },
+    { label: 'InstaAccess Use Cases', href: '/instaaccess-use-cases' },
     { label: 'InstaWorkforce', href: '/instaworkforce' },
+    { label: 'InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
   ]},
   { label: 'Use Cases', href: '#', children: [
+    { label: 'InstaAccess Use Cases', href: '/instaaccess-use-cases' },
+    { label: 'InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
     { label: 'Credential Compromise', href: '/credential-compromise' },
-    { label: 'Cloud Zero-Day', href: '/cloud-zero-day-attack-solution' },
+    { label: 'Cloud Zero-Day Attack', href: '/cloud-zero-day-attack-solution' },
     { label: 'Data Perimeter on AWS', href: '/data-perimeter-on-aws' },
     { label: 'Close Compliance Gap', href: '/close-compliance-gap' },
     { label: 'Fix Risks Before Pentest', href: '/fix-risks-before-pentest' },
