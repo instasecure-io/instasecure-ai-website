@@ -1,0 +1,94 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+import IconBadge from '@/components/ui/IconBadge.astro';
+
+import rsac from '@/assets/events/rsac-2025.png';
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const upcomingEvents = [
+  {
+    title: 'RSA Conference (RSAC) 2025',
+    dates: 'April 29 – May 1, 2025',
+    location: 'San Francisco',
+    booth: 'Early Stage Expo · Booth ESE #28',
+    description: "InstaSecure is exhibiting at RSAC with scheduling availability for cloud-security leaders to meet our team during the conference. Drop by the booth or book a 30-minute slot ahead of time.",
+    cta: { label: 'Find a time to meet at RSAC', href: 'https://calendly.com/mishra-rupesh/rsa?back=1&month=2025-04' },
+    image: { src: rsac.src, alt: 'RSA Conference 2025 promotional graphic for InstaSecure' },
+  },
+  {
+    title: 'Black Hat USA & DEF CON 33',
+    dates: 'August 3 – 11, 2025',
+    location: 'Las Vegas',
+    booth: 'Book a founder meeting — details on /conference',
+    description: "Our founders Rupesh and John are live in Las Vegas during Black Hat and DEF CON. Book a 30-minute meeting with Rupesh (Aug 5–8) or a 'Cigar with John' conversation (Aug 5–10).",
+    cta: { label: 'See meeting options', href: '/conference' },
+    image: null,
+  },
+];
+---
+<BaseLayout
+  title="Events | InstaSecure"
+  description="Meet InstaSecure at RSA Conference, Black Hat, DEF CON, fwd:cloudsec, and other cloud-security industry events. Book time with our team live on-site."
+>
+  <Hero
+    eyebrow="Events"
+    title="Meet InstaSecure in the real world"
+    description="We show up where cloud-security practitioners gather — RSAC, Black Hat, DEF CON, fwd:cloudsec, AWS re:Inforce. Come say hello, demo the platform, or book a dedicated slot with our team."
+    primaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+    secondaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+  />
+
+  <section class="mx-auto max-w-7xl px-6 py-20">
+    <div class="mb-12">
+      <SectionHeader eyebrow="Upcoming" title="Where we'll be next" />
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      {upcomingEvents.map(ev => (
+        <article class="p-8 rounded-2xl bg-white border border-black/5 shadow-sm hover:shadow-md transition flex flex-col">
+          {ev.image && (
+            <img src={ev.image.src} alt={ev.image.alt} class="w-full rounded-xl mb-6 bg-slate-50 object-contain" style="max-height: 200px;" />
+          )}
+          <h2 class="text-2xl font-bold text-[var(--color-text)] leading-tight tracking-tight">{ev.title}</h2>
+          <div class="mt-4 space-y-2 text-[15px] text-slate-700">
+            <div class="flex gap-3 items-start">
+              <IconBadge name="lucide:calendar" color="brand" size="sm" />
+              <div class="pt-2"><span class="font-semibold text-[var(--color-text)]">Dates:</span> {ev.dates}</div>
+            </div>
+            <div class="flex gap-3 items-start">
+              <IconBadge name="lucide:map-pin" color="accent" size="sm" />
+              <div class="pt-2"><span class="font-semibold text-[var(--color-text)]">Location:</span> {ev.location}</div>
+            </div>
+            {ev.booth && (
+              <div class="flex gap-3 items-start">
+                <IconBadge name="lucide:store" color="brand" size="sm" />
+                <div class="pt-2"><span class="font-semibold text-[var(--color-text)]">Booth:</span> {ev.booth}</div>
+              </div>
+            )}
+          </div>
+          <p class="mt-5 text-slate-700 leading-relaxed flex-1">{ev.description}</p>
+          <a href={ev.cta.href} class="mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 bg-[var(--color-accent)] text-white font-semibold hover:opacity-90 shadow-md shadow-[var(--color-accent)]/25 transition text-sm self-start">
+            {ev.cta.label} →
+          </a>
+        </article>
+      ))}
+    </div>
+
+    <p class="mt-16 text-center text-slate-600 max-w-2xl mx-auto">
+      Speaking at a conference we should attend? <a href="/contact" class="text-[var(--color-brand)] font-semibold hover:underline">Let us know</a> — we try to show up where cloud-security teams need us.
+    </p>
+  </section>
+
+  <CTAStripe
+    title="Not at an event? Let's still talk."
+    description="Our team does focused, high-signal demos year-round. Pick a 30-minute slot that works for you."
+    supporting="Or start immediately on AWS Marketplace — no conversation required."
+    primaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+    secondaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+  />
+</BaseLayout>

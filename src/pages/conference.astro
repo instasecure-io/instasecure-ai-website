@@ -1,0 +1,76 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import SectionHeader from '@/components/sections/SectionHeader.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+import IconBadge from '@/components/ui/IconBadge.astro';
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const meetings = [
+  {
+    who: 'Rupesh Mishra',
+    role: 'Founder & CEO, InstaSecure',
+    availability: 'Live August 5 – 8',
+    event: 'Black Hat USA 2025',
+    description: '30-minute meeting with Rupesh to walk through InstaSecure against your AWS environment. Come with account details; leave with a hardening plan.',
+    cta: { label: 'Book 30 min with Rupesh', href: 'https://calendly.com/mishra-rupesh/blackhat' },
+    accent: 'brand' as const,
+  },
+  {
+    who: 'John — Co-founder',
+    role: 'Co-founder, InstaSecure',
+    availability: 'Live August 5 – 10',
+    event: 'Black Hat + DEF CON',
+    description: 'Informal "Cigar with John" conversation — cloud security war stories, the preventive-control philosophy, and where InstaSecure can fit into your program.',
+    cta: { label: 'Book cigar time with John', href: 'https://calendly.com/mishra-rupesh/cigar-with-john' },
+    accent: 'accent' as const,
+  },
+];
+---
+<BaseLayout
+  title="Meet Us in Las Vegas — Black Hat & DEF CON | InstaSecure"
+  description="Book a 30-minute founder meeting during Black Hat (Aug 3–8) and DEF CON 33 (Aug 8–11) in Las Vegas. Walk through your AWS environment with Rupesh or John."
+>
+  <Hero
+    eyebrow="Meet us at"
+    title="Black Hat · DEF CON · Las Vegas"
+    description="August 3–11, 2025 in Las Vegas. Our founders are live on the floor for meetings, demos, and the kind of informal conversations that actually go somewhere."
+  />
+
+  <section class="mx-auto max-w-7xl px-6 py-20">
+    <div class="mb-12">
+      <SectionHeader eyebrow="Book a meeting" title="Who do you want to meet?" subtitle="Two founders, two very different conversations. Pick whichever fits." />
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      {meetings.map(m => (
+        <article class={`p-8 md:p-10 rounded-2xl border border-black/5 shadow-sm hover:shadow-md transition flex flex-col ${m.accent === 'accent' ? 'bg-gradient-to-br from-white to-[var(--color-accent)]/5' : 'bg-gradient-to-br from-white to-[var(--color-brand)]/5'}`}>
+          <IconBadge name="lucide:user-round" color={m.accent} size="lg" />
+          <div class="mt-6">
+            <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)]">{m.event}</div>
+            <h2 class="text-2xl md:text-3xl font-bold text-[var(--color-text)] mt-2 leading-tight tracking-tight">{m.who}</h2>
+            <div class="text-sm text-slate-600 mt-1">{m.role}</div>
+          </div>
+          <div class="flex gap-2 items-center mt-5 text-sm text-slate-700">
+            <IconBadge name="lucide:calendar" color="brand" size="sm" />
+            <span class="font-semibold">{m.availability}</span>
+          </div>
+          <p class="mt-5 text-slate-700 leading-relaxed text-[16px] flex-1">{m.description}</p>
+          <a href={m.cta.href} target="_blank" rel="noopener" class={`mt-7 inline-flex items-center gap-2 rounded-full px-6 py-3 text-white font-semibold transition text-sm self-start shadow-md ${m.accent === 'accent' ? 'bg-[var(--color-accent)] hover:opacity-90 shadow-[var(--color-accent)]/25' : 'bg-[var(--color-brand)] hover:opacity-90 shadow-[var(--color-brand)]/25'}`}>
+            {m.cta.label} →
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <CTAStripe
+    title="Not in Las Vegas?"
+    description="We run the same focused demo remotely — pick a 30-minute slot any week of the year."
+    supporting="Choose your path — self-serve on AWS Marketplace or schedule a personalized walkthrough."
+    primaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+    secondaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+  />
+</BaseLayout>
