@@ -1,0 +1,23 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "visual:baseline": "TARGET_URL=https://instasecure.ai MODE=baseline playwright test tests/visual/capture.spec.ts",
+    "visual:current": "MODE=current playwright test tests/visual/capture.spec.ts",
+    "visual:diff": "node tests/visual/diff.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0"
+  }
+}

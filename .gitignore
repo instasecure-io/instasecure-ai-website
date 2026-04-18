@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.local
+.vercel/
+.DS_Store
+tests/visual/baseline/
+tests/visual/current/
+tests/visual/diff/
+playwright-report/
+test-results/
