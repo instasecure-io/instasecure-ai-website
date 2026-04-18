@@ -1,0 +1,23 @@
+---
+import { FOOTER_SECTIONS, SOCIAL } from '@/data/footer';
+---
+<footer class="bg-slate-50 border-t border-black/5 mt-24">
+  <div class="mx-auto max-w-7xl px-6 py-12 grid md:grid-cols-4 gap-8">
+    <div>
+      <div class="font-bold text-lg">InstaSecure</div>
+      <p class="text-sm text-slate-600 mt-2">Preventive cloud security for AWS.</p>
+    </div>
+    {FOOTER_SECTIONS.map(section => (
+      <div>
+        <h3 class="font-semibold text-sm uppercase tracking-wide mb-3">{section.title}</h3>
+        <ul class="space-y-2">
+          {section.links.map(l => <li><a href={l.href} class="text-sm text-slate-700 hover:text-[var(--color-brand)]">{l.label}</a></li>)}
+        </ul>
+      </div>
+    ))}
+  </div>
+  <div class="border-t border-black/5 px-6 py-6 text-sm text-slate-500 flex justify-between max-w-7xl mx-auto">
+    <span>© {new Date().getFullYear()} InstaSecure, Inc.</span>
+    <a href={SOCIAL.linkedin} class="hover:text-[var(--color-brand)]">LinkedIn</a>
+  </div>
+</footer>
