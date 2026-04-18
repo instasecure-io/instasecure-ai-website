@@ -1,0 +1,31 @@
+---
+import Button from '@/components/ui/Button.astro';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  primaryCta?: { label: string; href: string };
+  secondaryCta?: { label: string; href: string };
+  image?: { src: string; alt: string };
+}
+const { eyebrow, title, description, primaryCta, secondaryCta, image } = Astro.props;
+---
+<section class="relative overflow-hidden">
+  <div class="mx-auto max-w-7xl px-6 pt-20 pb-24 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      {eyebrow && <div class="text-xs uppercase tracking-[0.2em] font-bold text-[var(--color-brand)] mb-4">{eyebrow}</div>}
+      <h1 class="text-4xl md:text-6xl font-bold leading-[1.05] text-[var(--color-text)]">{title}</h1>
+      <p class="text-lg md:text-xl text-slate-700 mt-6 max-w-xl leading-relaxed">{description}</p>
+      <div class="flex flex-wrap gap-3 mt-8">
+        {primaryCta && <Button href={primaryCta.href} size="lg">{primaryCta.label}</Button>}
+        {secondaryCta && <Button href={secondaryCta.href} variant="secondary" size="lg">{secondaryCta.label}</Button>}
+      </div>
+    </div>
+    {image && (
+      <div class="relative">
+        <img src={image.src} alt={image.alt} class="w-full rounded-2xl shadow-lg" loading="eager" />
+      </div>
+    )}
+  </div>
+</section>

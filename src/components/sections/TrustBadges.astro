@@ -1,0 +1,27 @@
+---
+export interface Badge {
+  src: string;
+  alt: string;
+  href?: string;
+  height?: number;
+}
+
+interface Props {
+  title?: string;
+  badges: Badge[];
+}
+const { title = 'Proud AWS partner', badges } = Astro.props;
+---
+<section class="bg-[var(--color-text)] text-white py-12">
+  <div class="mx-auto max-w-7xl px-6 text-center">
+    {title && <div class="text-xs uppercase tracking-[0.25em] text-white/60 mb-6">{title}</div>}
+    <div class="flex flex-wrap gap-10 md:gap-16 justify-center items-center">
+      {badges.map(b => {
+        const img = <img src={b.src} alt={b.alt} class="object-contain" style={`height: ${b.height ?? 56}px;`} />;
+        return b.href
+          ? <a href={b.href} target="_blank" rel="noopener" class="hover:opacity-80 transition">{img}</a>
+          : <div>{img}</div>;
+      })}
+    </div>
+  </div>
+</section>

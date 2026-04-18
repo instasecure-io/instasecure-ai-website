@@ -1,0 +1,50 @@
+---
+export interface Feature {
+  icon?: string;
+  title: string;
+  description?: string;
+  bullets?: string[];
+}
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  features: Feature[];
+  columns?: 2 | 3 | 4;
+  variant?: 'plain' | 'cards';
+  class?: string;
+}
+import SectionHeader from './SectionHeader.astro';
+const { eyebrow, title, subtitle, features, columns = 3, variant = 'cards', class: klass = '' } = Astro.props;
+const gridClass = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-4' }[columns];
+const cardClass = variant === 'cards'
+  ? 'p-8 rounded-2xl border border-black/5 bg-white shadow-sm'
+  : '';
+---
+<section class={`mx-auto max-w-7xl px-6 py-20 ${klass}`}>
+  {(title || eyebrow) && (
+    <div class="mb-14">
+      <SectionHeader eyebrow={eyebrow} title={title!} subtitle={subtitle} />
+    </div>
+  )}
+  <div class={`grid gap-6 md:gap-8 ${gridClass}`}>
+    {features.map(f => (
+      <div class={cardClass}>
+        {f.icon && <div class="text-3xl mb-4">{f.icon}</div>}
+        <h3 class="font-semibold text-xl text-[var(--color-text)]">{f.title}</h3>
+        {f.description && <p class="text-slate-600 mt-3 leading-relaxed">{f.description}</p>}
+        {f.bullets && (
+          <ul class="mt-4 space-y-2">
+            {f.bullets.map(b => (
+              <li class="flex gap-2 text-sm text-slate-700">
+                <span class="text-[var(--color-brand)] font-bold">•</span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    ))}
+  </div>
+</section>

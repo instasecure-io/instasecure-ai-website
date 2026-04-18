@@ -1,0 +1,29 @@
+---
+export interface Testimonial {
+  quote: string;
+  name: string;
+  title: string;
+  company?: string;
+}
+
+interface Props {
+  testimonials: Testimonial[];
+}
+const { testimonials } = Astro.props;
+---
+<section class="mx-auto max-w-7xl px-6 py-20">
+  <div class="grid md:grid-cols-2 gap-8">
+    {testimonials.map(t => (
+      <figure class="p-8 md:p-10 rounded-2xl bg-slate-50 border border-black/5">
+        <svg width="36" height="24" viewBox="0 0 36 24" fill="none" class="text-[var(--color-brand)] mb-4" aria-hidden="true">
+          <path d="M14 0H0v14c0 5.523 4.477 10 10 10v-4c-3.314 0-6-2.686-6-6V10h10V0zm22 0H22v14c0 5.523 4.477 10 10 10v-4c-3.314 0-6-2.686-6-6V10h10V0z" fill="currentColor"/>
+        </svg>
+        <blockquote class="text-lg leading-relaxed text-slate-800">"{t.quote}"</blockquote>
+        <figcaption class="mt-6 text-sm">
+          <div class="font-semibold text-[var(--color-text)]">{t.name}</div>
+          <div class="text-slate-600">{t.title}{t.company ? `, ${t.company}` : ''}</div>
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+</section>

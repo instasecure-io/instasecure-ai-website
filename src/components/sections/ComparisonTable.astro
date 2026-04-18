@@ -1,0 +1,62 @@
+---
+type CellValue = true | false | 'partial' | string;
+
+export interface Row {
+  feature: string;
+  values: CellValue[];
+}
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  columns: string[];
+  rows: Row[];
+  highlightColumn?: number;
+}
+import SectionHeader from './SectionHeader.astro';
+const { eyebrow, title, subtitle, columns, rows, highlightColumn = 0 } = Astro.props;
+
+function renderCell(v: CellValue) {
+  if (v === true) return { text: '✓', class: 'text-emerald-600 text-xl font-bold' };
+  if (v === false) return { text: '—', class: 'text-slate-400 text-xl' };
+  if (v === 'partial') return { text: '◐', class: 'text-amber-500 text-xl' };
+  return { text: v, class: 'text-sm text-slate-700 font-medium' };
+}
+---
+<section class="mx-auto max-w-7xl px-6 py-20">
+  {(title || eyebrow) && (
+    <div class="mb-14">
+      <SectionHeader eyebrow={eyebrow} title={title!} subtitle={subtitle} />
+    </div>
+  )}
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse min-w-[700px]">
+      <thead>
+        <tr>
+          <th class="text-left p-4 border-b-2 border-black/10"></th>
+          {columns.map((c, i) => (
+            <th
+              class={`text-center p-4 border-b-2 ${i === highlightColumn ? 'bg-[var(--color-brand)]/5 text-[var(--color-brand)] border-[var(--color-brand)] font-bold' : 'border-black/10 font-semibold text-slate-700'}`}
+            >{c}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(r => (
+          <tr>
+            <td class="p-4 border-b border-black/5 font-medium text-[var(--color-text)]">{r.feature}</td>
+            {r.values.map((v, i) => {
+              const c = renderCell(v);
+              return (
+                <td class={`p-4 text-center border-b border-black/5 ${i === highlightColumn ? 'bg-[var(--color-brand)]/5' : ''}`}>
+                  <span class={c.class}>{c.text}</span>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
