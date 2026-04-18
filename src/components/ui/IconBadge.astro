@@ -1,0 +1,32 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  name: string;
+  color?: 'brand' | 'accent' | 'navy' | 'brand-tint' | 'accent-tint';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+const { name, color = 'brand', size = 'md', class: klass = '' } = Astro.props;
+
+const sizeClasses = {
+  sm: 'w-10 h-10',
+  md: 'w-14 h-14',
+  lg: 'w-16 h-16',
+};
+const iconSize = {
+  sm: '20',
+  md: '24',
+  lg: '28',
+};
+const colorClasses = {
+  brand: 'bg-[var(--color-brand)] text-white',
+  accent: 'bg-[var(--color-accent)] text-white',
+  navy: 'bg-[var(--color-text)] text-white',
+  'brand-tint': 'bg-[var(--color-brand)]/10 text-[var(--color-brand)]',
+  'accent-tint': 'bg-[var(--color-accent)]/10 text-[var(--color-accent)]',
+};
+---
+<div class={`${sizeClasses[size]} ${colorClasses[color]} rounded-2xl flex items-center justify-center shrink-0 ${klass}`}>
+  <Icon name={name} width={iconSize[size]} height={iconSize[size]} />
+</div>

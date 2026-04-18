@@ -19,14 +19,15 @@ import productivityImg from '@/assets/home/productivity.png';
 const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
 
 const threeFeatures = [
-  { icon: '🛡️', title: '50+ AWS-native preventive guardrails for AI, data & identity', description: 'Prevents misconfigurations across your entire environment from the moment they are deployed.' },
-  { icon: '⚡', title: 'Minutes to remediate risks — no code changes', description: 'Give your developers time back. Your team can now fix risks without manual intervention or complex coding.' },
-  { icon: '🔗', title: 'Works with your CNAPP, IdP, and IaC', description: 'Our platform seamlessly integrates with your existing security and development tools, so you can get up and running instantly.' },
+  { icon: 'lucide:shield-check', iconColor: 'brand' as const, title: '50+ AWS-native preventive guardrails for AI, data & identity', description: 'Prevents misconfigurations across your entire environment from the moment they are deployed.' },
+  { icon: 'lucide:zap', iconColor: 'accent' as const, title: 'Minutes to remediate risks — no code changes', description: 'Give your developers time back. Your team can now fix risks without manual intervention or complex coding.' },
+  { icon: 'lucide:plug-zap', iconColor: 'brand' as const, title: 'Works with your CNAPP, IdP, and IaC', description: 'Our platform seamlessly integrates with your existing security and development tools, so you can get up and running instantly.' },
 ];
 
 const outcomes = [
   {
-    icon: '🎨',
+    icon: 'lucide:sparkles',
+    iconColor: 'accent' as const,
     title: 'Hygiene & AWS Governance',
     description: 'Ensure preventive enterprise-wide security baselines and governance control:',
     bullets: [
@@ -37,13 +38,15 @@ const outcomes = [
     ],
   },
   {
-    icon: '🛡️',
+    icon: 'lucide:shield-alert',
+    iconColor: 'brand' as const,
     title: 'Neutralize Ransomware & Insider Threats',
     description: 'Lock sensitive IAM permissions to shield against critical threats, including:',
     bullets: ['Ransomware', 'Privilege escalation', 'Data exfiltration', 'Infrastructure modification', 'Crypto-mining'],
   },
   {
-    icon: '📦',
+    icon: 'lucide:package-check',
+    iconColor: 'accent' as const,
     title: 'Build air-gapped environments',
     description: 'Build missing AWS Data Perimeters (IAM Trust Boundary) to prevent:',
     bullets: ['Credential theft', 'Zero-day exploits', 'Untrusted third-party access', 'Lateral movement', 'Data exfiltration'],
@@ -52,22 +55,24 @@ const outcomes = [
 
 const innovations = [
   {
-    icon: '🏰',
+    icon: 'lucide:lock-keyhole',
+    iconColor: 'brand' as const,
     title: 'Cloud Hardening using Guardrails',
     description: '50+ AWS-specific preventive guardrails to enforce cloud hygiene by default — locking down misconfigured access to AI models, data, and pipelines, and shrinking attack surface from insider threats, architectural gaps, and advanced vectors.',
   },
   {
-    icon: '⚡',
+    icon: 'lucide:zap',
+    iconColor: 'accent' as const,
     title: 'Real-Time Remediation using Preventive Virtual Patches',
     description: 'Policy-based virtual patches use historical behavior and risk insights to fix identity risks, misconfigs, and CNAPP findings in real time — minutes, not days — with no workload impact or developers required.',
   },
 ];
 
 const differentiators = [
-  { icon: '🛡️', title: 'Proactive Zero-Trust Security', description: 'InstaSecure leads with a zero-trust approach, eliminating threats before they can impact your organization.' },
-  { icon: '⚡', title: 'Automated Alert Remediation', description: 'Unique automated grouping and remediation of CNAPP alerts ensures efficiency and reduces security team workload.' },
-  { icon: '🏢', title: 'Organization-Wide Impact', description: 'Implement comprehensive protection across your entire infrastructure instead of incremental, asset-level responses.' },
-  { icon: '🚀', title: 'Simplified Implementation', description: 'Get up and running in hours, not weeks or months, with intuitive onboarding and seamless integration.' },
+  { icon: 'lucide:shield-check', iconColor: 'brand' as const, title: 'Proactive Zero-Trust Security', description: 'InstaSecure leads with a zero-trust approach, eliminating threats before they can impact your organization.' },
+  { icon: 'lucide:bell-ring', iconColor: 'accent' as const, title: 'Automated Alert Remediation', description: 'Unique automated grouping and remediation of CNAPP alerts ensures efficiency and reduces security team workload.' },
+  { icon: 'lucide:building-2', iconColor: 'brand' as const, title: 'Organization-Wide Impact', description: 'Implement comprehensive protection across your entire infrastructure instead of incremental, asset-level responses.' },
+  { icon: 'lucide:rocket', iconColor: 'accent' as const, title: 'Simplified Implementation', description: 'Get up and running in hours, not weeks or months, with intuitive onboarding and seamless integration.' },
 ];
 
 const howDifferent = [
