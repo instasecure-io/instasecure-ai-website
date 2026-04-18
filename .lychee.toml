@@ -1,0 +1,35 @@
+cache = true
+max_cache_age = "2d"
+
+# Treat redirects as OK — many marketing links redirect
+accept = [200, 201, 204, 301, 302, 303, 307, 308, 403, 429]
+
+# Timeout per request
+timeout = 20
+
+# Skip third-party bot-blockers and rate-limited hosts
+exclude = [
+    # LinkedIn blocks bot checks
+    "linkedin\\.com",
+    # YouTube anti-bot
+    "youtube\\.com",
+    "youtu\\.be",
+    # Squarespace CDN (legacy, not on new site)
+    "squarespace-cdn\\.com",
+    # Calendly does bot detection
+    "calendly\\.com",
+    # AWS Marketplace intermittent
+    "aws\\.amazon\\.com",
+    # Vercel internals
+    "vercel\\.com",
+    "vercel-insights\\.com",
+    # localhost / relative-to-absolute issues
+    "^/$",
+    "^/#",
+]
+
+# Check only HTML files in dist
+include = ["*.html"]
+
+# Verbose on failure only
+verbose = "info"
