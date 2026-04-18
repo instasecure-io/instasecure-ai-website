@@ -39,13 +39,13 @@ const cardClass = variant === 'cards'
             <IconBadge name={f.icon} color={f.iconColor ?? 'brand'} size="md" />
           </div>
         )}
-        <h3 class="font-semibold text-xl text-[var(--color-text)] leading-snug">{f.title}</h3>
-        {f.description && <p class="text-slate-600 mt-3 leading-relaxed">{f.description}</p>}
+        <h3 class="font-bold text-xl text-[var(--color-text)] leading-snug tracking-tight">{f.title}</h3>
+        {f.description && <p class="text-slate-700 mt-3 leading-relaxed text-[16px]">{f.description}</p>}
         {f.bullets && (
-          <ul class="mt-4 space-y-2">
+          <ul class="mt-5 space-y-2.5">
             {f.bullets.map(b => (
-              <li class="flex gap-2 text-sm text-slate-700">
-                <span class="text-[var(--color-accent)] font-bold">▸</span>
+              <li class="flex gap-2.5 text-[15px] text-slate-800 leading-snug">
+                <span class="text-[var(--color-accent)] font-bold shrink-0">▸</span>
                 <span>{b}</span>
               </li>
             ))}

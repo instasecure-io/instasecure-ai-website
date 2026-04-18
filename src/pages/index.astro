@@ -186,9 +186,9 @@ const latestPosts = [
 
   <section class="mx-auto max-w-7xl px-6 py-20">
     <div class="text-center max-w-3xl mx-auto mb-12">
-      <div class="text-xs uppercase tracking-[0.2em] font-bold text-[var(--color-brand)] mb-4">The InstaSecure Platform</div>
-      <h2 class="text-3xl md:text-4xl font-bold">The Cloud Identity Firewall Platform</h2>
-      <p class="mt-4 text-lg text-slate-600">Preventive cloud controls that rapidly remediate alerts within minutes and automatically prevent future risk of the same type.</p>
+      <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">The InstaSecure Platform</div>
+      <h2 class="text-3xl md:text-5xl font-bold leading-[1.1] tracking-tight text-[var(--color-text)]">The Cloud Identity Firewall Platform</h2>
+      <p class="mt-5 text-lg md:text-xl text-slate-700 leading-relaxed">Preventive cloud controls that rapidly remediate alerts within minutes and automatically prevent future risk of the same type.</p>
     </div>
     <img src={platformDiagram.src} alt="InstaSecure platform architecture showing preventive guardrails layered across AWS services" class="w-full max-w-5xl mx-auto" />
   </section>
@@ -210,14 +210,14 @@ const latestPosts = [
   <div class="bg-slate-50">
     <section class="mx-auto max-w-7xl px-6 py-20">
       <div class="max-w-3xl mx-auto text-center mb-10">
-        <div class="text-xs uppercase tracking-[0.2em] font-bold text-[var(--color-brand)] mb-4">How We're Different</div>
-        <h2 class="text-3xl md:text-4xl font-bold">Preventive. Automated. Enterprise-wide.</h2>
+        <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">How We're Different</div>
+        <h2 class="text-3xl md:text-5xl font-bold leading-[1.1] tracking-tight text-[var(--color-text)]">Preventive. Automated. Enterprise-wide.</h2>
       </div>
       <ul class="max-w-3xl mx-auto space-y-4">
         {howDifferent.map(point => (
-          <li class="flex gap-3 items-start p-5 bg-white rounded-xl border border-black/5">
-            <span class="text-[var(--color-brand)] text-xl font-bold">✓</span>
-            <span class="text-lg text-slate-800">{point}</span>
+          <li class="flex gap-4 items-start p-6 bg-white rounded-xl border border-black/5 shadow-sm">
+            <span class="text-[var(--color-accent)] text-2xl font-bold leading-none shrink-0">✓</span>
+            <span class="text-lg text-slate-800 leading-relaxed">{point}</span>
           </li>
         ))}
       </ul>
@@ -247,10 +247,10 @@ const latestPosts = [
     </div>
     <div class="grid md:grid-cols-3 gap-6">
       {latestPosts.map(post => (
-        <a href={post.href} class="group p-6 rounded-2xl border border-black/5 bg-white hover:shadow-lg transition">
-          <div class="text-xs text-slate-500 font-medium">{post.date}</div>
-          <h3 class="mt-2 text-lg font-semibold text-[var(--color-text)] group-hover:text-[var(--color-brand)] transition">{post.title}</h3>
-          <div class="mt-4 text-sm font-semibold text-[var(--color-brand)]">Read post →</div>
+        <a href={post.href} class="group p-6 rounded-2xl border border-black/5 bg-white hover:shadow-lg hover:-translate-y-0.5 transition">
+          <div class="text-sm text-slate-600 font-semibold">{post.date}</div>
+          <h3 class="mt-3 text-lg font-bold text-[var(--color-text)] leading-snug group-hover:text-[var(--color-brand)] transition">{post.title}</h3>
+          <div class="mt-5 text-sm font-bold text-[var(--color-brand)]">Read post →</div>
         </a>
       ))}
     </div>

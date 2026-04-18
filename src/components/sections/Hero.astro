@@ -16,9 +16,9 @@ const { eyebrow, title, description, primaryCta, secondaryCta, image } = Astro.p
   <div class="absolute bottom-0 left-0 w-80 h-80 bg-[var(--color-brand)]/10 rounded-full blur-3xl -z-10"></div>
   <div class="mx-auto max-w-7xl px-6 pt-20 pb-24 grid md:grid-cols-2 gap-12 items-center relative">
     <div>
-      {eyebrow && <div class="text-xs uppercase tracking-[0.2em] font-bold text-[var(--color-brand)] mb-4">{eyebrow}</div>}
-      <h1 class="text-4xl md:text-6xl font-bold leading-[1.05] text-[var(--color-text)]">{title}</h1>
-      <p class="text-lg md:text-xl text-slate-700 mt-6 max-w-xl leading-relaxed">{description}</p>
+      {eyebrow && <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">{eyebrow}</div>}
+      <h1 class="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-[var(--color-text)]">{title}</h1>
+      <p class="text-lg md:text-xl text-slate-800 mt-6 max-w-xl leading-relaxed">{description}</p>
       <div class="flex flex-wrap gap-3 mt-8">
         {primaryCta && <Button href={primaryCta.href} variant="accent" size="lg">{primaryCta.label}</Button>}
         {secondaryCta && <Button href={secondaryCta.href} variant="secondary" size="lg">{secondaryCta.label}</Button>}
