@@ -15,6 +15,16 @@ import awsPartnerBadge from '@/assets/badges/aws-partner.png';
 import awsQualifiedBadge from '@/assets/badges/aws-qualified.png';
 import platformDiagram from '@/assets/home/platform-diagram.png';
 import productivityImg from '@/assets/home/productivity.png';
+import { getCollection } from 'astro:content';
+
+const latestPosts = (await getCollection('blog'))
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, 3)
+  .map(p => ({
+    date: p.data.publishDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+    title: p.data.title,
+    href: `/blog/${p.slug}`,
+  }));
 
 const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
 
@@ -137,11 +147,6 @@ const comparisonRows = [
   { feature: 'Time to Value', values: ['Immediate', 'Months', 'Weeks', 'Weeks'] },
 ];
 
-const latestPosts = [
-  { date: 'Sep 22, 2025', title: 'A New Era of Preventive Cloud Security with AWS', href: '/blog/a-new-era-of-preventive-cloud-security-with-aws' },
-  { date: 'Aug 25, 2025', title: 'InstaWorkforce in Action: Workforce Security Use Cases and Demo for AWS', href: '/blog/instaworkforce-in-action-workforce-security-use-cases-and-demo-for-aws' },
-  { date: 'Aug 25, 2025', title: 'Proactive Cloud Security: Tackling Credential Theft with InstaSecure', href: '/blog/proactive-cloud-security-tackling-credential-theft-with-instasecure' },
-];
 ---
 <BaseLayout
   title="InstaSecure — Proactive Cloud Security for AWS"

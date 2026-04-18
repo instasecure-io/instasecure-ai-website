@@ -1,0 +1,84 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Author from '@/components/Author.astro';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+import type { CollectionEntry } from 'astro:content';
+import { AUTHORS } from '@/data/authors';
+
+interface Props { entry: CollectionEntry<'blog'>; }
+const { entry } = Astro.props;
+const { title, description, publishDate, modifiedDate, author, heroImage, tags } = entry.data;
+const authorMeta = AUTHORS[author];
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
+
+const dateFmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<BaseLayout {title} {description} image={heroImage?.src}>
+  <article class="mx-auto max-w-3xl px-6 pt-12 pb-16">
+    <div class="mb-8">
+      <a href="/blog" class="inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-brand)] hover:underline">
+        ← All posts
+      </a>
+    </div>
+
+    <header class="mb-10">
+      <div class="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+        <time datetime={publishDate.toISOString()} class="font-semibold">{dateFmt(publishDate)}</time>
+        {tags.length > 0 && (
+          <>
+            <span>·</span>
+            <div class="flex flex-wrap gap-2">
+              {tags.map(t => <span class="text-xs font-bold tracking-[0.1em] uppercase text-[var(--color-brand)] bg-[var(--color-brand)]/10 rounded-full px-2.5 py-1">{t}</span>)}
+            </div>
+          </>
+        )}
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold mt-4 leading-[1.1] tracking-tight text-[var(--color-text)]">{title}</h1>
+      <p class="text-lg md:text-xl text-slate-700 mt-5 leading-relaxed">{description}</p>
+      <div class="mt-6">
+        <Author id={author} variant="inline" />
+      </div>
+    </header>
+
+    {heroImage && (
+      <img src={heroImage.src} alt="" class="w-full rounded-2xl shadow-md mb-10" loading="eager" />
+    )}
+
+    <div class="prose prose-slate prose-lg max-w-none
+      prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-[var(--color-text)]
+      prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4
+      prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-3
+      prose-p:leading-relaxed prose-p:text-slate-800
+      prose-a:text-[var(--color-brand)] prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+      prose-strong:text-[var(--color-text)]
+      prose-li:text-slate-800
+      prose-img:rounded-xl">
+      <slot />
+    </div>
+
+    <Author id={author} variant="card" />
+  </article>
+
+  <CTAStripe
+    title="Want to see this in your AWS environment?"
+    description="Book a 30-minute demo with our team, or start immediately on AWS Marketplace."
+    supporting="Choose your path — self-serve on AWS Marketplace or schedule a personalized walkthrough."
+    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
+    secondaryCta={{ label: 'Book a Demo', href: CALENDLY }}
+  />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description,
+    datePublished: publishDate.toISOString(),
+    dateModified: (modifiedDate ?? publishDate).toISOString(),
+    author: authorMeta ? { '@type': 'Person', name: authorMeta.name, url: authorMeta.linkedin } : { '@type': 'Person', name: author },
+    publisher: { '@type': 'Organization', name: 'InstaSecure', url: 'https://instasecure.ai' },
+    keywords: tags.join(', '),
+    ...(heroImage && { image: new URL(heroImage.src, Astro.site).toString() }),
+  })} />
+</BaseLayout>

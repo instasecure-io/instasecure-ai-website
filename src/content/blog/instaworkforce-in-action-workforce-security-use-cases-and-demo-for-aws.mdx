@@ -1,0 +1,36 @@
+---
+title: "InstaWorkforce in Action: Workforce Security Use Cases and Demo for AWS"
+description: "A live product walkthrough of InstaWorkforce — the access graph, dormant-access detection, prebuilt risk filters, permission right-sizing, and the Permission Optimizer that turns actual CloudTrail usage into least-privilege policy."
+publishDate: 2025-08-25
+author: rupesh-mishra
+heroImage: ../../assets/blog/instaworkforce-in-action-workforce-security-use-cases-and-demo-for-aws.png
+tags: ['product', 'instaworkforce', 'demo']
+---
+
+import Video from '@/components/ui/Video.astro';
+
+Welcome to InstaSecure's product demo. InstaSecure is a proactive cloud security platform. We have built cloud configuration hardening and remediation as a solution.
+
+<Video id="D3pmyxFWmC4" />
+
+We provide 50+ AWS-native preventive guardrails for securing AI, data, identity, and cloud infrastructure. Today, as part of this demo, we are going to focus on InstaWorkforce, our solution for managing human workforce access to AWS cloud environments.
+
+As part of our solution, we have unified access understanding between your IDP (Okta, Active Directory), AWS Identity Center, cloud accounts, and the resources and permissions that connect all of these assets together. This is built through our Access Authorization Graph. Let's look directly into the product to understand how all these elements come together.
+
+Inside the product, the first thing you will see is the dashboard. The dashboard is a place to understand the security posture of access across your environment. Here you will see all the principals, accounts, and permission sets configured inside the identity center. It shows dormant, inactive, and active access situations to help you understand hygiene and governance.
+
+It also breaks down access risks across your IDP users, groups, accounts, and permission sets inside the AWS environment. Once you understand your overall security posture, you can investigate deeper in the inventory tab. Here you can clearly see access for every principal, which cloud account they belong to, what type of account it is, and what permissions are granted.
+
+You can filter or sort by risk score, calculated using our fair risk scoring system, which considers activity, permission usage, and perimeter risks associated with every access in the environment. Not only does it provide this detailed view, but you can also use prebuilt filters that surface common risks as part of our curated list.
+
+You can further drill down by applying filters based on your use cases, such as which assets a particular user has access to, what permissions they are using in AWS, or whether they have read, write, or sensitive permissions. You can also assess risks such as network exposure, account boundaries, last activity, and sensitive privileges. For example, one customer with over 5,000 users in their AWS environment was able to quickly surface risks with this system and use filters to hone in on specific users or groups to optimize.
+
+Next, once risks are identified, we provide the ability to take action on those access issues. For example, you can suspend unused services, revoke sensitive permissions, or apply other controls to quickly mitigate risks.
+
+For long-term governance of access, we have built the Permission Optimizer. To understand and optimize permissions, you can go to the permission sets view. Here it clearly identifies every type of access configured inside AWS Identity Center, which IDP users and groups have those permissions assigned, how many accounts they provide access to, and what the activity looks like.
+
+From there, you can optimize access for users and groups across environments, choosing from different algorithms to reduce risk by account type (e.g., production, dev, staging). The system automatically generates least-privilege policies based on those constraints and allows you to deploy optimized access for individual users or groups. It also supports rollback and policy verification.
+
+This was a quick summary of the capabilities provided by InstaSecure Workforce Access Solution. I’m happy to deep dive into specific use cases such as separation of duty violations, hygiene and governance of access, compliance requirements, access reviews, and right-sizing permissions.
+
+We are available on AWS Marketplace and offer a 30-day free trial so you can see the value in your own environment.
