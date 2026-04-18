@@ -1,5 +1,5 @@
 export interface NavLeaf { label: string; href: string; description?: string; }
-export interface NavGroup { heading: string; items: NavLeaf[]; }
+export interface NavGroup { heading: string; description?: string; items: NavLeaf[]; }
 export interface NavEntry {
   label: string;
   href: string;
@@ -12,11 +12,23 @@ export const PRIMARY_NAV: NavEntry[] = [
   {
     label: 'Products',
     href: '#',
-    children: [
-      { label: 'InstaAccess', href: '/instaaccess', description: 'Harden non-human identities' },
-      { label: 'InstaAccess Use Cases', href: '/instaaccess-use-cases' },
-      { label: 'InstaWorkforce', href: '/instaworkforce', description: 'Secure human access' },
-      { label: 'InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
+    groups: [
+      {
+        heading: 'InstaAccess',
+        description: 'Preventive cloud controls for non-human identities — service roles, automation, third-party integrations.',
+        items: [
+          { label: 'Product overview', href: '/instaaccess' },
+          { label: 'View 10 use cases', href: '/instaaccess-use-cases' },
+        ],
+      },
+      {
+        heading: 'InstaWorkforce',
+        description: 'Secure human access to the cloud — least-privilege, just-in-time, policy-aligned.',
+        items: [
+          { label: 'Product overview', href: '/instaworkforce' },
+          { label: 'View 10 use cases', href: '/instaworkforce-use-cases' },
+        ],
+      },
     ],
   },
   {

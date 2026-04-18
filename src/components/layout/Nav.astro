@@ -29,29 +29,54 @@ import { PRIMARY_NAV, CTA_NAV } from '@/data/nav';
             </div>
           )}
 
-          {item.groups && (
-            <div class="absolute left-1/2 -translate-x-1/2 top-full hidden group-hover:block pt-2">
-              <div class="bg-white shadow-xl rounded-xl border border-black/5 p-6 w-[760px]">
-                <div class="grid grid-cols-3 gap-6">
-                  {item.groups.map(g => (
-                    <div>
-                      <div class="text-xs uppercase tracking-[0.12em] font-bold text-[var(--color-brand)] mb-3">{g.heading}</div>
-                      <ul class="space-y-1">
-                        {g.items.map(it => (
-                          <li>
-                            <a href={it.href} class="block -mx-2 px-3 py-2 rounded-lg hover:bg-slate-50 transition">
-                              <div class="font-semibold text-[14px] text-[var(--color-text)] leading-snug">{it.label}</div>
-                              {it.description && <div class="text-xs text-slate-600 mt-0.5 leading-snug">{it.description}</div>}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+          {item.groups && (() => {
+            const cols = item.groups.length;
+            const widthClass = cols === 2 ? 'w-[640px]' : 'w-[760px]';
+            const gridClass = cols === 2 ? 'grid-cols-2' : 'grid-cols-3';
+            const richHeading = item.groups.some(g => !!g.description);
+            return (
+              <div class="absolute left-1/2 -translate-x-1/2 top-full hidden group-hover:block pt-2">
+                <div class={`bg-white shadow-xl rounded-xl border border-black/5 p-6 ${widthClass}`}>
+                  <div class={`grid ${gridClass} gap-6`}>
+                    {item.groups.map(g => (
+                      <div class={richHeading ? 'p-4 rounded-lg bg-slate-50/60 border border-black/5' : ''}>
+                        {richHeading ? (
+                          <>
+                            <div class="font-bold text-[15px] text-[var(--color-text)]">{g.heading}</div>
+                            {g.description && <p class="text-xs text-slate-600 mt-1 leading-snug">{g.description}</p>}
+                            <ul class="mt-3 space-y-0.5">
+                              {g.items.map(it => (
+                                <li>
+                                  <a href={it.href} class="block -mx-2 px-3 py-1.5 rounded-md text-[14px] font-semibold text-[var(--color-brand)] hover:bg-white transition inline-flex items-center gap-1">
+                                    <span>{it.label}</span>
+                                    <span class="opacity-70">→</span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        ) : (
+                          <>
+                            <div class="text-xs uppercase tracking-[0.12em] font-bold text-[var(--color-brand)] mb-3">{g.heading}</div>
+                            <ul class="space-y-1">
+                              {g.items.map(it => (
+                                <li>
+                                  <a href={it.href} class="block -mx-2 px-3 py-2 rounded-lg hover:bg-slate-50 transition">
+                                    <div class="font-semibold text-[14px] text-[var(--color-text)] leading-snug">{it.label}</div>
+                                    {it.description && <div class="text-xs text-slate-600 mt-0.5 leading-snug">{it.description}</div>}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </li>
       ))}
     </ul>
