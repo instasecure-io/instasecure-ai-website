@@ -1,7 +1,136 @@
+/* =====================================================================
+   BrandSerif — IBM Plex Serif (open-source, replaces Typekit ibm-plex-serif)
+   Weights observed on live site: 500, 600, 700
+   ===================================================================== */
+@font-face {
+  font-family: 'BrandSerif';
+  src: url('/fonts/ibm-plex-serif/IBMPlexSerif-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSerif';
+  src: url('/fonts/ibm-plex-serif/IBMPlexSerif-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSerif';
+  src: url('/fonts/ibm-plex-serif/IBMPlexSerif-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSerif';
+  src: url('/fonts/ibm-plex-serif/IBMPlexSerif-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSerif';
+  src: url('/fonts/ibm-plex-serif/IBMPlexSerif-SemiBoldItalic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSerif';
+  src: url('/fonts/ibm-plex-serif/IBMPlexSerif-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =====================================================================
+   BrandSans — DM Sans (open-source, replaces proprietary General Sans
+   loaded from Squarespace CDN as TTF; same geometric sans-serif genre)
+   Weights observed on live site: 400 (Regular), 500 (Medium), 600 (SemiBold)
+   ===================================================================== */
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/dm-sans/DMSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/dm-sans/DMSans-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/dm-sans/DMSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/dm-sans/DMSans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/dm-sans/DMSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =====================================================================
+   BrandMono — IBM Plex Mono (open-source, same family used on live site
+   via Squarespace CDN TTF + Google Fonts; downloaded directly here)
+   Weights observed on live site: 500 (Medium), 600 (SemiBold)
+   ===================================================================== */
+@font-face {
+  font-family: 'BrandMono';
+  src: url('/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandMono';
+  src: url('/fonts/ibm-plex-mono/IBMPlexMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BrandMono';
+  src: url('/fonts/ibm-plex-mono/IBMPlexMono-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =====================================================================
+   Design tokens — extracted from https://instasecure.ai on 2026-04-17
+   ===================================================================== */
 @theme {
-  --color-text: #0f172a;
-  --color-bg: #ffffff;
-  --color-brand: #2563eb;
-  --color-accent: #ec4899;
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  /* Colors — from computed styles on live site */
+  --color-text:    #1d2f71;   /* rgb(29, 47, 113)  — body / h3 / p / nav */
+  --color-bg:      #ffffff;   /* rgb(255, 255, 255) — page background */
+  --color-brand:   #4d66e0;   /* rgb(77, 102, 224)  — link / interactive accent */
+  --color-accent:  #ff553b;   /* rgb(255, 85, 59)   — CTA button bg / border highlight */
+  --color-muted:   #1d1d1d;   /* rgb(29, 29, 29)    — marquee / dark-bg text */
+  --color-border:  #e0e0e0;   /* rgb(224, 224, 224) — table dividers */
+  --color-brand-dark: #4c47e3; /* rgb(76, 71, 227)  — shape fills / secondary brand */
+  --color-success: #65f6a4;   /* rgb(101, 246, 164) — green accent shape */
+  --color-teal:    #24a886;   /* rgb(36, 168, 134)  — teal accent shape */
+  --color-bg-subtle: #ececff; /* rgb(236, 236, 255) — light lavender bg block */
+
+  /* Typography */
+  --font-sans:   'BrandSans',   ui-sans-serif, system-ui, sans-serif;
+  --font-serif:  'BrandSerif',  ui-serif, Georgia, serif;
+  --font-mono:   'BrandMono',   ui-monospace, 'Courier New', monospace;
 }
