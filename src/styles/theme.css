@@ -1,0 +1,7 @@
+@theme {
+  --color-text: #0f172a;
+  --color-bg: #ffffff;
+  --color-brand: #2563eb;
+  --color-accent: #ec4899;
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+}
