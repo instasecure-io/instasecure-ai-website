@@ -10,3 +10,4 @@ tests/visual/current/
 tests/visual/diff/
 playwright-report/
 test-results/
+.vercel
