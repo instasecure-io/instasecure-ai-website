@@ -1,6 +1,12 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.instasecure.ai" }],
+      "destination": "https://instasecure.ai/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.instasecure.ai" }],
       "destination": "https://instasecure.ai/:path*",
