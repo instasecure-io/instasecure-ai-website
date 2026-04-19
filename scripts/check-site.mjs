@@ -1,0 +1,50 @@
+import { chromium } from '@playwright/test';
+const START = process.env.TARGET_URL ?? 'https://instasecure.ai/';
+const browser = await chromium.launch({ headless: true });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+const page = await ctx.newPage();
+
+const requests = [];
+const responses = [];
+const failed = [];
+const consoleMsgs = [];
+const errors = [];
+
+page.on('request', r => requests.push({ url: r.url(), type: r.resourceType() }));
+page.on('response', r => responses.push({ url: r.url(), status: r.status(), headers: r.headers() }));
+page.on('requestfailed', r => failed.push({ url: r.url(), err: r.failure()?.errorText, type: r.resourceType() }));
+page.on('console', m => consoleMsgs.push({ type: m.type(), text: m.text().slice(0, 300) }));
+page.on('pageerror', e => errors.push(e.message));
+
+const res = await page.goto(START, { waitUntil: 'networkidle', timeout: 30000 }).catch(e => { console.log('GOTO ERR:', e.message); return null; });
+await page.waitForTimeout(1500);
+console.log('=== START URL:', START);
+console.log('=== Final URL:', page.url());
+console.log('=== HTTP:', res?.status());
+console.log('=== Title:', await page.title());
+console.log('=== H1:', await page.locator('h1').first().textContent({ timeout: 500 }).catch(() => 'NO H1'));
+console.log('');
+console.log('=== Stylesheet links found in rendered DOM ===');
+const stylesheets = await page.locator('link[rel="stylesheet"]').evaluateAll(els => els.map(e => e.href));
+stylesheets.forEach(s => console.log(' ', s));
+console.log('');
+console.log('=== All non-2xx responses ===');
+responses.filter(r => r.status < 200 || r.status >= 300).forEach(r => console.log(' ', r.status, r.url.slice(0, 140)));
+console.log('');
+console.log('=== Failed requests (network-level errors) ===');
+failed.forEach(r => console.log(' ', r.err, '|', r.type, '|', r.url.slice(0, 140)));
+console.log('');
+console.log('=== Console errors/warnings ===');
+consoleMsgs.filter(m => m.type === 'error' || m.type === 'warning').forEach(m => console.log(' ', m.type, '|', m.text));
+console.log('');
+console.log('=== Page JS errors ===');
+errors.forEach(e => console.log(' ', e));
+console.log('');
+// Check computed style on body to see if CSS actually applied
+const bodyFont = await page.evaluate(() => getComputedStyle(document.body).fontFamily);
+const h1Font = await page.locator('h1').first().evaluate(el => getComputedStyle(el).fontSize).catch(()=>'?');
+console.log('=== body font-family:', bodyFont);
+console.log('=== h1 font-size:', h1Font);
+await page.screenshot({ path: '/tmp/live-site.png' });
+console.log('=== /tmp/live-site.png saved');
+await browser.close();
