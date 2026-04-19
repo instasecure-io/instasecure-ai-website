@@ -2,6 +2,7 @@
    BrandSerif — IBM Plex Serif (open-source, replaces Typekit ibm-plex-serif)
    Weights observed on live site: 500, 600, 700
    ===================================================================== */
+:root { --cache-bust-2026-04-19: 1; }
 @font-face {
   font-family: 'BrandSerif';
   src: url('/fonts/ibm-plex-serif/IBMPlexSerif-Regular.woff2') format('woff2');
