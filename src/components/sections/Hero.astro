@@ -7,9 +7,10 @@ interface Props {
   description: string;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
-  image?: { src: string; alt: string };
+  image?: { src: string; alt: string; width?: number; height?: number; poster?: string };
 }
 const { eyebrow, title, description, primaryCta, secondaryCta, image } = Astro.props;
+const isVideo = !!image && /\.(mp4|webm)(\?|$)/i.test(image.src);
 ---
 <section class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
   <div class="absolute top-0 right-0 w-96 h-96 bg-[var(--color-accent)]/10 rounded-full blur-3xl -z-10"></div>
@@ -25,8 +26,35 @@ const { eyebrow, title, description, primaryCta, secondaryCta, image } = Astro.p
       </div>
     </div>
     {image && (
-      <div class="relative">
-        <img src={image.src} alt={image.alt} class="w-full rounded-2xl shadow-lg" loading="eager" />
+      <div
+        class="relative w-full"
+        style={image.width && image.height ? `aspect-ratio: ${image.width} / ${image.height};` : undefined}
+      >
+        {isVideo ? (
+          <video
+            src={image.src}
+            poster={image.poster}
+            width={image.width}
+            height={image.height}
+            class="absolute inset-0 w-full h-full rounded-2xl shadow-lg block object-cover"
+            autoplay
+            loop
+            muted
+            playsinline
+            preload="metadata"
+            aria-label={image.alt}
+          ></video>
+        ) : (
+          <img
+            src={image.src}
+            alt={image.alt}
+            width={image.width}
+            height={image.height}
+            class="absolute inset-0 w-full h-full rounded-2xl shadow-lg object-cover"
+            loading="eager"
+            fetchpriority="high"
+          />
+        )}
       </div>
     )}
   </div>

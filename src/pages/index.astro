@@ -10,6 +10,7 @@ import ComparisonTable from '@/components/sections/ComparisonTable.astro';
 import CTAStripe from '@/components/sections/CTAStripe.astro';
 import SectionHeader from '@/components/sections/SectionHeader.astro';
 
+import { Image } from 'astro:assets';
 import awsMarketplaceBadge from '@/assets/badges/aws-marketplace.png';
 import awsPartnerBadge from '@/assets/badges/aws-partner.png';
 import awsQualifiedBadge from '@/assets/badges/aws-qualified.png';
@@ -104,14 +105,14 @@ const products = [
     name: 'InstaAccess',
     tagline: 'Cloud Configuration Hardening & Automated Remediation',
     description: 'Protect non-human identities — service roles, automation agents, third-party integrations. InstaAccess automates the hardening of cloud configurations, prevents untrusted access, and remediates exposure risks in minutes — without disrupting workloads.',
-    primaryCta: { label: 'Learn more', href: '/instaaccess' },
+    primaryCta: { label: 'Learn more about InstaAccess', href: '/instaaccess' },
     secondaryCta: { label: 'View InstaAccess Use Cases', href: '/instaaccess-use-cases' },
   },
   {
     name: 'InstaWorkforce',
     tagline: 'Secure Human Access to the Cloud',
     description: 'Ensure least-privilege, just-in-time, and policy-aligned access for your workforce across cloud environments. InstaWorkforce enforces identity-based segmentation, detects privilege creep, and helps eliminate excessive access risks for employees, contractors, and partners.',
-    primaryCta: { label: 'Learn more', href: '/instaworkforce' },
+    primaryCta: { label: 'Learn more about InstaWorkforce', href: '/instaworkforce' },
     secondaryCta: { label: 'View InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
   },
 ];
@@ -131,9 +132,9 @@ const testimonials = [
 ];
 
 const trustBadgesResolved = [
-  { src: awsMarketplaceBadge.src, alt: 'Available in AWS Marketplace', href: 'https://aws.amazon.com/marketplace/seller-profile?id=4a6c459c-f656-480a-812c-eab216c22824', height: 56 },
-  { src: awsPartnerBadge.src, alt: 'AWS Partner', height: 64 },
-  { src: awsQualifiedBadge.src, alt: 'AWS Certified Qualified Software', height: 64 },
+  { src: awsMarketplaceBadge.src, alt: 'Available in AWS Marketplace', href: 'https://aws.amazon.com/marketplace/seller-profile?id=4a6c459c-f656-480a-812c-eab216c22824', height: 56, intrinsicWidth: awsMarketplaceBadge.width, intrinsicHeight: awsMarketplaceBadge.height },
+  { src: awsPartnerBadge.src, alt: 'AWS Partner', height: 64, intrinsicWidth: awsPartnerBadge.width, intrinsicHeight: awsPartnerBadge.height },
+  { src: awsQualifiedBadge.src, alt: 'AWS Certified Qualified Software', height: 64, intrinsicWidth: awsQualifiedBadge.width, intrinsicHeight: awsQualifiedBadge.height },
 ];
 
 const comparisonColumns = ['InstaSecure', 'In-House', 'Cloud Providers', 'CSPM / CIEM / DSPM'];
@@ -159,8 +160,11 @@ const comparisonRows = [
     primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
     secondaryCta={{ label: 'Book a Demo', href: '/contact' }}
     image={{
-      src: 'https://images.squarespace-cdn.com/content/v1/66272c93ced316215a563dca/b53da488-6aa2-4cc4-8c54-888753fa8d9c/home-rotate1.2.gif',
-      alt: 'Proactive Threat Reduction — enforcement of security baselines and closing architectural gaps reduces risk from ransomware and crypto-mining.',
+      src: '/home/hero.mp4',
+      poster: '/home/hero-poster.webp',
+      width: 960,
+      height: 718,
+      alt: 'Rotating highlights: Proactive Threat Reduction, Right-Sized Cloud Access, Preventive Controls, and more.',
     }}
   />
 
@@ -195,14 +199,23 @@ const comparisonRows = [
       <h2 class="text-3xl md:text-5xl font-bold leading-[1.1] tracking-tight text-[var(--color-text)]">The Cloud Identity Firewall Platform</h2>
       <p class="mt-5 text-lg md:text-xl text-slate-700 leading-relaxed">Preventive cloud controls that rapidly remediate alerts within minutes and automatically prevent future risk of the same type.</p>
     </div>
-    <img src={platformDiagram.src} alt="InstaSecure platform architecture showing preventive guardrails layered across AWS services" class="w-full max-w-5xl mx-auto" />
+    <Image
+      src={platformDiagram}
+      alt="InstaSecure platform architecture showing preventive guardrails layered across AWS services"
+      widths={[640, 960, 1280, 1600]}
+      sizes="(max-width: 1024px) 100vw, 1024px"
+      format="webp"
+      quality={80}
+      loading="lazy"
+      class="w-full max-w-5xl mx-auto"
+    />
   </section>
 
   <StatsRow
     title="Enhance Your Cloud Security Team"
     subtitle="Empower your central security team to own the entire process."
     stats={teamStats}
-    image={{ src: productivityImg.src, alt: 'Productivity gains for cloud security teams using InstaSecure' }}
+    image={{ src: productivityImg.src, alt: 'Productivity gains for cloud security teams using InstaSecure', width: productivityImg.width, height: productivityImg.height }}
   />
 
   <FeatureGrid

@@ -122,7 +122,8 @@
   --color-text:    #1d2f71;   /* rgb(29, 47, 113)  — body / h3 / p / nav */
   --color-bg:      #ffffff;   /* rgb(255, 255, 255) — page background */
   --color-brand:   #4d66e0;   /* rgb(77, 102, 224)  — link / interactive accent */
-  --color-accent:  #ff553b;   /* rgb(255, 85, 59)   — CTA button bg / border highlight */
+  --color-accent:  #ff553b;   /* rgb(255, 85, 59)   — accent highlight (decorative, borders, eyebrow) */
+  --color-accent-bold: #d4321b; /* rgb(212, 50, 27) — darker shade for buttons; WCAG AA white-on-accent (4.9:1) */
   --color-muted:   #1d1d1d;   /* rgb(29, 29, 29)    — marquee / dark-bg text */
   --color-border:  #e0e0e0;   /* rgb(224, 224, 224) — table dividers */
   --color-brand-dark: #4c47e3; /* rgb(76, 71, 227)  — shape fills / secondary brand */
