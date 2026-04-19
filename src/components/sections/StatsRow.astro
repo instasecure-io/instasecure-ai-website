@@ -9,7 +9,7 @@ interface Props {
   title?: string;
   subtitle?: string;
   stats: Stat[];
-  image?: { src: string; alt: string };
+  image?: { src: string; alt: string; width?: number; height?: number };
 }
 const { title, subtitle, stats, image } = Astro.props;
 ---
@@ -31,7 +31,7 @@ const { title, subtitle, stats, image } = Astro.props;
   </div>
   {image && (
     <div class="mt-14 flex justify-center">
-      <img src={image.src} alt={image.alt} class="max-w-3xl w-full" />
+      <img src={image.src} alt={image.alt} width={image.width} height={image.height} loading="lazy" class="max-w-3xl w-full h-auto" />
     </div>
   )}
 </section>

@@ -32,11 +32,13 @@ function renderCell(v: CellValue) {
   )}
   <div class="overflow-x-auto">
     <table class="w-full border-collapse min-w-[700px]">
+      <caption class="sr-only">{title ?? 'Feature comparison'}</caption>
       <thead>
         <tr>
-          <th class="text-left p-4 border-b-2 border-black/10"></th>
+          <th scope="col" class="text-left p-4 border-b-2 border-black/10"><span class="sr-only">Feature</span></th>
           {columns.map((c, i) => (
             <th
+              scope="col"
               class={`text-center p-4 border-b-2 ${i === highlightColumn ? 'bg-[var(--color-brand)]/5 text-[var(--color-brand)] border-[var(--color-brand)] font-bold' : 'border-black/10 font-semibold text-slate-700'}`}
             >{c}</th>
           ))}
@@ -45,7 +47,7 @@ function renderCell(v: CellValue) {
       <tbody>
         {rows.map(r => (
           <tr>
-            <td class="p-4 border-b border-black/5 font-medium text-[var(--color-text)]">{r.feature}</td>
+            <th scope="row" class="p-4 border-b border-black/5 font-medium text-left text-[var(--color-text)]">{r.feature}</th>
             {r.values.map((v, i) => {
               const c = renderCell(v);
               return (
