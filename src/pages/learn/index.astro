@@ -1,0 +1,63 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const articles = [
+  {
+    href: '/learn/cloud-architecture-gaps',
+    eyebrow: 'Cloud architecture',
+    title: 'Cloud Hardening as a Proactive Defense Against Adversarial AI',
+    summary: 'AI compressed cloud reconnaissance from weeks to minutes. The architectural problems it exploits — tenancy, perimeter, and blast radius — were always there. Here\'s a vendor-neutral guide to closing them with AWS-native primitives.',
+    readingTime: '12 min read',
+    interactive: true,
+    topics: ['Tenancy', 'Data Perimeter', 'IAM Blast Radius'],
+  },
+];
+---
+<BaseLayout
+  title="Learn — Cloud security architecture, vendor-neutral | InstaSecure"
+  description="Field guides on cloud security architecture. Vendor-neutral, technical, focused on the real issues — tenancy, perimeter, blast radius — and the AWS-native primitives that solve them."
+>
+  <section class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
+    <div class="mx-auto max-w-5xl px-6 pt-20 pb-16 text-center">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Learn</div>
+      <h1 class="font-serif text-4xl md:text-6xl font-semibold leading-[1.05] tracking-tight text-[var(--color-text)]">
+        Cloud security architecture,<br/>vendor-neutral.
+      </h1>
+      <p class="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-slate-700 leading-relaxed">
+        Field guides on the architectural problems behind real cloud breaches — tenancy, perimeter, blast radius — and the AWS-native primitives that close them. No marketing. No vendor pitch. The actual techniques.
+      </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-6 py-20">
+    <div class="grid gap-8">
+      {articles.map(a => (
+        <a href={a.href} class="group block p-8 md:p-10 rounded-2xl border border-black/5 bg-white hover:shadow-xl hover:-translate-y-0.5 transition">
+          <div class="flex flex-wrap items-center gap-3 mb-5">
+            <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)]">{a.eyebrow}</div>
+            <span class="text-xs text-slate-400">·</span>
+            <div class="text-xs text-slate-500">{a.readingTime}</div>
+            {a.interactive && (
+              <>
+                <span class="text-xs text-slate-400">·</span>
+                <div class="text-xs uppercase tracking-[0.12em] font-mono font-medium text-[var(--color-accent-bold)]">Interactive demo</div>
+              </>
+            )}
+          </div>
+          <h2 class="font-serif text-2xl md:text-3xl font-semibold leading-tight tracking-tight text-[var(--color-text)] group-hover:text-[var(--color-brand)] transition">{a.title}</h2>
+          <p class="mt-4 text-base md:text-lg text-slate-700 leading-relaxed">{a.summary}</p>
+          <div class="mt-6 flex flex-wrap gap-2">
+            {a.topics.map(t => (
+              <span class="px-3 py-1 rounded-full bg-slate-50 border border-black/5 text-xs font-medium text-slate-600">{t}</span>
+            ))}
+          </div>
+          <div class="mt-6 text-sm font-semibold text-[var(--color-brand)]">Read the field guide →</div>
+        </a>
+      ))}
+    </div>
+
+    <div class="mt-16 text-center text-sm text-slate-500">
+      More guides on AWS hardening, identity, and cloud architecture — coming as we write them.
+    </div>
+  </section>
+</BaseLayout>

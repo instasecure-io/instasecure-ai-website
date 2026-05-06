@@ -63,6 +63,7 @@ export const PRIMARY_NAV: NavEntry[] = [
     ],
   },
   { label: 'How It Works', href: '/howitworks' },
+  { label: 'Learn', href: '/learn' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },
