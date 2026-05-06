@@ -1,5 +1,5 @@
 ---
-import { PRIMARY_NAV, CTA_NAV } from '@/data/nav';
+import { PRIMARY_NAV, CTA_NAV, TRIAL_CTA } from '@/data/nav';
 import logo from '@/assets/brand/logo.png';
 ---
 <header class="border-b border-black/5 sticky top-0 bg-white/90 backdrop-blur z-50">
@@ -83,8 +83,13 @@ import logo from '@/assets/brand/logo.png';
         </li>
       ))}
     </ul>
-    <a href={CTA_NAV.href} class="rounded-full px-5 py-2 bg-[var(--color-brand)] text-white font-semibold text-[14px] hover:opacity-90 transition shadow-sm">
-      {CTA_NAV.label}
-    </a>
+    <div class="flex items-center gap-2">
+      <a href={CTA_NAV.href} class="hidden md:inline-flex rounded-full px-5 py-2 bg-[var(--color-brand)] text-white font-semibold text-[14px] hover:opacity-90 transition shadow-sm">
+        {CTA_NAV.label}
+      </a>
+      <a href={TRIAL_CTA.href} target="_blank" rel="noopener" class="inline-flex rounded-full px-5 py-2 bg-[var(--color-accent-bold)] text-white font-semibold text-[14px] hover:opacity-90 transition shadow-sm shadow-[var(--color-accent)]/25">
+        {TRIAL_CTA.label}
+      </a>
+    </div>
   </nav>
 </header>

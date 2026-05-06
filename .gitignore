@@ -5,9 +5,7 @@ dist/
 .env.local
 .vercel/
 .DS_Store
-tests/visual/baseline/
-tests/visual/current/
-tests/visual/diff/
 playwright-report/
 test-results/
-.vercel
+.claude/
+private/

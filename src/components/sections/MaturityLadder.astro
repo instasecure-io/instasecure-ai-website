@@ -1,0 +1,58 @@
+---
+import SectionHeader from './SectionHeader.astro';
+
+export interface Phase {
+  number: string;
+  title: string;
+  summary: string;
+  examples: string[];
+  tagline?: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  phases: Phase[];
+}
+const { eyebrow, title, subtitle, phases } = Astro.props;
+---
+<section class="mx-auto max-w-7xl px-6 py-20">
+  {(title || eyebrow) && (
+    <div class="mb-14">
+      <SectionHeader eyebrow={eyebrow} title={title!} subtitle={subtitle} />
+    </div>
+  )}
+  <ol class="grid md:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
+    {phases.map((p, i) => (
+      <li class="relative bg-white rounded-2xl border border-black/5 shadow-sm p-6 flex flex-col hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="flex items-baseline gap-2 mb-4">
+          <span class="font-mono font-semibold text-3xl text-[var(--color-brand)] leading-none">{p.number}</span>
+          <span class="text-[11px] font-mono uppercase tracking-[0.12em] text-slate-500">Phase</span>
+        </div>
+        <h3 class="font-serif text-xl font-semibold text-[var(--color-text)] leading-tight tracking-tight">{p.title}</h3>
+        <p class="mt-3 text-[14px] text-slate-700 leading-relaxed">{p.summary}</p>
+        <ul class="mt-4 space-y-2 text-[13px] text-slate-700">
+          {p.examples.map(e => (
+            <li class="flex gap-2 items-start leading-snug">
+              <span class="text-[var(--color-brand)] shrink-0 mt-0.5">▸</span>
+              <span>{e}</span>
+            </li>
+          ))}
+        </ul>
+        {p.tagline && (
+          <div class="mt-5 pt-4 border-t border-black/5 text-[11px] font-mono uppercase tracking-[0.1em] text-slate-500">
+            {p.tagline}
+          </div>
+        )}
+        {i < phases.length - 1 && (
+          <div class="hidden lg:block absolute top-12 -right-3 w-5 h-5 text-[var(--color-brand)]/30 z-10" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" class="w-full h-full">
+              <path d="M3 8 L13 8 M9 4 L13 8 L9 12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        )}
+      </li>
+    ))}
+  </ol>
+</section>

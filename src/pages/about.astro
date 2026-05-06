@@ -5,9 +5,13 @@ import SectionHeader from '@/components/sections/SectionHeader.astro';
 import CTAStripe from '@/components/sections/CTAStripe.astro';
 import { Icon } from 'astro-icon/components';
 
+import { AUTHORS } from '@/data/authors';
+
 import teamExpertiseLogos from '@/assets/about/team-expertise-logos.png';
 import industryRecognition from '@/assets/about/industry-recognition.png';
 import investorsLogo from '@/assets/about/investors.jpg';
+
+const founder = AUTHORS['rupesh-mishra'];
 
 const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
 const CALENDLY = import.meta.env.PUBLIC_CALENDLY_DEMO_URL;
@@ -48,6 +52,43 @@ function initials(name: string) {
     title="Crafting a Breakthrough in Cloud Security"
     description="We believe in a future of cloud security where it is quick and easy to set up, enforce, and manage security controls that significantly reduce organizational risk — empowering central security teams to make widespread changes quickly, without slowing developer or business velocity."
   />
+
+  <div class="bg-slate-50">
+    <section class="mx-auto max-w-5xl px-6 py-20">
+      <div class="text-center mb-14">
+        <SectionHeader eyebrow="Leadership" title="Meet the founder" />
+      </div>
+      <div class="grid md:grid-cols-[256px_1fr] gap-10 md:gap-14 items-start">
+        <div class="flex flex-col items-center md:items-start">
+          <img
+            src={founder.avatar}
+            alt={`${founder.name}, ${founder.title}`}
+            width="256"
+            height="256"
+            loading="lazy"
+            decoding="async"
+            class="w-56 h-56 md:w-64 md:h-64 rounded-2xl object-cover shadow-md"
+          />
+          {founder.linkedin && (
+            <a
+              href={founder.linkedin}
+              target="_blank"
+              rel="noopener"
+              class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-brand)] hover:opacity-80 transition"
+            >
+              <Icon name="lucide:linkedin" width="18" height="18" />
+              Connect on LinkedIn
+            </a>
+          )}
+        </div>
+        <div>
+          <h3 class="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-[var(--color-text)]">{founder.name}</h3>
+          <div class="mt-2 text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)]">{founder.title}</div>
+          <p class="mt-6 text-lg leading-relaxed text-slate-700">{founder.bio}</p>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <section class="mx-auto max-w-7xl px-6 py-20 text-center">
     <SectionHeader eyebrow="Our Team" title="Expertise from the industry's best" />

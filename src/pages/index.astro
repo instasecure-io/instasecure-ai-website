@@ -1,22 +1,27 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/ui/Button.astro';
 import Hero from '@/components/sections/Hero.astro';
 import FeatureGrid from '@/components/sections/FeatureGrid.astro';
-import StatsRow from '@/components/sections/StatsRow.astro';
-import ProductTeaser from '@/components/sections/ProductTeaser.astro';
+import QuoteStrip from '@/components/sections/QuoteStrip.astro';
+import StepFlow from '@/components/sections/StepFlow.astro';
+import VersusBlock from '@/components/sections/VersusBlock.astro';
+import MaturityLadder from '@/components/sections/MaturityLadder.astro';
 import TestimonialRow from '@/components/sections/TestimonialRow.astro';
-import TrustBadges from '@/components/sections/TrustBadges.astro';
-import ComparisonTable from '@/components/sections/ComparisonTable.astro';
-import CTAStripe from '@/components/sections/CTAStripe.astro';
 import SectionHeader from '@/components/sections/SectionHeader.astro';
-
-import { Image } from 'astro:assets';
+import CTAStripe from '@/components/sections/CTAStripe.astro';
+import { getCollection } from 'astro:content';
 import awsMarketplaceBadge from '@/assets/badges/aws-marketplace.png';
 import awsPartnerBadge from '@/assets/badges/aws-partner.png';
 import awsQualifiedBadge from '@/assets/badges/aws-qualified.png';
-import platformDiagram from '@/assets/home/platform-diagram.png';
-import productivityImg from '@/assets/home/productivity.png';
-import { getCollection } from 'astro:content';
+
+const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
+
+const trustBadgesResolved = [
+  { src: awsMarketplaceBadge.src, alt: 'Available in AWS Marketplace', href: 'https://aws.amazon.com/marketplace/seller-profile?id=4a6c459c-f656-480a-812c-eab216c22824', height: 56, intrinsicWidth: awsMarketplaceBadge.width, intrinsicHeight: awsMarketplaceBadge.height },
+  { src: awsPartnerBadge.src, alt: 'AWS Partner', height: 64, intrinsicWidth: awsPartnerBadge.width, intrinsicHeight: awsPartnerBadge.height },
+  { src: awsQualifiedBadge.src, alt: 'AWS Certified Qualified Software', height: 64, intrinsicWidth: awsQualifiedBadge.width, intrinsicHeight: awsQualifiedBadge.height },
+];
 
 const latestPosts = (await getCollection('blog'))
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
@@ -26,96 +31,6 @@ const latestPosts = (await getCollection('blog'))
     title: p.data.title,
     href: `/blog/${p.slug}`,
   }));
-
-const AWS_MARKETPLACE = 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa';
-
-const threeFeatures = [
-  { icon: 'lucide:shield-check', iconColor: 'brand' as const, title: '50+ AWS-native preventive guardrails for AI, data & identity', description: 'Prevents misconfigurations across your entire environment from the moment they are deployed.' },
-  { icon: 'lucide:zap', iconColor: 'accent' as const, title: 'Minutes to remediate risks — no code changes', description: 'Give your developers time back. Your team can now fix risks without manual intervention or complex coding.' },
-  { icon: 'lucide:plug-zap', iconColor: 'brand' as const, title: 'Works with your CNAPP, IdP, and IaC', description: 'Our platform seamlessly integrates with your existing security and development tools, so you can get up and running instantly.' },
-];
-
-const outcomes = [
-  {
-    icon: 'lucide:sparkles',
-    iconColor: 'accent' as const,
-    title: 'Hygiene & AWS Governance',
-    description: 'Ensure preventive enterprise-wide security baselines and governance control:',
-    bullets: [
-      'Protect AI services like Bedrock, Sagemaker, Amazon Polly, Rekognition',
-      'Deny changes to security services',
-      'Protect cloud platform resources',
-      'Quarantine inactive users and service roles',
-    ],
-  },
-  {
-    icon: 'lucide:shield-alert',
-    iconColor: 'brand' as const,
-    title: 'Neutralize Ransomware & Insider Threats',
-    description: 'Lock sensitive IAM permissions to shield against critical threats, including:',
-    bullets: ['Ransomware', 'Privilege escalation', 'Data exfiltration', 'Infrastructure modification', 'Crypto-mining'],
-  },
-  {
-    icon: 'lucide:package-check',
-    iconColor: 'accent' as const,
-    title: 'Build air-gapped environments',
-    description: 'Build missing AWS Data Perimeters (IAM Trust Boundary) to prevent:',
-    bullets: ['Credential theft', 'Zero-day exploits', 'Untrusted third-party access', 'Lateral movement', 'Data exfiltration'],
-  },
-];
-
-const innovations = [
-  {
-    icon: 'lucide:lock-keyhole',
-    iconColor: 'brand' as const,
-    title: 'Cloud Hardening using Guardrails',
-    description: '50+ AWS-specific preventive guardrails to enforce cloud hygiene by default — locking down misconfigured access to AI models, data, and pipelines, and shrinking attack surface from insider threats, architectural gaps, and advanced vectors.',
-  },
-  {
-    icon: 'lucide:zap',
-    iconColor: 'accent' as const,
-    title: 'Real-Time Remediation using Preventive Virtual Patches',
-    description: 'Policy-based virtual patches use historical behavior and risk insights to fix identity risks, misconfigs, and CNAPP findings in real time — minutes, not days — with no workload impact or developers required.',
-  },
-];
-
-const differentiators = [
-  { icon: 'lucide:shield-check', iconColor: 'brand' as const, title: 'Proactive Zero-Trust Security', description: 'InstaSecure leads with a zero-trust approach, eliminating threats before they can impact your organization.' },
-  { icon: 'lucide:bell-ring', iconColor: 'accent' as const, title: 'Automated Alert Remediation', description: 'Unique automated grouping and remediation of CNAPP alerts ensures efficiency and reduces security team workload.' },
-  { icon: 'lucide:building-2', iconColor: 'brand' as const, title: 'Organization-Wide Impact', description: 'Implement comprehensive protection across your entire infrastructure instead of incremental, asset-level responses.' },
-  { icon: 'lucide:rocket', iconColor: 'accent' as const, title: 'Simplified Implementation', description: 'Get up and running in hours, not weeks or months, with intuitive onboarding and seamless integration.' },
-];
-
-const howDifferent = [
-  'Instant Security Wins — fully deployable remediation, no dev dependency',
-  'Preventive-first: shift from reactive fixes to enforced guardrails',
-  'No-code: no changes to pipelines or IaC to get value',
-  'Broad coverage: resolve groups of related alerts at once',
-  'Human identity governance: visibility + cleanup',
-];
-
-const teamStats = [
-  { value: '82%', label: 'Of alerts resolved instantly', description: 'Preventive cloud controls solve entire classes of alerts at once — no more fixing them one by one.' },
-  { value: '$3M', label: 'Cost savings over two years', description: 'Thanks to the efficiency gains of InstaSecure.' },
-  { value: '10×', label: 'Your cloud security team', description: 'Unlock their time to focus on data loss, credential compromise, and compliance mandates.' },
-];
-
-const products = [
-  {
-    name: 'InstaAccess',
-    tagline: 'Cloud Configuration Hardening & Automated Remediation',
-    description: 'Protect non-human identities — service roles, automation agents, third-party integrations. InstaAccess automates the hardening of cloud configurations, prevents untrusted access, and remediates exposure risks in minutes — without disrupting workloads.',
-    primaryCta: { label: 'Learn more about InstaAccess', href: '/instaaccess' },
-    secondaryCta: { label: 'View InstaAccess Use Cases', href: '/instaaccess-use-cases' },
-  },
-  {
-    name: 'InstaWorkforce',
-    tagline: 'Secure Human Access to the Cloud',
-    description: 'Ensure least-privilege, just-in-time, and policy-aligned access for your workforce across cloud environments. InstaWorkforce enforces identity-based segmentation, detects privilege creep, and helps eliminate excessive access risks for employees, contractors, and partners.',
-    primaryCta: { label: 'Learn more about InstaWorkforce', href: '/instaworkforce' },
-    secondaryCta: { label: 'View InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
-  },
-];
 
 const testimonials = [
   {
@@ -131,154 +46,288 @@ const testimonials = [
   },
 ];
 
-const trustBadgesResolved = [
-  { src: awsMarketplaceBadge.src, alt: 'Available in AWS Marketplace', href: 'https://aws.amazon.com/marketplace/seller-profile?id=4a6c459c-f656-480a-812c-eab216c22824', height: 56, intrinsicWidth: awsMarketplaceBadge.width, intrinsicHeight: awsMarketplaceBadge.height },
-  { src: awsPartnerBadge.src, alt: 'AWS Partner', height: 64, intrinsicWidth: awsPartnerBadge.width, intrinsicHeight: awsPartnerBadge.height },
-  { src: awsQualifiedBadge.src, alt: 'AWS Certified Qualified Software', height: 64, intrinsicWidth: awsQualifiedBadge.width, intrinsicHeight: awsQualifiedBadge.height },
+const threats = [
+  {
+    icon: 'lucide:bot',
+    iconColor: 'brand' as const,
+    title: 'Attackers automated.',
+    description: 'Frontier models enumerate IAM paths, trust chains, and misconfigurations in minutes. The cloud attack surface moved from payload to policy — and policy is where AI-assisted attackers now live.',
+  },
+  {
+    icon: 'lucide:key-round',
+    iconColor: 'accent' as const,
+    title: 'Defenders drowned.',
+    description: 'Non-human identities — service roles, pipelines, third-parties, AI agents — already outnumber humans 20–50 to 1. Every new agent is a new credential. SOC alert volume rises faster than headcount ever can.',
+  },
+  {
+    icon: 'lucide:clock-alert',
+    iconColor: 'brand' as const,
+    title: "Detection lost its economics.",
+    description: 'Finding threats faster than attackers move is a losing race against AI-accelerated adversaries. Mean-time-to-detect becomes meaningless when mean-time-to-compromise collapses to minutes.',
+  },
 ];
 
-const comparisonColumns = ['InstaSecure', 'In-House', 'Cloud Providers', 'CSPM / CIEM / DSPM'];
-const comparisonRows = [
-  { feature: 'Automated Remediation', values: [true, false, false, false] },
-  { feature: 'Preventive Approach', values: [true, false, false, false] },
-  { feature: 'Alert Grouping & Prioritization', values: [true, false, 'partial', 'partial'] },
-  { feature: 'Always Current', values: [true, false, true, true] },
-  { feature: 'Multi-Cloud Support', values: [true, false, false, true] },
-  { feature: 'Implementation Time', values: ['Hours', 'Months', 'Weeks', 'Weeks'] },
-  { feature: 'Time to Value', values: ['Immediate', 'Months', 'Weeks', 'Weeks'] },
+const gatesVsGuardrails = {
+  before: {
+    label: 'Gates',
+    bullets: [
+      'CI/CD scanners, IaC linters, PR blockers at deploy time',
+      'Slow developers to catch attackers who don\'t use your pipeline',
+      'Cover greenfield code only — legacy and runtime drift stay exposed',
+      'Every fix is a ticket and a developer hour',
+    ],
+  },
+  after: {
+    label: 'Guardrails',
+    bullets: [
+      'Policy enforced at the organization edge, above every account',
+      'Invisible to developers — zero pipeline friction, zero PR gates',
+      'Cover every account, every resource, every future deployment',
+      'One guardrail retires a whole class of findings, permanently',
+    ],
+  },
+};
+
+const phases = [
+  {
+    number: '01',
+    title: 'Basic Governance',
+    summary: 'Lock down the security services themselves. Nothing your team relies on can be silently disabled.',
+    examples: [
+      'CloudTrail can never be disabled',
+      'GuardDuty, Config, SecurityHub protected',
+      'Billing and root-contact details frozen',
+      'Critical IAM roles immutable',
+    ],
+    tagline: 'Foundation · Mandatory',
+  },
+  {
+    number: '02',
+    title: 'Attack Surface Reduction',
+    summary: 'Draw the line. Regions, services, and public-access defaults get explicit approval — or they\'re denied.',
+    examples: [
+      'Deny non-approved AWS regions',
+      'Deny non-approved AWS services',
+      'Deny creation of default VPC / public Lambda URLs',
+      'Enforce S3 public-access block',
+    ],
+    tagline: 'Scope · Strongly recommended',
+  },
+  {
+    number: '03',
+    title: 'Best Practice Enforcement',
+    summary: 'Industry best practices stop being aspirational. Mandatory tags, encryption, IMDSv2, no root, no new IAM users.',
+    examples: [
+      'Require owner tags on EC2, RDS',
+      'Enforce EBS encryption, IMDSv2',
+      'Prevent root-user activity outside assume-root',
+      'Block new long-lived IAM users and keys',
+    ],
+    tagline: 'Hygiene · Strongly recommended',
+  },
+  {
+    number: '04',
+    title: 'Advanced Attack Patterns',
+    summary: 'Eliminate the escalation paths and exfil routes attackers use. Privilege escalation, destructive actions, backdoor creation — all structurally blocked.',
+    examples: [
+      'Prevent IAM privilege escalation',
+      'Prevent credential leakage via API responses',
+      'Limit high-impact destructive actions',
+      'Block backdoor resource-policy modifications',
+    ],
+    tagline: 'Depth · Critical',
+  },
+  {
+    number: '05',
+    title: 'Data Perimeter',
+    summary: 'Close the organization. Only trusted identities from trusted networks access trusted resources. Cross-org RAM, VPN, SAML federation — all bounded.',
+    examples: [
+      'Trusted-resource + trusted-network policy',
+      'Deny RAM shares outside the OU',
+      'Block S3 access from outside the Organization',
+      'Lock SAML and IAM federation creation',
+    ],
+    tagline: 'Perimeter · Critical',
+  },
 ];
 
+const steps = [
+  { icon: 'lucide:search', title: 'Discover', description: 'Map every identity — human, service, pipeline, agent — and the actions each one can actually take across your AWS org.' },
+  { icon: 'lucide:workflow', title: 'Prioritize', description: 'Build the attack graph. Calculate blast radius per identity. Rank the exposures that matter before attackers rank them.' },
+  { icon: 'lucide:shield-check', title: 'Enforce', description: 'Deploy the guardrail set. Policy installs at the organization edge — no pipeline changes, no developer tickets, no code.' },
+  { icon: 'lucide:plus-circle', title: 'Extend', description: 'Your guardrails library grows with attacker capability. New attack class → new guardrail → org-wide, continuously.' },
+];
+
+const economicsBefore = {
+  label: 'CSPM + SOC',
+  bullets: [
+    'Linear headcount growth to scale detection — every new alert source needs analysts',
+    'Sub-linear coverage — tomorrow\'s attack isn\'t in yesterday\'s rules',
+    'Attacker-tempo dependent — loses to AI-speed adversaries by design',
+  ],
+};
+const economicsAfter = {
+  label: 'InstaSecure guardrails',
+  bullets: [
+    'Fixed-cost boundary — one enforcement layer, organization-wide, forever',
+    'Deterministic coverage — impossibility is impossibility at any attacker speed',
+    'Attacker-tempo independent — prevention doesn\'t race, it pre-commits',
+  ],
+};
 ---
 <BaseLayout
-  title="InstaSecure — Proactive Cloud Security for AWS"
-  description="Built for AWS, InstaSecure enforces enterprise-wide baselines, stops misconfigurations, and prevents privilege creep — with zero friction and zero code changes."
+  title="InstaSecure — The Guardrails Platform for AWS"
+  description="Attackers got AI. Defense needs automation. InstaSecure is the Guardrails platform for AWS — preventive, organization-wide policy that makes whole classes of attack structurally impossible. Zero code. Minutes to enforced."
 >
   <Hero
-    eyebrow="Proactive Cloud Security"
-    title="Zero Noise — All Fixes."
-    description="Built for AWS, InstaSecure enables DevSecOps, platform, and cloud security teams to enforce enterprise-wide baselines, stop misconfigurations, and prevent privilege creep — hardening your cloud with stronger security, faster compliance, and cost savings, with zero friction and zero code changes."
+    eyebrow="Agentic Cloud Security · Preventive Guardrails"
+    title="Attackers got AI. Your defense needs automation."
+    description="InstaSecure is the Guardrails platform for AWS — automated, organization-wide policy that makes whole classes of attack structurally impossible. Stolen credentials go inert. Rogue agents hit a wall. Privilege drift loses its blast radius. Zero code. Minutes to enforced."
     primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
-    secondaryCta={{ label: 'Book a Demo', href: '/contact' }}
+    secondaryCta={{ label: 'Find your guardrails phase', href: '/contact' }}
+    trustLine="Available on AWS Marketplace · No credit card · Bills via your AWS account"
     image={{
       src: '/home/hero.mp4',
       poster: '/home/hero-poster.webp',
       width: 960,
       height: 718,
-      alt: 'Rotating highlights: Proactive Threat Reduction, Right-Sized Cloud Access, Preventive Controls, and more.',
+      alt: 'Animated highlights of preventive guardrails — proactive threat reduction, right-sized access, trusted perimeters.',
     }}
   />
 
-  <TrustBadges title="AWS-Native Cloud Security" badges={trustBadgesResolved} />
+  <QuoteStrip
+    quote="We closed 12,000 NHI exposure paths in 48 hours without touching a pipeline."
+    attribution="Design Partner · Financial Services"
+  />
 
   <FeatureGrid
-    eyebrow="Real-Time Remediation"
-    title="Virtual Patches, Instantly"
-    features={threeFeatures}
+    eyebrow="The shift"
+    title="The attack economy flipped. The defense stack didn't."
+    subtitle="Three things changed in 24 months. Most security programs were built for the world that existed before them."
+    features={threats}
     columns={3}
   />
 
   <div class="bg-slate-50">
-    <FeatureGrid
-      eyebrow="Outcomes"
-      title="Security Outcomes You Can Achieve Fast"
-      features={outcomes}
-      columns={3}
+    <VersusBlock
+      eyebrow="The inflection"
+      title="Gates stopped scaling. Guardrails just started."
+      subtitle="The industry moved from scanning to preventing — because there's no other way to keep up with AI-speed attackers."
+      before={gatesVsGuardrails.before}
+      after={gatesVsGuardrails.after}
     />
+    <div class="mx-auto max-w-4xl px-6 pb-20 -mt-10 text-center">
+      <blockquote class="font-serif text-2xl md:text-3xl leading-[1.3] tracking-tight text-[var(--color-text)]">
+        &ldquo;You can't out-detect an AI. You can out-prevent one. Guardrails are how.&rdquo;
+      </blockquote>
+    </div>
   </div>
 
-  <FeatureGrid
-    eyebrow="Two Key Innovations"
-    title="InstaSecure Delivers"
-    features={innovations}
-    columns={2}
-  />
-
-  <section class="mx-auto max-w-7xl px-6 py-20">
-    <div class="text-center max-w-3xl mx-auto mb-12">
-      <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">The InstaSecure Platform</div>
-      <h2 class="text-3xl md:text-5xl font-bold leading-[1.1] tracking-tight text-[var(--color-text)]">The Cloud Identity Firewall Platform</h2>
-      <p class="mt-5 text-lg md:text-xl text-slate-700 leading-relaxed">Preventive cloud controls that rapidly remediate alerts within minutes and automatically prevent future risk of the same type.</p>
-    </div>
-    <Image
-      src={platformDiagram}
-      alt="InstaSecure platform architecture showing preventive guardrails layered across AWS services"
-      widths={[640, 960, 1280, 1600]}
-      sizes="(max-width: 1024px) 100vw, 1024px"
-      format="webp"
-      quality={80}
-      loading="lazy"
-      class="w-full max-w-5xl mx-auto"
-    />
-  </section>
-
-  <StatsRow
-    title="Enhance Your Cloud Security Team"
-    subtitle="Empower your central security team to own the entire process."
-    stats={teamStats}
-    image={{ src: productivityImg.src, alt: 'Productivity gains for cloud security teams using InstaSecure', width: productivityImg.width, height: productivityImg.height }}
-  />
-
-  <FeatureGrid
-    eyebrow="Why We Stand Out"
-    title="Why InstaSecure Stands Out"
-    features={differentiators}
-    columns={4}
+  <MaturityLadder
+    eyebrow="The platform"
+    title="Five phases of guardrails. Wherever you are, there's a set for that."
+    subtitle="The preventive controls library maps to a maturity ladder — every guardrail mapped to NIST, ISO 27001, CIS v8, and CSA CCM."
+    phases={phases}
   />
 
   <div class="bg-slate-50">
-    <section class="mx-auto max-w-7xl px-6 py-20">
-      <div class="max-w-3xl mx-auto text-center mb-10">
-        <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">How We're Different</div>
-        <h2 class="text-3xl md:text-5xl font-bold leading-[1.1] tracking-tight text-[var(--color-text)]">Preventive. Automated. Enterprise-wide.</h2>
-      </div>
-      <ul class="max-w-3xl mx-auto space-y-4">
-        {howDifferent.map(point => (
-          <li class="flex gap-4 items-start p-6 bg-white rounded-xl border border-black/5 shadow-sm">
-            <span class="text-[var(--color-accent)] text-2xl font-bold leading-none shrink-0">✓</span>
-            <span class="text-lg text-slate-800 leading-relaxed">{point}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <StepFlow
+      eyebrow="How it works"
+      title="Zero code. Org-wide. Minutes to enforced."
+      subtitle="No pipeline changes. No developer tickets. Just policy, installed at the control plane."
+      steps={steps}
+    />
   </div>
 
-  <ProductTeaser
-    eyebrow="Our Products"
-    title="Comprehensive Protection for Human and Non-Human Access"
-    products={products}
-  />
-
-  <ComparisonTable
-    eyebrow="How We Compare"
-    title="See Where InstaSecure Stands Apart"
-    subtitle="Side-by-side with in-house efforts, native cloud tools, and legacy security vendors."
-    columns={comparisonColumns}
-    rows={comparisonRows}
-    highlightColumn={0}
-  />
-
-  <TestimonialRow testimonials={testimonials} />
-
-  <section class="mx-auto max-w-7xl px-6 py-20">
-    <div class="mb-12">
-      <SectionHeader eyebrow="Latest from our Blog" title="Fresh Thinking on Cloud Security" />
+  <section class="mx-auto max-w-5xl px-6 py-20">
+    <div class="text-center max-w-3xl mx-auto">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Coexists with your stack</div>
+      <h2 class="font-serif text-3xl md:text-5xl font-semibold leading-[1.1] tracking-tight text-[var(--color-text)]">Your CSPM finds problems. InstaSecure retires categories of them.</h2>
+      <p class="mt-6 text-lg text-slate-700 leading-relaxed">
+        You don't have to rip and replace. Install a guardrail, watch the class of finding stop recurring. Alert fatigue stops — not because you muted the alerts, but because the conditions that create them no longer exist.
+      </p>
     </div>
-    <div class="grid md:grid-cols-3 gap-6">
-      {latestPosts.map(post => (
-        <a href={post.href} class="group p-6 rounded-2xl border border-black/5 bg-white hover:shadow-lg hover:-translate-y-0.5 transition">
-          <div class="text-sm text-slate-600 font-semibold">{post.date}</div>
-          <h3 class="mt-3 text-lg font-bold text-[var(--color-text)] leading-snug group-hover:text-[var(--color-brand)] transition">{post.title}</h3>
-          <div class="mt-5 text-sm font-bold text-[var(--color-brand)]">Read post →</div>
-        </a>
-      ))}
+  </section>
+
+  <div class="bg-slate-50">
+    <VersusBlock
+      eyebrow="The economics"
+      title="Prevention scales. Detection doesn't."
+      before={economicsBefore}
+      after={economicsAfter}
+    />
+  </div>
+
+  <QuoteStrip
+    variant="light"
+    quote="Every guardrail mapped to NIST, ISO 27001, CIS v8, CSA CCM. Continuous evidence. Auditors get the mapping; you get the enforcement."
+  />
+
+  <TestimonialRow
+    eyebrow="From the field"
+    title="What security leaders are saying"
+    testimonials={testimonials}
+  />
+
+  <section class="bg-[var(--color-text)] text-white">
+    <div class="mx-auto max-w-5xl px-6 py-20 text-center">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent)] mb-4">Self-serve on AWS</div>
+      <h2 class="font-serif text-3xl md:text-5xl font-semibold leading-[1.1] tracking-tight text-white">Already on AWS? Start free in minutes.</h2>
+      <p class="mt-6 text-lg text-white/70 leading-relaxed">AWS Partner · AWS Qualified Software. Procurement-friendly — bill through your existing AWS account, no new vendor onboarding.</p>
+      <div class="mt-8">
+        <Button href={AWS_MARKETPLACE} variant="accent" size="lg">Start free trial on AWS Marketplace →</Button>
+        <p class="mt-4 text-sm font-mono uppercase tracking-[0.12em] text-white/60">No credit card · Bills via your AWS account · Cancel anytime</p>
+      </div>
+      <div class="mt-12 flex flex-wrap gap-10 md:gap-16 justify-center items-center">
+        {trustBadgesResolved.map((b) => {
+          const renderedHeight = 64;
+          const aspect = b.intrinsicWidth && b.intrinsicHeight ? b.intrinsicWidth / b.intrinsicHeight : 1;
+          const renderedWidth = Math.round(renderedHeight * aspect);
+          const img = (
+            <img
+              src={b.src}
+              alt={b.alt}
+              width={renderedWidth}
+              height={renderedHeight}
+              loading="lazy"
+              decoding="async"
+              class="object-contain"
+              style={`height: ${renderedHeight}px; width: ${renderedWidth}px;`}
+            />
+          );
+          return b.href
+            ? <a href={b.href} target="_blank" rel="noopener" class="hover:opacity-80 transition">{img}</a>
+            : <div>{img}</div>;
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-slate-50">
+    <div class="mx-auto max-w-7xl px-6 py-20">
+      <div class="mb-14">
+        <SectionHeader
+          eyebrow="Field notes"
+          title="More on guardrails, agentic identity, and AWS perimeters"
+        />
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        {latestPosts.map(post => (
+          <a href={post.href} class="group p-6 rounded-2xl border border-black/5 bg-white hover:shadow-lg hover:-translate-y-0.5 transition">
+            <div class="text-sm font-mono uppercase tracking-[0.12em] text-slate-500">{post.date}</div>
+            <h3 class="mt-3 text-lg font-bold text-[var(--color-text)] leading-snug tracking-tight group-hover:text-[var(--color-brand)] transition">{post.title}</h3>
+            <div class="mt-5 text-sm font-semibold text-[var(--color-brand)]">Read post →</div>
+          </a>
+        ))}
+      </div>
     </div>
   </section>
 
   <CTAStripe
-    title="Ready to Build a Safer Cloud?"
-    description="Cloud teams like yours are already seeing results in weeks. You could be next."
-    supporting="Choose your path — self-serve on AWS Marketplace or schedule a personalized walkthrough."
-    primaryCta={{ label: 'Start Free Trial', href: AWS_MARKETPLACE }}
-    secondaryCta={{ label: 'Get a Demo', href: '/contact' }}
+    title="Find your phase. Get your next 10 guardrails."
+    description="Four minutes of questions, one report. Which guardrails your AWS org is missing, which classes of attack you're exposed to, and the fastest path to enforcement."
+    supporting="No sales call to see the report. Book a threat model only if you want one."
+    primaryCta={{ label: 'Run the assessment', href: '/contact' }}
+    secondaryCta={{ label: 'Book a threat model', href: '/contact' }}
   />
 </BaseLayout>

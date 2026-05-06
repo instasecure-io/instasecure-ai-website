@@ -4,11 +4,14 @@ interface Props { crumbs: Crumb[]; }
 const { crumbs } = Astro.props;
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://instasecure.ai';
+const currentPageUrl = new URL(Astro.url.pathname, Astro.site).toString();
 const itemListElement = crumbs.map((c, i) => ({
   '@type': 'ListItem',
   position: i + 1,
   name: c.label,
-  ...(c.href && { item: c.href.startsWith('http') ? c.href : `${siteUrl}${c.href}` }),
+  item: c.href
+    ? (c.href.startsWith('http') ? c.href : `${siteUrl}${c.href}`)
+    : currentPageUrl,
 }));
 ---
 <nav aria-label="Breadcrumb" class="mx-auto max-w-7xl px-6 pt-6 text-sm text-slate-600">
