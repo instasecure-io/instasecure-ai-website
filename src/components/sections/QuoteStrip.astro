@@ -1,0 +1,24 @@
+---
+interface Props {
+  quote: string;
+  attribution?: string;
+  variant?: 'dark' | 'light';
+}
+const { quote, attribution, variant = 'dark' } = Astro.props;
+const sectionClass = variant === 'dark'
+  ? 'bg-[var(--color-text)] text-white'
+  : 'bg-slate-50 text-[var(--color-text)]';
+const attributionClass = variant === 'dark' ? 'text-white/70' : 'text-slate-600';
+---
+<section class={sectionClass}>
+  <div class="mx-auto max-w-4xl px-6 py-16 md:py-20 text-center">
+    <blockquote class="font-serif text-2xl md:text-3xl leading-[1.3] tracking-tight">
+      &ldquo;{quote}&rdquo;
+    </blockquote>
+    {attribution && (
+      <div class={`mt-6 text-sm font-mono uppercase tracking-[0.12em] ${attributionClass}`}>
+        — {attribution}
+      </div>
+    )}
+  </div>
+</section>

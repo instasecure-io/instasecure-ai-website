@@ -69,3 +69,7 @@ export const PRIMARY_NAV: NavEntry[] = [
 ];
 
 export const CTA_NAV = { label: 'Book a Demo', href: '/contact' };
+export const TRIAL_CTA = {
+  label: 'Start Free Trial',
+  href: 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa',
+};

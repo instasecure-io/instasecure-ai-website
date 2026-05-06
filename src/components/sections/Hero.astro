@@ -7,9 +7,10 @@ interface Props {
   description: string;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
+  trustLine?: string;
   image?: { src: string; alt: string; width?: number; height?: number; poster?: string };
 }
-const { eyebrow, title, description, primaryCta, secondaryCta, image } = Astro.props;
+const { eyebrow, title, description, primaryCta, secondaryCta, trustLine, image } = Astro.props;
 const isVideo = !!image && /\.(mp4|webm)(\?|$)/i.test(image.src);
 ---
 <section class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
@@ -24,6 +25,9 @@ const isVideo = !!image && /\.(mp4|webm)(\?|$)/i.test(image.src);
         {primaryCta && <Button href={primaryCta.href} variant="accent" size="lg">{primaryCta.label}</Button>}
         {secondaryCta && <Button href={secondaryCta.href} variant="secondary" size="lg">{secondaryCta.label}</Button>}
       </div>
+      {trustLine && (
+        <p class="mt-5 text-sm font-mono uppercase tracking-[0.12em] text-slate-600">{trustLine}</p>
+      )}
     </div>
     {image && (
       <div

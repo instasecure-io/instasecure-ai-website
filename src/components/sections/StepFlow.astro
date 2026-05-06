@@ -1,0 +1,46 @@
+---
+import { Icon } from 'astro-icon/components';
+
+export interface Step {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  steps: Step[];
+}
+import SectionHeader from './SectionHeader.astro';
+const { eyebrow, title, subtitle, steps } = Astro.props;
+---
+<section class="mx-auto max-w-7xl px-6 py-20">
+  {(title || eyebrow) && (
+    <div class="mb-14">
+      <SectionHeader eyebrow={eyebrow} title={title!} subtitle={subtitle} />
+    </div>
+  )}
+  <ol class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-4 relative">
+    {steps.map((s, i) => (
+      <li class="relative bg-white rounded-2xl border border-black/5 shadow-sm p-6 md:p-7 flex flex-col">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="shrink-0 w-10 h-10 rounded-xl bg-[var(--color-brand)] text-white font-mono font-semibold flex items-center justify-center text-sm">
+            {String(i + 1).padStart(2, '0')}
+          </div>
+          <Icon name={s.icon} class="w-6 h-6 text-[var(--color-brand)] opacity-80" />
+        </div>
+        <h3 class="text-lg font-bold text-[var(--color-text)] tracking-tight leading-tight">{s.title}</h3>
+        <p class="mt-2 text-[15px] text-slate-700 leading-relaxed">{s.description}</p>
+        {i < steps.length - 1 && (
+          <div class="hidden lg:block absolute top-1/2 -right-2 w-4 h-4 -mt-2 text-[var(--color-brand)]/40" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" class="w-full h-full">
+              <path d="M2 8 L14 8 M10 4 L14 8 L10 12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        )}
+      </li>
+    ))}
+  </ol>
+</section>

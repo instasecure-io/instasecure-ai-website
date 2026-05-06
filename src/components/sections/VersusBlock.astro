@@ -1,0 +1,55 @@
+---
+import { Icon } from 'astro-icon/components';
+
+export interface Side {
+  label: string;
+  bullets: string[];
+}
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  before: Side;
+  after: Side;
+}
+import SectionHeader from './SectionHeader.astro';
+const { eyebrow, title, subtitle, before, after } = Astro.props;
+---
+<section class="mx-auto max-w-6xl px-6 py-20">
+  {(title || eyebrow) && (
+    <div class="mb-14">
+      <SectionHeader eyebrow={eyebrow} title={title!} subtitle={subtitle} />
+    </div>
+  )}
+  <div class="grid md:grid-cols-2 gap-4 md:gap-6 items-stretch">
+    <article class="rounded-2xl border border-black/10 bg-slate-50 p-8 md:p-10 relative">
+      <div class="flex items-center gap-2 text-slate-500 text-sm font-mono uppercase tracking-[0.12em] mb-5">
+        <Icon name="lucide:x-circle" class="w-4 h-4" />
+        {before.label}
+      </div>
+      <ul class="space-y-4">
+        {before.bullets.map(b => (
+          <li class="flex gap-3 items-start text-[16px] leading-relaxed text-slate-700">
+            <span class="text-slate-400 shrink-0 mt-1">—</span>
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+    <article class="rounded-2xl border-2 border-[var(--color-brand)] bg-white p-8 md:p-10 relative shadow-md shadow-[var(--color-brand)]/10">
+      <div class="flex items-center gap-2 text-[var(--color-brand)] text-sm font-mono uppercase tracking-[0.12em] mb-5">
+        <Icon name="lucide:check-circle-2" class="w-4 h-4" />
+        {after.label}
+      </div>
+      <ul class="space-y-4">
+        {after.bullets.map(b => (
+          <li class="flex gap-3 items-start text-[16px] leading-relaxed text-[var(--color-text)]">
+            <Icon name="lucide:check" class="w-5 h-5 text-[var(--color-brand)] shrink-0 mt-0.5" />
+            <span class="font-medium">{b}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  </div>
+</section>

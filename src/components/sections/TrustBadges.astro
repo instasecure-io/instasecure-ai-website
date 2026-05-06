@@ -12,12 +12,19 @@ export interface Badge {
 interface Props {
   title?: string;
   badges: Badge[];
+  variant?: 'dark' | 'light';
 }
-const { title = 'Proud AWS partner', badges } = Astro.props;
+const { title = 'Proud AWS partner', badges, variant = 'dark' } = Astro.props;
+const sectionClass = variant === 'dark'
+  ? 'bg-[var(--color-text)] text-white'
+  : 'bg-slate-50 text-[var(--color-text)]';
+const titleClass = variant === 'dark'
+  ? 'font-semibold text-white/90'
+  : 'font-mono font-medium text-[var(--color-brand)]';
 ---
-<section class="bg-[var(--color-text)] text-white py-14">
+<section class={`${sectionClass} py-14`}>
   <div class="mx-auto max-w-7xl px-6 text-center">
-    {title && <div class="text-sm uppercase tracking-[0.15em] font-semibold text-white/90 mb-8">{title}</div>}
+    {title && <div class={`text-sm uppercase tracking-[0.15em] mb-8 ${titleClass}`}>{title}</div>}
     <div class="flex flex-wrap gap-10 md:gap-16 justify-center items-center">
       {badges.map(b => {
         const renderedHeight = b.height ?? 56;

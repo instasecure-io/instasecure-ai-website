@@ -2,17 +2,11 @@
   "name": "website",
   "version": "1.0.0",
   "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "visual:baseline": "TARGET_URL=https://instasecure.ai MODE=baseline playwright test tests/visual/capture.spec.ts",
-    "visual:current": "MODE=current playwright test tests/visual/capture.spec.ts",
-    "visual:diff": "node tests/visual/diff.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

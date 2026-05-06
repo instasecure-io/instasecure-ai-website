@@ -1,4 +1,6 @@
 ---
+import SectionHeader from './SectionHeader.astro';
+
 export interface Testimonial {
   quote: string;
   name: string;
@@ -8,10 +10,18 @@ export interface Testimonial {
 
 interface Props {
   testimonials: Testimonial[];
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
 }
-const { testimonials } = Astro.props;
+const { testimonials, eyebrow, title, subtitle } = Astro.props;
 ---
 <section class="mx-auto max-w-7xl px-6 py-20">
+  {(title || eyebrow) && (
+    <div class="mb-14">
+      <SectionHeader eyebrow={eyebrow} title={title!} subtitle={subtitle} />
+    </div>
+  )}
   <div class="grid md:grid-cols-2 gap-8">
     {testimonials.map(t => (
       <figure class="p-8 md:p-10 rounded-2xl bg-slate-50 border border-black/5">
