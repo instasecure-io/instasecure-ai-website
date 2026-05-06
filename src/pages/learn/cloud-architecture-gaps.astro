@@ -1,0 +1,430 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Cloud Hardening as a Proactive Defense Against Adversarial AI | InstaSecure Learn"
+  description="Adversarial AI compressed cloud reconnaissance from weeks to minutes. The architectural problems it exploits — tenancy, perimeter, and blast radius — were always there. A vendor-neutral guide to closing them with AWS-native primitives."
+>
+  <article class="bg-white">
+
+    <!-- ─── Header ─── -->
+    <header class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
+      <div class="mx-auto max-w-3xl px-6 pt-16 pb-12">
+        <a href="/learn" class="text-sm font-mono uppercase tracking-[0.12em] text-[var(--color-brand)] hover:opacity-80 transition">← Learn</a>
+
+        <h1 class="mt-6 font-serif text-3xl md:text-5xl font-semibold leading-[1.1] tracking-tight text-[var(--color-text)]">
+          Cloud Hardening as a Proactive Defense Against Adversarial AI
+        </h1>
+
+        <div class="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+          <span class="font-mono uppercase tracking-[0.12em] text-[var(--color-brand)]">Cloud architecture</span>
+          <span>·</span>
+          <span>12 min read</span>
+          <span>·</span>
+          <span>Updated May 2026</span>
+        </div>
+
+        <p class="mt-8 text-lg md:text-xl text-slate-700 leading-relaxed">
+          AI compressed cloud reconnaissance from weeks to minutes. The architectural problems it exploits — <strong class="text-[var(--color-text)]">tenancy</strong>, <strong class="text-[var(--color-text)]">perimeter</strong>, and <strong class="text-[var(--color-text)]">blast radius</strong> — were always there. This guide is about closing them with AWS-native primitives.
+        </p>
+      </div>
+    </header>
+
+    <!-- ─── Hook: 90-second AI playbook ─── -->
+    <section class="bg-[var(--color-text)] text-white">
+      <div class="mx-auto max-w-3xl px-6 py-16">
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent)] mb-4">The 90-second adversarial AI playbook</div>
+        <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight">It's a Tuesday in 2026. An attacker has 90 seconds.</h2>
+
+        <ol class="mt-10 space-y-5 text-base md:text-lg leading-relaxed">
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">0:00</span><span class="text-white/90">An attacker drops a stolen access key into an LLM-driven agent.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">0:15</span><span class="text-white/90">The agent enumerates 200+ IAM roles and parses every trust policy.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">0:35</span><span class="text-white/90">It identifies three service roles with <code class="font-mono text-[var(--color-accent)]">iam:PassRole</code> into a privileged role.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">0:55</span><span class="text-white/90">It generates the exact <code class="font-mono text-[var(--color-accent)]">aws sts assume-role</code> chain. Tests it.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">1:20</span><span class="text-white/90">Lateral move complete. Reads from S3 in a sibling account.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">1:30</span><span class="text-white/90">The defender's GuardDuty finding hasn't fired yet.</span></li>
+        </ol>
+
+        <p class="mt-10 text-base md:text-lg text-white/70 leading-relaxed">
+          This isn't science fiction. Open-source pentest frameworks paired with frontier models can do this work at this pace today. The question isn't whether attackers are using AI — they are. The question is what you do when your detection clock can't keep up.
+        </p>
+      </div>
+    </section>
+
+    <!-- ─── Three shifts ─── -->
+    <section class="mx-auto max-w-3xl px-6 py-16">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">What changed in 18 months</div>
+      <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">Three things broke at once.</h2>
+
+      <ol class="mt-10 space-y-8">
+        <li>
+          <h3 class="font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Attackers got AI.</h3>
+          <p class="mt-3 text-base md:text-lg text-slate-700 leading-relaxed">Reconnaissance work that used to take a red team a week — enumerating IAM paths, parsing trust chains, finding misconfigurations — now happens in minutes. LLMs are excellent at parsing JSON IAM policies and chaining valid AWS API calls.</p>
+        </li>
+        <li>
+          <h3 class="font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Defenders got more credentials.</h3>
+          <p class="mt-3 text-base md:text-lg text-slate-700 leading-relaxed">Non-human identities — service roles, automation, third-party integrations, AI agents — now outnumber human principals 20–50 to 1 in a typical AWS organization. Every new agent is a new credential. Humans become a rounding error in your principal count.</p>
+        </li>
+        <li>
+          <h3 class="font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Detection economics broke.</h3>
+          <p class="mt-3 text-base md:text-lg text-slate-700 leading-relaxed">Mean-time-to-compromise has collapsed. Mean-time-to-detect, in most organizations, is flat. The gap between them is what attackers live in. Trying to out-detect AI-speed adversaries is a losing race.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ─── Three problems ─── -->
+    <section class="bg-slate-50">
+      <div class="mx-auto max-w-3xl px-6 py-16">
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">The architecture under it</div>
+        <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">Cloud has three structural problems. AI didn't create them — it weaponized them.</h2>
+
+        <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">If you trace any modern cloud breach back through its stages, you'll find the same three architectural gaps showing up — alone or in combination.</p>
+
+        <div class="mt-10 grid md:grid-cols-3 gap-5">
+          <div class="p-6 rounded-2xl bg-white border border-black/5">
+            <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-2">Problem 1</div>
+            <h3 class="font-serif text-xl font-semibold text-[var(--color-text)]">Tenancy</h3>
+            <p class="mt-3 text-[15px] text-slate-700 leading-relaxed">Where is your trust boundary? Cloud accounts are a thin form of isolation — a developer's personal sandbox and an attacker's external account look the same to AWS unless you tell it otherwise.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white border border-black/5">
+            <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-2">Problem 2</div>
+            <h3 class="font-serif text-xl font-semibold text-[var(--color-text)]">Perimeter</h3>
+            <p class="mt-3 text-[15px] text-slate-700 leading-relaxed">Network perimeters protect compute. They don't protect the cloud control plane. Cloud APIs are public endpoints; valid credentials work from anywhere on the internet — the credential portability problem.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white border border-black/5">
+            <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-2">Problem 3</div>
+            <h3 class="font-serif text-xl font-semibold text-[var(--color-text)]">Blast Radius</h3>
+            <p class="mt-3 text-[15px] text-slate-700 leading-relaxed">What can a compromised identity actually do? AI moves this from an external-attacker problem to an insider one — every NHI and agent is now a potential adversary you've already authenticated.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── The cloud trust model ─── -->
+    <section class="mx-auto max-w-3xl px-6 py-16">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">50,000-foot view</div>
+      <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">The cloud trust model is implicitly permissive.</h2>
+
+      <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">On-prem networks are isolated by default — you draw a network boundary with firewalls and stuff lives behind it. The trust model is <em>physical</em>. Either you're inside the perimeter or you're outside.</p>
+
+      <p class="mt-5 text-base md:text-lg text-slate-700 leading-relaxed">Cloud is the inverse. Every API endpoint is reachable from the internet. Every account in the world is one IAM call away from yours. The trust model is <em>logical</em> — and it's expressed entirely through configuration. There are two layers of trust, both implicit unless you make them explicit:</p>
+
+      <div class="mt-8 p-6 rounded-2xl border-l-4 border-[var(--color-brand)] bg-slate-50">
+        <h3 class="font-serif text-lg md:text-xl font-semibold text-[var(--color-text)]">Implicit trust</h3>
+        <p class="mt-2 text-[15px] md:text-base text-slate-700 leading-relaxed">A valid credential is sufficient. AWS doesn't care where the call came from, what device, what user, what time of day — by default. If the signature checks, the call proceeds.</p>
+      </div>
+
+      <div class="mt-4 p-6 rounded-2xl border-l-4 border-[var(--color-accent)] bg-slate-50">
+        <h3 class="font-serif text-lg md:text-xl font-semibold text-[var(--color-text)]">Explicit trust</h3>
+        <p class="mt-2 text-[15px] md:text-base text-slate-700 leading-relaxed">Cross-account assume-role, RAM resource shares, federated identity, S3 bucket policies that name external accounts. Every one of these is a deliberate handshake — but it's also a trust boundary you've widened.</p>
+      </div>
+
+      <p class="mt-8 text-base md:text-lg text-slate-700 leading-relaxed">Layered on top: the configuration surface itself. AWS has 200+ services, 15,000+ API actions, dozens of policy types, and conditions that interact in non-obvious ways. <strong class="text-[var(--color-text)]">Most cloud breaches aren't exploits — they're misconfigurations.</strong> AI just makes finding them faster.</p>
+    </section>
+
+    <!-- ─── Attack flow ─── -->
+    <section class="bg-slate-50">
+      <div class="mx-auto max-w-4xl px-6 py-16">
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">An attack, traced</div>
+        <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">A compromised credential, end to end.</h2>
+
+        <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">Here's how a single stolen credential becomes a multi-account data breach. Each step is enabled by one of the three architectural problems.</p>
+
+        <div class="mt-12 space-y-4">
+          <div class="grid md:grid-cols-[140px_1fr] gap-4 md:gap-6 items-start">
+            <div class="text-sm font-mono uppercase tracking-[0.12em] text-[var(--color-brand)] md:text-right">Step 1</div>
+            <div class="p-5 rounded-xl bg-white border border-black/5">
+              <div class="font-semibold text-[var(--color-text)]">Credential exfiltrated</div>
+              <p class="mt-1 text-sm text-slate-700">An EC2 instance with an IAM role is compromised (SSRF, malicious dependency, leaked GitHub key). The session token is exfiltrated to the attacker.</p>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-[140px_1fr] gap-4 md:gap-6 items-start">
+            <div class="text-sm font-mono uppercase tracking-[0.12em] text-[var(--color-accent-bold)] md:text-right">Perimeter</div>
+            <div class="p-5 rounded-xl bg-white border border-black/5">
+              <div class="font-semibold text-[var(--color-text)]">Credential is portable</div>
+              <p class="mt-1 text-sm text-slate-700">The attacker calls the AWS API from their laptop on a coffee-shop network. AWS accepts the call — there's no condition on source network, source VPC, or source IP. The cloud control plane treats every request the same.</p>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-[140px_1fr] gap-4 md:gap-6 items-start">
+            <div class="text-sm font-mono uppercase tracking-[0.12em] text-[var(--color-accent-bold)] md:text-right">Blast Radius</div>
+            <div class="p-5 rounded-xl bg-white border border-black/5">
+              <div class="font-semibold text-[var(--color-text)]">Privilege escalation</div>
+              <p class="mt-1 text-sm text-slate-700">The compromised role has <code class="font-mono text-[15px] bg-slate-100 px-1 rounded">iam:PassRole</code> and <code class="font-mono text-[15px] bg-slate-100 px-1 rounded">sts:AssumeRole</code>. The attacker chains into a more privileged role — one originally meant for the deployment pipeline. Now they're effectively an admin.</p>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-[140px_1fr] gap-4 md:gap-6 items-start">
+            <div class="text-sm font-mono uppercase tracking-[0.12em] text-[var(--color-accent-bold)] md:text-right">Tenancy</div>
+            <div class="p-5 rounded-xl bg-white border border-black/5">
+              <div class="font-semibold text-[var(--color-text)]">Cross-account data access</div>
+              <p class="mt-1 text-sm text-slate-700">The privileged role can assume a role in a sibling production account — there's no organization-level boundary preventing it. The attacker reads customer data from S3 in the prod account. They never touched prod's perimeter directly; tenancy never enforced one.</p>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-[140px_1fr] gap-4 md:gap-6 items-start">
+            <div class="text-sm font-mono uppercase tracking-[0.12em] text-slate-500 md:text-right">Step 5</div>
+            <div class="p-5 rounded-xl bg-white border border-black/5">
+              <div class="font-semibold text-[var(--color-text)]">GuardDuty fires. Too late.</div>
+              <p class="mt-1 text-sm text-slate-700">Detection eventually catches the anomalous behavior. The data is already gone. The clean-up is a six-figure incident response bill plus regulatory disclosure.</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="mt-12 text-base md:text-lg text-slate-700 leading-relaxed">Three of the four steps are architectural. None of them require an exploit. They require <em>configuration</em> — or rather, the absence of configuration that would make them impossible.</p>
+      </div>
+    </section>
+
+    <!-- ─── Problem 1: Tenancy ─── -->
+    <section class="mx-auto max-w-3xl px-6 py-16">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Problem 1 · Tenancy</div>
+      <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">Where is your trust boundary?</h2>
+
+      <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">In an on-prem world, tenancy is straightforward — you own the building. Networks isolate by physical reality.</p>
+
+      <p class="mt-5 text-base md:text-lg text-slate-700 leading-relaxed">In the cloud, tenancy is multi-layered and mostly logical:</p>
+
+      <ul class="mt-5 space-y-3 text-base md:text-lg text-slate-700 leading-relaxed">
+        <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Physical multi-tenancy</strong> — your VM may share hardware with another tenant. Mitigated by AWS, but not your concern.</span></li>
+        <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Logical multi-tenancy</strong> — accounts and Organizations are the boundary. <em>This</em> is your concern.</span></li>
+        <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">External tenancy</strong> — every other AWS account in the world is one IAM call away from yours unless you say otherwise.</span></li>
+      </ul>
+
+      <p class="mt-8 text-base md:text-lg text-slate-700 leading-relaxed">A developer's personal sandbox account and an attacker's account look <em>identical</em> to your AWS principals. Both are external. Both can be the destination of a cross-account assume-role, an S3 bucket grant, a RAM share. Without explicit organization boundaries, you treat them the same.</p>
+
+      <h3 class="mt-12 font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">The six trust boundary problems of AWS Data Perimeters</h3>
+      <p class="mt-3 text-base md:text-lg text-slate-700 leading-relaxed">AWS's Data Perimeter pattern names three dimensions of trust — <strong class="text-[var(--color-text)]">identity</strong>, <strong class="text-[var(--color-text)]">resource</strong>, and <strong class="text-[var(--color-text)]">network</strong>. Each combines with the right policy mechanism (SCP, RCP, VPC endpoint policy) to close one trust gap. Here are six concrete scenarios — click each one to see which gate blocks it.</p>
+    </section>
+
+    <!-- ─── Embedded interactive demo ─── -->
+    <section class="mx-auto max-w-6xl px-6 pb-16">
+      <div class="rounded-2xl overflow-hidden border border-black/10 bg-white shadow-md">
+        <iframe
+          src="/learn/data-perimeter-demo.html"
+          class="w-full block"
+          style="height: 760px; border: 0;"
+          title="AWS Data Perimeter — interactive demo of six trust boundary scenarios"
+          loading="lazy"
+        ></iframe>
+      </div>
+      <p class="mt-4 text-sm text-slate-500 text-center">Interactive: click a scenario card to see which trust gate blocks the attack and why.</p>
+    </section>
+
+    <!-- ─── Problem 2: Perimeter ─── -->
+    <section class="bg-slate-50">
+      <div class="mx-auto max-w-3xl px-6 py-16">
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Problem 2 · Perimeter</div>
+        <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">Cloud APIs are public endpoints. Your network perimeter doesn't apply.</h2>
+
+        <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">When teams move to the cloud, they bring on-prem network thinking with them. They build VPCs. They split public and private subnets. They put WAFs in front of load balancers. All of that protects <em>compute</em> — the workload network surface.</p>
+
+        <p class="mt-5 text-base md:text-lg text-slate-700 leading-relaxed">It does nothing for the cloud control plane.</p>
+
+        <p class="mt-5 text-base md:text-lg text-slate-700 leading-relaxed">Every AWS API call goes to a public endpoint — <code class="font-mono text-[15px] bg-white px-1 rounded">s3.amazonaws.com</code>, <code class="font-mono text-[15px] bg-white px-1 rounded">sts.amazonaws.com</code>. There's no firewall between the internet and AWS. Whoever has the credentials can call them. This is the <strong class="text-[var(--color-text)]">credential portability problem</strong>: a token works equally well from your prod VPC, your developer laptop, or an attacker's coffee shop.</p>
+
+        <h3 class="mt-12 font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Solution: conditional access via networking constructs</h3>
+
+        <p class="mt-4 text-base md:text-lg text-slate-700 leading-relaxed">AWS gives you the primitives to bind API calls to network conditions. The pattern: deny any API call that doesn't originate from a VPC, VPC endpoint, or trusted IP range you own.</p>
+
+        <div class="mt-6 rounded-xl overflow-hidden border border-black/10 bg-[#0d1117] text-[#e6edf3]">
+          <div class="px-4 py-2 text-xs font-mono uppercase tracking-wider text-[#7d8590] border-b border-white/5 flex justify-between">
+            <span>SCP — Network perimeter</span>
+            <span>JSON</span>
+          </div>
+<pre class="p-5 text-[13px] md:text-sm leading-relaxed overflow-x-auto"><code>{`{
+  "Statement": [{
+    "Sid": "EnforceNetworkPerimeter",
+    "Effect": "Deny",
+    "Action": "*",
+    "Resource": "*",
+    "Condition": {
+      "NotIpAddressIfExists": {
+        "aws:SourceIp": ["10.0.0.0/8", "203.0.113.0/24"]
+      },
+      "StringNotEqualsIfExists": {
+        "aws:SourceVpc": ["vpc-prod"]
+      },
+      "BoolIfExists": {
+        "aws:ViaAWSService": "false"
+      }
+    }
+  }]
+}`}</code></pre>
+        </div>
+
+        <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">The result: stolen credentials are inert outside your trust boundary. The token still authenticates — but the call is denied at the control plane.</p>
+
+        <h3 class="mt-10 font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">This is especially powerful for non-human identities</h3>
+
+        <p class="mt-4 text-base md:text-lg text-slate-700 leading-relaxed">Humans are mobile. They work from home, hotels, and conference WiFi. Constraining them by source IP is operationally fragile.</p>
+
+        <p class="mt-4 text-base md:text-lg text-slate-700 leading-relaxed">Non-human identities aren't. A Lambda function only ever runs in your VPC. A container service role is always called from your ECS clusters. An automation pipeline calls from known runners. <strong class="text-[var(--color-text)]">For NHIs, the trusted-network condition is essentially free</strong> — and NHIs are 95% of your principals.</p>
+      </div>
+    </section>
+
+    <!-- ─── Problem 3: Blast Radius ─── -->
+    <section class="mx-auto max-w-3xl px-6 py-16">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Problem 3 · Blast Radius</div>
+      <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">AI made blast radius an insider problem.</h2>
+
+      <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">Here's the shift that's least talked about: even after you've hardened tenancy and perimeter, <strong class="text-[var(--color-text)]">the threat model itself has changed</strong>.</p>
+
+      <p class="mt-5 text-base md:text-lg text-slate-700 leading-relaxed">Pre-AI, cloud security focused mostly on external attackers. Detection was about catching the unauthenticated outsider. Once an attacker landed, blast radius was a secondary concern — most NHIs lived inside trusted boundaries and got the benefit of the doubt.</p>
+
+      <p class="mt-5 text-base md:text-lg text-slate-700 leading-relaxed">Post-AI, your NHI count exploded — every AI agent, every automation pipeline, every third-party integration is a new credential. <strong class="text-[var(--color-text)]">Each one is now a potential adversary you've already authenticated.</strong> The threat moved inside the perimeter without anyone deciding to let it in.</p>
+
+      <p class="mt-5 text-base md:text-lg text-slate-700 leading-relaxed">Which means the question shifts from "how do we keep attackers out?" to "what damage can each principal actually do, and how do we structurally cap that?"</p>
+
+      <h3 class="mt-12 font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">The IAM entitlement audit you're not doing</h3>
+
+      <p class="mt-4 text-base md:text-lg text-slate-700 leading-relaxed">In a typical AWS organization:</p>
+
+      <ul class="mt-5 space-y-3 text-base md:text-lg text-slate-700 leading-relaxed">
+        <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span>40-60% of IAM policies grant action wildcards (<code class="font-mono text-[15px] bg-slate-100 px-1 rounded">s3:*</code>, <code class="font-mono text-[15px] bg-slate-100 px-1 rounded">ec2:*</code>)</span></li>
+        <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span>Many service roles have <code class="font-mono text-[15px] bg-slate-100 px-1 rounded">iam:PassRole</code> with <code class="font-mono text-[15px] bg-slate-100 px-1 rounded">Resource: *</code> — a privilege escalation primitive</span></li>
+        <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span>Third-party SaaS integrations were granted broad access at onboarding and never reviewed</span></li>
+        <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span>Cross-account assume-role policies use <code class="font-mono text-[15px] bg-slate-100 px-1 rounded">Principal: *</code> with vague conditions</span></li>
+        <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span>Long-lived IAM users coexist with role-based access, both with stale permissions</span></li>
+      </ul>
+
+      <p class="mt-8 text-base md:text-lg text-slate-700 leading-relaxed">An AI agent with a stolen credential can map all of this in seconds. The privilege escalation paths Bishop Fox and Rhino Security documented in 2018 still work — and now they're discoverable in real time.</p>
+
+      <h3 class="mt-12 font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Solution: structurally cap blast radius with SCPs</h3>
+
+      <p class="mt-4 text-base md:text-lg text-slate-700 leading-relaxed">You can't write perfect IAM policies. You can write a policy of last resort that blocks the privilege escalation paths an attacker would actually use:</p>
+
+      <div class="mt-6 rounded-xl overflow-hidden border border-black/10 bg-[#0d1117] text-[#e6edf3]">
+        <div class="px-4 py-2 text-xs font-mono uppercase tracking-wider text-[#7d8590] border-b border-white/5 flex justify-between">
+          <span>SCP — Block privilege escalation</span>
+          <span>JSON</span>
+        </div>
+<pre class="p-5 text-[13px] md:text-sm leading-relaxed overflow-x-auto"><code>{`{
+  "Statement": [{
+    "Sid": "DenyPrivilegeEscalation",
+    "Effect": "Deny",
+    "Action": [
+      "iam:CreateAccessKey",
+      "iam:AttachUserPolicy",
+      "iam:PutUserPolicy",
+      "iam:CreateLoginProfile",
+      "iam:UpdateLoginProfile",
+      "iam:AddUserToGroup",
+      "iam:CreatePolicyVersion",
+      "iam:SetDefaultPolicyVersion",
+      "iam:UpdateAssumeRolePolicy"
+    ],
+    "Resource": "*",
+    "Condition": {
+      "StringNotLike": {
+        "aws:PrincipalArn": "arn:aws:iam::*:role/IAMAdmins*"
+      }
+    }
+  }]
+}`}</code></pre>
+      </div>
+
+      <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">This SCP makes a whole class of privesc structurally impossible. An attacker with any role except your designated IAM admin role <em>cannot</em> escalate. Doesn't matter how broad their original permissions were — the SCP intersects.</p>
+
+      <p class="mt-5 text-base md:text-lg text-slate-700 leading-relaxed">Pair it with a destructive-actions SCP (denies bulk delete, GuardDuty disable, S3 bucket policy modification by non-admin roles), and the worst-case blast radius from any compromised NHI shrinks dramatically.</p>
+    </section>
+
+    <!-- ─── Practical mapping ─── -->
+    <section class="bg-slate-50">
+      <div class="mx-auto max-w-4xl px-6 py-16">
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Where to start</div>
+        <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">A five-phase ladder, mapped to the three problems.</h2>
+
+        <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">You don't need to ship every control at once. The five-phase ladder below is a practical sequence — most organizations have phase 1 done implicitly via Control Tower, then stall. Climb one phase at a time.</p>
+
+        <div class="mt-10 overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="border-b-2 border-[var(--color-brand)]/20">
+                <th class="py-3 pr-4 text-xs uppercase tracking-[0.12em] font-mono font-semibold text-[var(--color-brand)]">Phase</th>
+                <th class="py-3 pr-4 text-xs uppercase tracking-[0.12em] font-mono font-semibold text-[var(--color-brand)]">What it does</th>
+                <th class="py-3 text-xs uppercase tracking-[0.12em] font-mono font-semibold text-[var(--color-brand)]">Solves</th>
+              </tr>
+            </thead>
+            <tbody class="text-base">
+              <tr class="border-b border-black/5">
+                <td class="py-4 pr-4 font-semibold text-[var(--color-text)]">1 · Foundation</td>
+                <td class="py-4 pr-4 text-slate-700">Protect security services from being disabled (CloudTrail, GuardDuty, Config)</td>
+                <td class="py-4 text-slate-600 text-sm">All three</td>
+              </tr>
+              <tr class="border-b border-black/5">
+                <td class="py-4 pr-4 font-semibold text-[var(--color-text)]">2 · Scope</td>
+                <td class="py-4 pr-4 text-slate-700">Deny non-approved regions, services, and public-by-default resources</td>
+                <td class="py-4 text-slate-600 text-sm">Tenancy, Perimeter</td>
+              </tr>
+              <tr class="border-b border-black/5">
+                <td class="py-4 pr-4 font-semibold text-[var(--color-text)]">3 · Hygiene</td>
+                <td class="py-4 pr-4 text-slate-700">Mandatory tags, encryption, IMDSv2, no IAM users, no long-lived keys</td>
+                <td class="py-4 text-slate-600 text-sm">Tenancy</td>
+              </tr>
+              <tr class="border-b border-black/5">
+                <td class="py-4 pr-4 font-semibold text-[var(--color-text)]">4 · Depth</td>
+                <td class="py-4 pr-4 text-slate-700">Block privilege escalation primitives, restrict destructive actions</td>
+                <td class="py-4 text-slate-600 text-sm font-semibold">Blast Radius</td>
+              </tr>
+              <tr>
+                <td class="py-4 pr-4 font-semibold text-[var(--color-text)]">5 · Perimeter</td>
+                <td class="py-4 pr-4 text-slate-700">Identity / resource / network trust boundaries (Data Perimeter)</td>
+                <td class="py-4 text-slate-600 text-sm font-semibold">Tenancy, Perimeter</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="mt-10 text-base md:text-lg text-slate-700 leading-relaxed">Every phase is implementable with AWS-native primitives — Service Control Policies, Resource Control Policies (GA late 2024), VPC endpoint policies, IAM conditions. No third-party tooling required to start.</p>
+      </div>
+    </section>
+
+    <!-- ─── Take-home checklist ─── -->
+    <section class="mx-auto max-w-3xl px-6 py-16">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Take-home checklist</div>
+      <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">Ten things to check tonight.</h2>
+
+      <ol class="mt-10 space-y-4 text-base md:text-lg text-slate-700 leading-relaxed">
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">01</span><span>Run IAM Access Analyzer against your org. Look at the public-resource and cross-account-access findings.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">02</span><span>Audit how many IAM users exist. Plan to delete them.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">03</span><span>Audit assume-role trust policies for <code class="font-mono text-[15px] bg-slate-100 px-1 rounded">Principal: *</code> or wide patterns. Add <code class="font-mono text-[15px] bg-slate-100 px-1 rounded">aws:PrincipalOrgID</code> conditions.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">04</span><span>Check whether CloudTrail can be disabled by any non-admin role. Ship the SCP that says no.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">05</span><span>List every active AWS region. Deny the ones you don't use.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">06</span><span>Require IMDSv2 on EC2 launches. SSRF + IMDSv1 is exactly how Capital One happened.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">07</span><span>Block S3 buckets from being made public via SCP — even if a misconfig tries.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">08</span><span>Identify your privilege-escalation IAM actions and deny them outside your IAM admin role.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">09</span><span>Inventory every NHI. For each, ask: does it ever call AWS from outside our VPC? If no, scope it to your VPCs.</span></li>
+        <li class="flex gap-4"><span class="font-mono font-semibold text-[var(--color-brand)] shrink-0 w-6">10</span><span>Review your data perimeter. If you don't have one, AWS publishes example policies — start there.</span></li>
+      </ol>
+    </section>
+
+    <!-- ─── References ─── -->
+    <section class="bg-slate-50">
+      <div class="mx-auto max-w-3xl px-6 py-16">
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Further reading</div>
+        <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">References.</h2>
+
+        <ul class="mt-10 space-y-4 text-base md:text-lg leading-relaxed">
+          <li><a href="https://aws.amazon.com/identity/data-perimeters/" target="_blank" rel="noopener" class="text-[var(--color-brand)] font-medium hover:underline">AWS Data Perimeter — official pattern docs</a></li>
+          <li><a href="https://github.com/aws-samples/data-perimeter-policy-examples" target="_blank" rel="noopener" class="text-[var(--color-brand)] font-medium hover:underline">aws-samples/data-perimeter-policy-examples</a> <span class="text-slate-500 text-sm">— production-ready SCPs and RCPs</span></li>
+          <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_rcp.html" target="_blank" rel="noopener" class="text-[var(--color-brand)] font-medium hover:underline">Resource Control Policies (RCP)</a> <span class="text-slate-500 text-sm">— GA late 2024, the resource-attached counterpart to SCPs</span></li>
+          <li><a href="https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation" target="_blank" rel="noopener" class="text-[var(--color-brand)] font-medium hover:underline">Rhino Security: AWS IAM Privilege Escalation</a> <span class="text-slate-500 text-sm">— the canonical privesc path catalog</span></li>
+          <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-resource-types.html" target="_blank" rel="noopener" class="text-[var(--color-brand)] font-medium hover:underline">IAM Access Analyzer</a> <span class="text-slate-500 text-sm">— surfaces over-permissive policies and external access</span></li>
+          <li><a href="https://github.com/RhinoSecurityLabs/pacu" target="_blank" rel="noopener" class="text-[var(--color-brand)] font-medium hover:underline">Pacu</a> <span class="text-slate-500 text-sm">— AWS exploitation framework, useful for red-team validation</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ─── About this guide ─── -->
+    <section class="mx-auto max-w-3xl px-6 py-16">
+      <div class="p-6 md:p-8 rounded-2xl border border-black/5 bg-white">
+        <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-slate-500 mb-3">About this guide</div>
+        <p class="text-[15px] text-slate-700 leading-relaxed">
+          Written by the team at <a href="/" class="font-semibold text-[var(--color-brand)] hover:underline">InstaSecure</a>. We build a guardrails platform for AWS that operationalizes the techniques in this guide — but the techniques themselves are AWS-native and vendor-neutral. Everything here is implementable without InstaSecure. If you'd like help operationalizing it across a real AWS organization, <a href="/contact" class="font-semibold text-[var(--color-brand)] hover:underline">reach out</a>.
+        </p>
+      </div>
+
+      <div class="mt-12 text-center">
+        <a href="/learn" class="text-sm font-mono uppercase tracking-[0.12em] text-[var(--color-brand)] hover:opacity-80 transition">← Back to Learn</a>
+      </div>
+    </section>
+
+  </article>
+</BaseLayout>
