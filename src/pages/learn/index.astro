@@ -3,15 +3,28 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 
 const articles = [
   {
+    href: '/learn/aws-organizational-policies',
+    eyebrow: 'Interactive simulator',
+    title: 'AWS Organizational Policy Controls — interactive simulator',
+    summary: 'Try AWS organizational policies live: click through six trust scenarios and watch which gate blocks each one. Below the simulator, a tabbed deep-dive on Effective Permissions, Data Perimeter, SCPs, and RCPs — and the AWS evaluation logic that ties them together.',
+    readingTime: 'Hands-on',
+    interactive: true,
+    featured: true,
+    topics: ['Simulator', 'SCP', 'RCP', 'Data Perimeter'],
+  },
+  {
     href: '/learn/cloud-architecture-gaps',
     eyebrow: 'Cloud architecture',
     title: 'Cloud Hardening as a Proactive Defense Against Adversarial AI',
     summary: 'AI compressed cloud reconnaissance from weeks to minutes. The architectural problems it exploits — tenancy, perimeter, and blast radius — were always there. Here\'s a vendor-neutral guide to closing them with AWS-native primitives.',
-    readingTime: '12 min read',
+    readingTime: '15 min read',
     interactive: true,
     topics: ['Tenancy', 'Data Perimeter', 'IAM Blast Radius'],
   },
 ];
+
+const formspreeId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID;
+const newsletterAction = formspreeId ? `https://formspree.io/f/${formspreeId}` : '#';
 ---
 <BaseLayout
   title="Learn — Cloud security architecture, vendor-neutral | InstaSecure"
@@ -32,8 +45,11 @@ const articles = [
   <section class="mx-auto max-w-5xl px-6 py-20">
     <div class="grid gap-8">
       {articles.map(a => (
-        <a href={a.href} class="group block p-8 md:p-10 rounded-2xl border border-black/5 bg-white hover:shadow-xl hover:-translate-y-0.5 transition">
+        <a href={a.href} class={`group block p-8 md:p-10 rounded-2xl border bg-white hover:shadow-xl hover:-translate-y-0.5 transition ${a.featured ? 'border-[var(--color-accent)]/40 ring-1 ring-[var(--color-accent)]/15 shadow-md' : 'border-black/5'}`}>
           <div class="flex flex-wrap items-center gap-3 mb-5">
+            {a.featured && (
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 text-[10px] uppercase tracking-[0.14em] font-mono font-semibold text-[var(--color-accent-bold)]">★ Featured</span>
+            )}
             <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)]">{a.eyebrow}</div>
             <span class="text-xs text-slate-400">·</span>
             <div class="text-xs text-slate-500">{a.readingTime}</div>
@@ -58,6 +74,53 @@ const articles = [
 
     <div class="mt-16 text-center text-sm text-slate-500">
       More guides on AWS hardening, identity, and cloud architecture — coming as we write them.
+    </div>
+  </section>
+
+  <!-- Subscribe — RSS + email -->
+  <section class="bg-slate-50 border-t border-black/5">
+    <div class="mx-auto max-w-3xl px-6 py-16">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-3 text-center">Stay in the loop</div>
+      <h2 class="text-center font-serif text-2xl md:text-3xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">Get new field guides when they ship.</h2>
+      <p class="mt-3 text-center text-base text-slate-600 max-w-xl mx-auto">No marketing. Just deeply technical writing on cloud security architecture, AWS IAM, and the patterns behind real breaches.</p>
+
+      <form
+        action={newsletterAction}
+        method="POST"
+        class="mt-8 flex flex-col sm:flex-row gap-3 max-w-xl mx-auto"
+      >
+        <label class="sr-only" for="newsletter-email">Email address</label>
+        <input
+          id="newsletter-email"
+          type="email"
+          name="email"
+          required
+          placeholder="you@company.com"
+          class="flex-1 rounded-lg border border-black/10 bg-white px-4 py-3 text-[15px] outline-none focus:border-[var(--color-brand)] focus:ring-2 focus:ring-[var(--color-brand)]/20 transition"
+        />
+        <input type="hidden" name="_subject" value="Learn newsletter signup" />
+        <input type="hidden" name="source" value="learn-index" />
+        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+        <button
+          type="submit"
+          class="inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 bg-[var(--color-accent)] text-white font-semibold hover:opacity-90 shadow-md shadow-[var(--color-accent)]/25 transition text-base whitespace-nowrap"
+        >
+          Subscribe →
+        </button>
+      </form>
+
+      <div class="mt-6 flex items-center justify-center gap-3 text-sm text-slate-500">
+        <span>Prefer a feed reader?</span>
+        <a
+          href="/rss.xml"
+          class="inline-flex items-center gap-2 font-mono uppercase tracking-[0.1em] text-xs text-[var(--color-brand)] hover:underline"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6.18 15.64a2.18 2.18 0 1 1 0 4.36 2.18 2.18 0 0 1 0-4.36zM4 4.44A19.56 19.56 0 0 1 23.56 24h-2.83A16.73 16.73 0 0 0 4 7.27V4.44zm0 5.66A13.9 13.9 0 0 1 17.9 24h-2.83A11.07 11.07 0 0 0 4 12.93V10.1z"/>
+          </svg>
+          Subscribe via RSS
+        </a>
+      </div>
     </div>
   </section>
 </BaseLayout>

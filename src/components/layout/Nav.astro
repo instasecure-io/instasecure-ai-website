@@ -7,7 +7,7 @@ import logo from '@/assets/brand/logo.png';
     <a href="/" class="flex items-center shrink-0" aria-label="InstaSecure home">
       <img src={logo.src} alt="InstaSecure" class="h-9 md:h-10 w-auto" width={logo.width} height={logo.height} />
     </a>
-    <ul class="hidden md:flex gap-8 items-center">
+    <ul class="hidden md:flex gap-8 items-center" aria-label="Primary">
       {PRIMARY_NAV.map(item => (
         <li class="relative group">
           <a href={item.href} class="inline-flex items-center gap-1 py-2 text-[15px] font-medium text-[var(--color-text)] hover:text-[var(--color-brand)] transition">
@@ -87,9 +87,116 @@ import logo from '@/assets/brand/logo.png';
       <a href={CTA_NAV.href} class="hidden md:inline-flex rounded-full px-5 py-2 bg-[var(--color-brand)] text-white font-semibold text-[14px] hover:opacity-90 transition shadow-sm">
         {CTA_NAV.label}
       </a>
-      <a href={TRIAL_CTA.href} target="_blank" rel="noopener" class="inline-flex rounded-full px-5 py-2 bg-[var(--color-accent-bold)] text-white font-semibold text-[14px] hover:opacity-90 transition shadow-sm shadow-[var(--color-accent)]/25">
+      <a href={TRIAL_CTA.href} target="_blank" rel="noopener" class="inline-flex rounded-full px-4 md:px-5 py-2 bg-[var(--color-accent-bold)] text-white font-semibold text-[13px] md:text-[14px] hover:opacity-90 transition shadow-sm shadow-[var(--color-accent)]/25">
         {TRIAL_CTA.label}
       </a>
+      <button
+        id="nav-toggle"
+        type="button"
+        class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-[var(--color-text)] hover:bg-slate-100 transition"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg id="nav-icon-open" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="4" y1="7" x2="20" y2="7"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="4" y1="17" x2="20" y2="17"/>
+        </svg>
+        <svg id="nav-icon-close" class="hidden w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18"/>
+          <line x1="18" y1="6" x2="6" y2="18"/>
+        </svg>
+      </button>
     </div>
   </nav>
+
+  <!-- Mobile menu drawer -->
+  <div
+    id="mobile-menu"
+    class="md:hidden hidden border-t border-black/5 bg-white max-h-[calc(100vh-4rem)] overflow-y-auto"
+    aria-label="Mobile navigation"
+  >
+    <ul class="px-4 py-4 space-y-1">
+      {PRIMARY_NAV.map(item => (
+        <li>
+          {(item.children || item.groups) ? (
+            <details class="group">
+              <summary class="flex items-center justify-between cursor-pointer list-none px-3 py-3 rounded-lg font-semibold text-[var(--color-text)] hover:bg-slate-50 transition">
+                <span>{item.label}</span>
+                <svg class="w-4 h-4 opacity-60 transition group-open:rotate-180" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </summary>
+              <ul class="pl-3 pr-1 py-1 space-y-0.5">
+                {item.children && item.children.map(c => (
+                  <li>
+                    <a href={c.href} class="block px-3 py-2 rounded-md text-[15px] text-slate-700 hover:bg-slate-50 hover:text-[var(--color-brand)] transition">
+                      {c.label}
+                    </a>
+                  </li>
+                ))}
+                {item.groups && item.groups.map(g => (
+                  <li class="mt-3 first:mt-1">
+                    <div class="px-3 pt-2 pb-1 text-[11px] uppercase tracking-[0.12em] font-mono font-semibold text-[var(--color-brand)]">{g.heading}</div>
+                    <ul class="space-y-0.5">
+                      {g.items.map(it => (
+                        <li>
+                          <a href={it.href} class="block px-3 py-2 rounded-md text-[15px] text-slate-700 hover:bg-slate-50 hover:text-[var(--color-brand)] transition">
+                            {it.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : (
+            <a href={item.href} class="block px-3 py-3 rounded-lg font-semibold text-[var(--color-text)] hover:bg-slate-50 transition">
+              {item.label}
+            </a>
+          )}
+        </li>
+      ))}
+      <li class="pt-3 mt-2 border-t border-black/5">
+        <a href={CTA_NAV.href} class="block px-3 py-3 rounded-lg font-semibold text-[var(--color-brand)] hover:bg-slate-50 transition">
+          {CTA_NAV.label}
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <script is:inline>
+    (function () {
+      function init() {
+        const btn = document.getElementById('nav-toggle');
+        const menu = document.getElementById('mobile-menu');
+        const iconOpen = document.getElementById('nav-icon-open');
+        const iconClose = document.getElementById('nav-icon-close');
+        if (!btn || !menu || btn.dataset.bound === '1') return;
+        btn.dataset.bound = '1';
+        const setOpen = (open) => {
+          menu.classList.toggle('hidden', !open);
+          iconOpen.classList.toggle('hidden', open);
+          iconClose.classList.toggle('hidden', !open);
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        };
+        btn.addEventListener('click', () => setOpen(menu.classList.contains('hidden')));
+        // Close menu when a link is clicked
+        menu.addEventListener('click', (e) => {
+          const t = e.target;
+          if (t && t.closest('a')) setOpen(false);
+        });
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && !menu.classList.contains('hidden')) setOpen(false);
+        });
+      }
+      document.addEventListener('astro:page-load', init);
+      if (document.readyState !== 'loading') init();
+      else document.addEventListener('DOMContentLoaded', init);
+    })();
+  </script>
 </header>

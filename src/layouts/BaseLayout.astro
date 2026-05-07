@@ -52,8 +52,11 @@ const websiteSchema = {
     <slot name="head" />
   </head>
   <body>
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[var(--color-brand)] focus:text-white focus:rounded-lg focus:font-semibold focus:text-sm focus:shadow-lg">
+      Skip to main content
+    </a>
     <Nav />
-    <main><slot /></main>
+    <main id="main"><slot /></main>
     <Footer />
     <SpeedInsights />
     <Analytics />

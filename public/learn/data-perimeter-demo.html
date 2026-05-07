@@ -5,10 +5,16 @@
 <title>AWS Organizational Policy Controls — SCP & RCP</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #fff; color: #1a1a2e; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; padding: 24px; }
+  html, body { height: 100%; }
+  body {
+    background: #fff; color: #1a1a2e;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    padding: 16px 24px;
+    display: flex; flex-direction: column;
+  }
   h1 { text-align: center; font-size: 1.5rem; margin-bottom: 4px; color: #1a1a2e; }
-  .subtitle { text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 20px; }
-  .controls { text-align: center; margin-bottom: 16px; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .subtitle { text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 12px; }
+  .controls { text-align: center; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
   .controls button {
     background: #fff; color: #1a1a2e; border: 2px solid #e5e7eb;
     padding: 10px 22px; border-radius: 8px; cursor: pointer;
@@ -22,7 +28,23 @@
     min-width: 280px; text-align: center; transition: all 0.3s;
   }
   .step-hint.highlight { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
-  svg { display: block; margin: 0 auto; }
+  svg { display: block; margin: 0 auto; flex: 1; min-height: 0; width: 100%; max-width: 960px; height: auto; max-height: 100%; }
+  /* Data Perimeter scene typography
+     The supporting text inside gates and eval panels uses tiny inline font-size attributes (7–14).
+     Bump them proportionally so they read at a comfortable size, without changing layout positions.
+     Card text uses CSS classes (below) and is excluded from this rule. */
+  #dp-scene text[font-size="7"]  { font-size: 10px; }
+  #dp-scene text[font-size="8"]  { font-size: 11px; }
+  #dp-scene text[font-size="9"]  { font-size: 12px; }
+  #dp-scene text[font-size="10"] { font-size: 13px; }
+  #dp-scene text[font-size="11"] { font-size: 14px; }
+  #dp-scene text[font-size="12"] { font-size: 15px; }
+  #dp-scene text[font-size="13"] { font-size: 16px; }
+  #dp-scene text[font-size="14"] { font-size: 17px; }
+  /* Card text (six scenarios on the left) — class-based so it isn't affected by the font-size selectors above. */
+  .dp-card-header   { font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px; }
+  .dp-card-title    { font-size: 12px; font-weight: 700; letter-spacing: -0.15px; }
+  .dp-card-subtitle { font-size: 10.5px; fill-opacity: 0.85; }
   .label { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
   .packet, .packet-trail { opacity: 0; }
   .firewall-flash, .block-x, .block-label, .eval-text { opacity: 0; }
@@ -48,7 +70,7 @@
   <button id="btn-reset" onclick="resetAll()">Reset</button>
 </div>
 
-<svg id="diagram" viewBox="0 0 960 560" width="960" height="560" xmlns="http://www.w3.org/2000/svg">
+<svg id="diagram" viewBox="0 0 960 590" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="arr-g" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#16a34a"/></marker>
     <marker id="arr-r" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#dc2626"/></marker>
@@ -345,53 +367,57 @@
     <text x="570" y="14" text-anchor="middle" class="label" fill="#1a1a2e" font-size="13" font-weight="bold">AWS Data Perimeter — Three Dimensions of Trust</text>
     <text x="570" y="28" text-anchor="middle" class="label" fill="#6b7280" font-size="10">Click a scenario on the left to see which trust gate blocks it</text>
 
-    <!-- ─── LEFT: 6 CLICKABLE SCENARIO CARDS (vertical stack) ─── -->
+    <!-- ─── LEFT: 6 CLICKABLE SCENARIO CARDS (vertical stack)
+           Each card is 280 wide × 72 tall, with 12px vertical gap (84 stride).
+           Stack runs from y=40 to y=532, ending well above the bottom strip.
+           Right edge at x=290 exactly meets the gate column — clean separation. ─── -->
     <g id="dp-cards">
       <g id="dp-card1" cursor="pointer" onclick="runDpScenario(1)">
-        <rect x="10" y="40" width="250" height="42" rx="6" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
-        <rect x="10" y="40" width="3" height="42" rx="1.5" fill="#2563eb"/>
-        <text x="22" y="55" class="label" fill="#1e40af" font-size="7" font-weight="bold">1 · IDENTITY · RCP</text>
-        <text x="22" y="67" class="label" fill="#1a1a2e" font-size="9" font-weight="bold">Misconfigured bucket policy (Principal:*)</text>
-        <text x="22" y="78" class="label" fill="#6b7280" font-size="7">External account reads S3 customer data</text>
+        <rect x="0" y="40" width="280" height="72" rx="8" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
+        <rect x="0" y="40" width="4" height="72" rx="2" fill="#2563eb"/>
+        <text x="14" y="62"  class="label dp-card-header"   fill="#1e40af">1 · IDENTITY · RCP</text>
+        <text x="14" y="84"  class="label dp-card-title"    fill="#1a1a2e">Misconfigured bucket policy (Principal:*)</text>
+        <text x="14" y="102" class="label dp-card-subtitle" fill="#6b7280">External account reads S3 customer data</text>
       </g>
       <g id="dp-card2" cursor="pointer" onclick="runDpScenario(2)">
-        <rect x="10" y="88" width="250" height="42" rx="6" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
-        <rect x="10" y="88" width="3" height="42" rx="1.5" fill="#2563eb"/>
-        <text x="22" y="103" class="label" fill="#1e40af" font-size="7" font-weight="bold">2 · IDENTITY · VPC EP</text>
-        <text x="22" y="115" class="label" fill="#1a1a2e" font-size="9" font-weight="bold">Personal AWS creds on corporate network</text>
-        <text x="22" y="126" class="label" fill="#6b7280" font-size="7">Dev brings personal access keys into VPC</text>
+        <rect x="0" y="124" width="280" height="72" rx="8" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
+        <rect x="0" y="124" width="4" height="72" rx="2" fill="#2563eb"/>
+        <text x="14" y="146" class="label dp-card-header"   fill="#1e40af">2 · IDENTITY · VPC EP</text>
+        <text x="14" y="168" class="label dp-card-title"    fill="#1a1a2e">Personal AWS creds on corporate network</text>
+        <text x="14" y="186" class="label dp-card-subtitle" fill="#6b7280">Dev brings personal access keys into VPC</text>
       </g>
       <g id="dp-card3" cursor="pointer" onclick="runDpScenario(3)">
-        <rect x="10" y="136" width="250" height="42" rx="6" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
-        <rect x="10" y="136" width="3" height="42" rx="1.5" fill="#d97706"/>
-        <text x="22" y="151" class="label" fill="#92400e" font-size="7" font-weight="bold">3 · RESOURCE · SCP</text>
-        <text x="22" y="163" class="label" fill="#1a1a2e" font-size="9" font-weight="bold">Insider exfils data to personal S3 bucket</text>
-        <text x="22" y="174" class="label" fill="#6b7280" font-size="7">s3:CopyObject to account outside org</text>
+        <rect x="0" y="208" width="280" height="72" rx="8" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
+        <rect x="0" y="208" width="4" height="72" rx="2" fill="#d97706"/>
+        <text x="14" y="230" class="label dp-card-header"   fill="#92400e">3 · RESOURCE · SCP</text>
+        <text x="14" y="252" class="label dp-card-title"    fill="#1a1a2e">Insider exfils data to personal S3 bucket</text>
+        <text x="14" y="270" class="label dp-card-subtitle" fill="#6b7280">s3:CopyObject to account outside org</text>
       </g>
       <g id="dp-card4" cursor="pointer" onclick="runDpScenario(4)">
-        <rect x="10" y="184" width="250" height="42" rx="6" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
-        <rect x="10" y="184" width="3" height="42" rx="1.5" fill="#d97706"/>
-        <text x="22" y="199" class="label" fill="#92400e" font-size="7" font-weight="bold">4 · RESOURCE · VPC EP</text>
-        <text x="22" y="211" class="label" fill="#1a1a2e" font-size="9" font-weight="bold">Compromised app writes to attacker bucket</text>
-        <text x="22" y="222" class="label" fill="#6b7280" font-size="7">Malware uploads via VPC endpoint</text>
+        <rect x="0" y="292" width="280" height="72" rx="8" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
+        <rect x="0" y="292" width="4" height="72" rx="2" fill="#d97706"/>
+        <text x="14" y="314" class="label dp-card-header"   fill="#92400e">4 · RESOURCE · VPC EP</text>
+        <text x="14" y="336" class="label dp-card-title"    fill="#1a1a2e">Compromised app writes to attacker bucket</text>
+        <text x="14" y="354" class="label dp-card-subtitle" fill="#6b7280">Malware uploads via VPC endpoint</text>
       </g>
       <g id="dp-card5" cursor="pointer" onclick="runDpScenario(5)">
-        <rect x="10" y="232" width="250" height="42" rx="6" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
-        <rect x="10" y="232" width="3" height="42" rx="1.5" fill="#16a34a"/>
-        <text x="22" y="247" class="label" fill="#166534" font-size="7" font-weight="bold">5 · NETWORK · SCP</text>
-        <text x="22" y="259" class="label" fill="#1a1a2e" font-size="9" font-weight="bold">Stolen creds used from attacker's network</text>
-        <text x="22" y="270" class="label" fill="#6b7280" font-size="7">Keys leaked on GitHub, called from 185.42.x.x</text>
+        <rect x="0" y="376" width="280" height="72" rx="8" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
+        <rect x="0" y="376" width="4" height="72" rx="2" fill="#16a34a"/>
+        <text x="14" y="398" class="label dp-card-header"   fill="#166534">5 · NETWORK · SCP</text>
+        <text x="14" y="420" class="label dp-card-title"    fill="#1a1a2e">Stolen creds used from attacker's network</text>
+        <text x="14" y="438" class="label dp-card-subtitle" fill="#6b7280">Keys leaked on GitHub, called from 185.42.x.x</text>
       </g>
       <g id="dp-card6" cursor="pointer" onclick="runDpScenario(6)">
-        <rect x="10" y="280" width="250" height="42" rx="6" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
-        <rect x="10" y="280" width="3" height="42" rx="1.5" fill="#16a34a"/>
-        <text x="22" y="295" class="label" fill="#166534" font-size="7" font-weight="bold">6 · NETWORK · RCP</text>
-        <text x="22" y="307" class="label" fill="#1a1a2e" font-size="9" font-weight="bold">Employee accesses S3 from home laptop</text>
-        <text x="22" y="318" class="label" fill="#6b7280" font-size="7">Valid SSO creds from home WiFi, no VPN</text>
+        <rect x="0" y="460" width="280" height="72" rx="8" fill="#fff" stroke="#d1d5db" stroke-width="1.5" class="dp-card-bg"/>
+        <rect x="0" y="460" width="4" height="72" rx="2" fill="#16a34a"/>
+        <text x="14" y="482" class="label dp-card-header"   fill="#166534">6 · NETWORK · RCP</text>
+        <text x="14" y="504" class="label dp-card-title"    fill="#1a1a2e">Employee accesses S3 from home laptop</text>
+        <text x="14" y="522" class="label dp-card-subtitle" fill="#6b7280">Valid SSO creds from home WiFi, no VPN</text>
       </g>
     </g>
 
-    <!-- ─── RIGHT: Trust gates (top-down flow) ─── -->
+    <!-- ─── RIGHT: Trust gates (top-down flow) — shifted right by 35 to give the cards visual breathing room ─── -->
+    <g id="dp-right-group" transform="translate(35, 0)">
 
     <!-- API Request at top -->
     <rect x="430" y="38" width="260" height="28" rx="6" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/>
@@ -505,6 +531,8 @@
     </g>
     <circle class="packet" id="dp-s6-pkt" cx="745" cy="82" r="6" fill="#dc2626" filter="url(#glow-r)"/>
     <circle class="packet-trail" id="dp-s6-trl" cx="745" cy="82" r="3" fill="#dc262688"/>
+
+    </g><!-- /#dp-right-group -->
   </g>
 </svg>
 
@@ -579,19 +607,21 @@ async function handleClick(type){
     return;
   }
   if(currentStep===0){
-    currentDemo=type;currentStep=1;
+    currentDemo=type;currentStep=1;running=true;
     $(`btn-${type}`).classList.add('active');
     $(`${type}-scene`).setAttribute('class','scene-visible');
-    running=true;await animatePolicy(type);running=false;
-    setHint(`Click "${type.toUpperCase()} Demo" again for Step 2: Traffic Flow`,true);
-  } else if(currentStep===1 && currentDemo===type){
-    currentStep=2;running=true;
+    // Step 1: policy is attached and cascades down
+    setHint(`Step 1 of 2: Policy attaches to your AWS Organization...`);
+    await animatePolicy(type);
+    setHint(`Step 1 complete. Now simulating traffic against the ${type.toUpperCase()}...`,true);
+    await new Promise(r=>setTimeout(r,1400));
+    // Step 2: traffic flow runs automatically
+    currentStep=2;
     $(`${type}-traffic`).setAttribute('class','traffic-visible');
     if($(type+'-legend')) $(type+'-legend').style.opacity=1;
-    await new Promise(r=>setTimeout(r,600));
-    setHint('Step 2: Simulating traffic flow...');
+    setHint(`Step 2 of 2: Traffic hits the ${type.toUpperCase()} firewall...`);
     if(type==='scp') await runSCPTraffic(); else await runRCPTraffic();
-    setHint('Done! Click Reset or try another demo.');
+    setHint('Done. Click Reset or try another demo.');
     running=false;
   }
 }
