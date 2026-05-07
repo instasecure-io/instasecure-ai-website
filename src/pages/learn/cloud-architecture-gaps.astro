@@ -113,18 +113,18 @@ const breadcrumbSchema = {
     <!-- ─── 1. Hook: Tuesday in 2026 ────────────────────────────────────── -->
     <section class="bg-[var(--color-text)] text-white">
       <div class="mx-auto max-w-3xl px-6 py-16">
-        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent)] mb-4">The 90-second adversarial AI playbook</div>
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent-on-dark)] mb-4">The 90-second adversarial AI playbook</div>
         <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight">It's a Tuesday in 2026. An attacker has 90 seconds.</h2>
 
         <p class="mt-6 text-base md:text-lg text-white/80 leading-relaxed">A stolen access key falls into the hands of an LLM-driven agent. Not a human red-teamer working a week-long engagement — an autonomous loop that calls AWS APIs, reads the responses, decides what to do next, and never gets tired.</p>
 
         <ol class="mt-10 space-y-5 text-base md:text-lg leading-relaxed">
-          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">0:00</span><span class="text-white/90">Stolen access key dropped into the agent.</span></li>
-          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">0:15</span><span class="text-white/90">Agent enumerates IAM roles, parses every trust policy.</span></li>
-          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">0:35</span><span class="text-white/90">Identifies a cross-account <code class="font-mono text-[var(--color-accent)]">sts:AssumeRole</code> into a sibling production account.</span></li>
-          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">0:55</span><span class="text-white/90">Generates the assume-role chain. Tests it.</span></li>
-          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">1:20</span><span class="text-white/90">Lateral move complete. Reads customer data from S3 in the production account.</span></li>
-          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent)] font-semibold shrink-0 w-14">1:30</span><span class="text-white/90">GuardDuty hasn't fired yet. Five AWS API calls. No exploit.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">0:00</span><span class="text-white/90">Stolen access key dropped into the agent.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">0:15</span><span class="text-white/90">Agent enumerates IAM roles, parses every trust policy.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">0:35</span><span class="text-white/90">Identifies a cross-account <code class="font-mono text-[var(--color-accent-on-dark)]">sts:AssumeRole</code> into a sibling production account.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">0:55</span><span class="text-white/90">Generates the assume-role chain. Tests it.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">1:20</span><span class="text-white/90">Lateral move complete. Reads customer data from S3 in the production account.</span></li>
+          <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">1:30</span><span class="text-white/90">GuardDuty hasn't fired yet. Five AWS API calls. No exploit.</span></li>
         </ol>
 
         <p class="mt-10 text-base md:text-lg text-white/70 leading-relaxed">This isn't science fiction. The cast below is the actual recording — real AWS accounts, real IAM, no exploit. Open-source pentest frameworks paired with frontier models can do this work at this pace today.</p>
@@ -220,7 +220,7 @@ const breadcrumbSchema = {
         <div class="mt-6 grid md:grid-cols-3 gap-4">
           <div class="rounded-xl border border-black/10 bg-white overflow-hidden">
             <div class="px-5 py-3 bg-[var(--color-text)] text-white">
-              <div class="text-xs font-mono uppercase tracking-[0.12em] text-[var(--color-accent)]">Attacker</div>
+              <div class="text-xs font-mono uppercase tracking-[0.12em] text-[var(--color-accent-on-dark)]">Attacker</div>
               <div class="font-mono text-sm mt-1">acct&nbsp;111111111111</div>
             </div>
             <div class="p-5 space-y-2 text-sm text-slate-700">
@@ -232,7 +232,7 @@ const breadcrumbSchema = {
 
           <div class="rounded-xl border border-black/10 bg-white overflow-hidden">
             <div class="px-5 py-3 bg-[var(--color-brand)] text-white">
-              <div class="text-xs font-mono uppercase tracking-[0.12em] text-white/80">Your company</div>
+              <div class="text-xs font-mono uppercase tracking-[0.12em] text-white">Your company</div>
               <div class="font-mono text-sm mt-1">acct&nbsp;222222222222</div>
             </div>
             <div class="p-5 space-y-2 text-sm text-slate-700">
@@ -273,7 +273,7 @@ const breadcrumbSchema = {
 
       <!-- Internet header strip -->
       <div class="mt-8 max-w-4xl mx-auto p-4 rounded-xl bg-[var(--color-text)] text-center">
-        <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent)]">Public internet · no perimeter</div>
+        <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent-on-dark)]">Public internet · no perimeter</div>
         <div class="mt-1 text-sm text-white/80">Attacker laptop · Dev personal AWS · Engineer's coffee-shop wifi</div>
       </div>
 
@@ -314,7 +314,7 @@ const breadcrumbSchema = {
     <!-- ─── 7. Problem 3 · Blast Radius ─────────────────────────────────── -->
     <section class="bg-[var(--color-text)] text-white">
       <div class="mx-auto max-w-3xl px-6 py-16">
-        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent)] mb-4">Problem 3 · Blast Radius</div>
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent-on-dark)] mb-4">Problem 3 · Blast Radius</div>
         <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight">AI made this an insider problem.</h2>
 
         <p class="mt-8 text-base md:text-lg text-white/80 leading-relaxed">Pre-AI, cloud security focused on external attackers. Detection was about catching the unauthenticated outsider. Once an attacker landed, blast radius was a secondary concern — most NHIs lived inside trusted boundaries and got the benefit of the doubt.</p>
@@ -334,7 +334,7 @@ const breadcrumbSchema = {
 
       <p class="mt-6 text-base md:text-lg text-slate-700 leading-relaxed">AI just makes finding them faster. The AWS API surface keeps growing — dozens of policy types, conditions that interact in non-obvious ways, a steady drip of new permissions every quarter. You don't need a CVE to compromise an AWS account; you need an over-broad role, a wildcard, and patience.</p>
 
-      <p class="mt-4 text-sm text-slate-500">Tracked at <a href="https://aws.permissions.cloud" target="_blank" rel="noopener" class="text-[var(--color-brand)] hover:underline">aws.permissions.cloud</a></p>
+      <p class="mt-4 text-sm text-slate-500">Tracked at <a href="https://aws.permissions.cloud" target="_blank" rel="noopener" class="text-[var(--color-brand)] underline">aws.permissions.cloud</a></p>
     </section>
 
     <!-- ─── 9. Attack flow, end to end ──────────────────────────────────── -->
@@ -444,7 +444,7 @@ const breadcrumbSchema = {
 
       </div>
 
-      <p class="mt-8 text-sm text-slate-500">Framework: <a href="https://aws.amazon.com/identity/data-perimeters-on-aws/" target="_blank" rel="noopener" class="text-[var(--color-brand)] hover:underline">aws.amazon.com/identity/data-perimeters-on-aws</a></p>
+      <p class="mt-8 text-sm text-slate-500">Framework: <a href="https://aws.amazon.com/identity/data-perimeters-on-aws/" target="_blank" rel="noopener" class="text-[var(--color-brand)] underline">aws.amazon.com/identity/data-perimeters-on-aws</a></p>
     </section>
 
     <!-- ─── 11. Interactive demo ────────────────────────────────────────── -->
@@ -517,7 +517,7 @@ const breadcrumbSchema = {
         </table>
       </div>
 
-      <p class="mt-6 text-sm text-slate-500">Phases 1–4 link to subdirectories of <a href="https://github.com/aws-samples/service-control-policy-examples" target="_blank" rel="noopener" class="text-[var(--color-brand)] hover:underline">aws-samples/service-control-policy-examples</a>. Phase 5 lives in the dedicated <a href="https://github.com/aws-samples/data-perimeter-policy-examples" target="_blank" rel="noopener" class="text-[var(--color-brand)] hover:underline">data-perimeter-policy-examples</a> repo.</p>
+      <p class="mt-6 text-sm text-slate-500">Phases 1–4 link to subdirectories of <a href="https://github.com/aws-samples/service-control-policy-examples" target="_blank" rel="noopener" class="text-[var(--color-brand)] underline">aws-samples/service-control-policy-examples</a>. Phase 5 lives in the dedicated <a href="https://github.com/aws-samples/data-perimeter-policy-examples" target="_blank" rel="noopener" class="text-[var(--color-brand)] underline">data-perimeter-policy-examples</a> repo.</p>
 
       <p class="mt-8 text-base md:text-lg text-slate-700 leading-relaxed max-w-3xl">Every phase is implementable with AWS-native primitives — Service Control Policies, Resource Control Policies (GA late 2024), VPC endpoint policies, IAM conditions. No third-party tooling required to start.</p>
     </section>
@@ -594,6 +594,18 @@ const breadcrumbSchema = {
           poster: 'npt:0:1',
           idleTimeLimit: 0.8,
         });
+        // Patch a11y: the vendored asciinema player exposes the timer as
+        // role="textbox" but without an accessible name. Lighthouse flags it.
+        // Add the label once the DOM nodes exist; retry briefly while the player mounts.
+        let tries = 0;
+        const labelTimer = () => {
+          const t = host.querySelector('.ap-timer');
+          if (t && !t.getAttribute('aria-label')) {
+            t.setAttribute('aria-label', 'Playback time');
+          }
+          if (++tries < 20 && (!t || !t.getAttribute('aria-label'))) setTimeout(labelTimer, 100);
+        };
+        labelTimer();
       }
       // Fires on initial load and on every Astro view transition
       document.addEventListener('astro:page-load', initCast);

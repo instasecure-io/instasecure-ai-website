@@ -51,8 +51,8 @@ const challenges = [
 ];
 ---
 <BaseLayout
-  title="InstaWorkforce — Secure Human Access to the Cloud | InstaSecure"
-  description="Agentless engine connecting your IdP, AWS Identity Center, and AWS accounts to compute true end-to-end permissions — who can actually access what."
+  title="InstaWorkforce — AWS Human Access Security & IAM Controls | InstaSecure"
+  description="Secure human access to AWS with InstaWorkforce. Agentless engine connects your IdP, AWS Identity Center, and AWS accounts to compute true permissions — and applies preventive AWS security controls (SCPs, permission boundaries, data perimeters) to enforce least privilege."
 >
   <StructuredData slot="head" data={{
     '@context': 'https://schema.org',
@@ -82,8 +82,8 @@ const challenges = [
   />
 
   <FeatureGrid
-    eyebrow="Core Capabilities"
-    title="What InstaWorkforce Does"
+    eyebrow="AWS Identity & Access Security Controls"
+    title="AWS Security Controls for Human Access"
     features={coreCapabilities}
     columns={2}
   />
@@ -139,10 +139,10 @@ const challenges = [
   />
   <FeatureRow
     eyebrow="Capability 03"
-    title="Identify Key Risk Categories"
+    title="Identify AI Agent & Human Permission Risks"
     bullets={[
-      'Quickly detect lateral movement threats, toxic permission combinations, and Identity Provider bypass vulnerabilities',
-      'Identify and stop unauthorized privilege escalation across cloud accounts',
+      'Detect AI agent permission sprawl, lateral movement threats, toxic permission combinations, and Identity Provider bypass vulnerabilities',
+      'Identify and stop unauthorized privilege escalation across cloud accounts — for human and non-human identities alike',
       'Continuously scan identity provider vulnerabilities to protect cloud identities',
     ]}
     image={{ src: ft03.src, alt: 'Colorful pie chart showing risk distribution across five categories.' }}
