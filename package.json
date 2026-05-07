@@ -8,7 +8,9 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "indexnow": "node scripts/indexnow-ping.mjs",
+    "indexnow:all": "node scripts/indexnow-ping.mjs --all"
   },
   "keywords": [],
   "author": "",
