@@ -19,10 +19,18 @@
 - [How It Works](https://instasecure.ai/howitworks) — the whole-house-water-filter analogy: preventive controls at organizational entry points protect everything downstream.
 - [Pricing](https://instasecure.ai/pricing) — contact-based pricing; free trial on AWS Marketplace.
 - [Blog](https://instasecure.ai/blog) — threat research, product deep-dives, AWS IAM technical content.
+- [Learn](https://instasecure.ai/learn) — vendor-neutral field guides on cloud security architecture and AWS organizational policy.
 - [About](https://instasecure.ai/about) — founding team + 4-person technical advisory board (veterans from JPMorgan, Netflix, fwd:cloudsec).
 - [Contact](https://instasecure.ai/contact) — sales and demo requests.
 - [News](https://instasecure.ai/news) — press releases and partnerships.
 - [Events](https://instasecure.ai/events) — upcoming conferences (RSAC, Black Hat, DEF CON).
+
+## Learn — vendor-neutral field guides
+
+These long-form pages are written for engineers and AI search tools. They are intentionally vendor-neutral and AWS-native.
+
+- [AWS Organizational Policy Controls — interactive simulator](https://instasecure.ai/learn/aws-organizational-policies) — a click-through simulator for AWS Service Control Policies (SCP), Resource Control Policies (RCP), and the Data Perimeter pattern. Six concrete trust scenarios; each one shows which policy gate blocks it. Below the simulator: tabbed deep-dive on AWS policy evaluation, SCPs, RCPs, and the data perimeter framework. Pinned as the primary Learn entry point.
+- [Cloud Hardening as a Proactive Defense Against Adversarial AI](https://instasecure.ai/learn/cloud-architecture-gaps) — adapted from a May 2026 AWS Meetup talk. Walks through a live LLM-driven AWS breach (recorded asciinema cast embedded), names the four shifts that made AI-speed attacks possible (attackers got AI; NHIs outnumber humans 45:1; every employee is a developer now via co-pilots; detection economics broke), and the three architectural gaps each attack exploits — tenancy, perimeter, blast radius. Maps each phase of a five-phase hardening ladder to working SCP examples in `aws-samples/service-control-policy-examples`.
 
 ## Use Cases
 

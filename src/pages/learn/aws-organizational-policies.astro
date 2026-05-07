@@ -1,0 +1,314 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'AWS Organizational Policy Controls — interactive simulator',
+  description: 'An interactive simulator for AWS organizational policies — Service Control Policies (SCP), Resource Control Policies (RCP), and the Data Perimeter pattern. See how each gate blocks a specific class of attack, with deep-dive docs on AWS policy evaluation.',
+  author: { '@type': 'Organization', name: 'InstaSecure', url: 'https://instasecure.ai/' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'InstaSecure',
+    url: 'https://instasecure.ai/',
+    logo: { '@type': 'ImageObject', url: 'https://instasecure.ai/favicon.png' },
+  },
+  datePublished: '2026-05-07',
+  dateModified: '2026-05-07',
+  url: 'https://instasecure.ai/learn/aws-organizational-policies/',
+  mainEntityOfPage: 'https://instasecure.ai/learn/aws-organizational-policies/',
+  image: 'https://instasecure.ai/og-default.png',
+  about: ['Service Control Policies', 'Resource Control Policies', 'AWS Data Perimeter', 'IAM policy evaluation'],
+  keywords: 'AWS SCP, RCP, Resource Control Policy, Service Control Policy, Data Perimeter, IAM policy evaluation, AWS Organizations',
+  inLanguage: 'en-US',
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://instasecure.ai/' },
+    { '@type': 'ListItem', position: 2, name: 'Learn', item: 'https://instasecure.ai/learn/' },
+    { '@type': 'ListItem', position: 3, name: 'AWS Organizational Policy Controls', item: 'https://instasecure.ai/learn/aws-organizational-policies/' },
+  ],
+};
+---
+<BaseLayout
+  title="AWS Organizational Policy Controls — interactive simulator | InstaSecure Learn"
+  description="Interactive simulator for AWS SCPs, RCPs, and the Data Perimeter pattern. Click six trust scenarios — see which gate blocks each, with policy deep-dives."
+>
+  <Fragment slot="head">
+    <StructuredData data={articleSchema} />
+    <StructuredData data={breadcrumbSchema} />
+  </Fragment>
+
+  <article class="bg-white">
+
+    <!-- ─── Hero ─────────────────────────────────────────────────────────── -->
+    <header class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
+      <div class="mx-auto max-w-4xl px-6 pt-12 pb-12">
+        <nav aria-label="Breadcrumb" class="text-sm">
+          <ol class="flex flex-wrap items-center gap-1.5 text-slate-500">
+            <li><a href="/" class="hover:text-[var(--color-brand)] transition">Home</a></li>
+            <li aria-hidden="true" class="text-slate-300">›</li>
+            <li><a href="/learn" class="hover:text-[var(--color-brand)] transition">Learn</a></li>
+            <li aria-hidden="true" class="text-slate-300">›</li>
+            <li class="text-[var(--color-text)] font-medium" aria-current="page">AWS Organizational Policy Controls</li>
+          </ol>
+        </nav>
+
+        <h1 class="mt-6 font-serif text-3xl md:text-5xl font-semibold leading-[1.1] tracking-tight text-[var(--color-text)]">
+          AWS Organizational Policy Controls — interactive simulator
+        </h1>
+
+        <div class="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+          <span class="font-mono uppercase tracking-[0.12em] text-[var(--color-brand)]">Interactive demo</span>
+          <span>·</span>
+          <span>Hands-on, no setup</span>
+          <span>·</span>
+          <span>Updated May 2026</span>
+        </div>
+
+        <p class="mt-8 text-lg md:text-xl text-slate-700 leading-relaxed">
+          Click a scenario in the diagram below and watch which gate blocks the request. AWS organizational policy is a layered system — <strong class="text-[var(--color-text)]">Service Control Policies (SCPs)</strong>, <strong class="text-[var(--color-text)]">Resource Control Policies (RCPs)</strong>, identity policies, resource policies, VPC endpoint policies — and each one closes a specific class of attack. The simulator makes the layering visible.
+        </p>
+      </div>
+    </header>
+
+    <!-- ─── Interactive simulator ───────────────────────────────────────── -->
+    <section class="mx-auto max-w-6xl px-6 pt-8 pb-12">
+      <div class="rounded-2xl overflow-hidden border border-black/10 bg-white shadow-md">
+        <iframe
+          src="/learn/data-perimeter-demo.html"
+          class="w-full block"
+          style="height: 820px; border: 0;"
+          title="AWS Organizational Policy Controls — interactive simulator"
+        ></iframe>
+      </div>
+      <p class="mt-4 text-sm text-slate-500 text-center">Try the four modes — <strong>Effective Permissions</strong>, <strong>Data Perimeter</strong>, <strong>SCP Demo</strong>, <strong>RCP Demo</strong> — to see how each policy type behaves.</p>
+    </section>
+
+    <!-- ─── Tabbed deep-dive ────────────────────────────────────────────── -->
+    <section class="bg-slate-50 border-y border-black/5">
+      <div class="mx-auto max-w-4xl px-6 py-16">
+        <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-3">How each policy type works</div>
+        <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">Four modes, explained.</h2>
+        <p class="mt-4 text-base md:text-lg text-slate-700 leading-relaxed">Below is what's happening behind each tab in the simulator above, plus the AWS policy evaluation logic that ultimately decides whether a request goes through.</p>
+
+        <!-- Tab list -->
+        <div class="mt-10 flex flex-wrap gap-1 p-1 rounded-xl bg-white border border-black/10" role="tablist" aria-label="Policy mode docs">
+          <button type="button" data-tab="effective" id="tab-effective" role="tab" aria-controls="panel-effective" aria-selected="true"
+            class="tab-btn flex-1 min-w-[140px] px-4 py-3 rounded-lg text-sm font-semibold text-slate-600 hover:text-[var(--color-text)] data-[active=true]:bg-[var(--color-brand)] data-[active=true]:text-white transition" data-active="true">
+            Effective Permissions
+          </button>
+          <button type="button" data-tab="dp" id="tab-dp" role="tab" aria-controls="panel-dp" aria-selected="false"
+            class="tab-btn flex-1 min-w-[140px] px-4 py-3 rounded-lg text-sm font-semibold text-slate-600 hover:text-[var(--color-text)] data-[active=true]:bg-[var(--color-brand)] data-[active=true]:text-white transition" data-active="false">
+            Data Perimeter
+          </button>
+          <button type="button" data-tab="scp" id="tab-scp" role="tab" aria-controls="panel-scp" aria-selected="false"
+            class="tab-btn flex-1 min-w-[140px] px-4 py-3 rounded-lg text-sm font-semibold text-slate-600 hover:text-[var(--color-text)] data-[active=true]:bg-[var(--color-brand)] data-[active=true]:text-white transition" data-active="false">
+            SCP
+          </button>
+          <button type="button" data-tab="rcp" id="tab-rcp" role="tab" aria-controls="panel-rcp" aria-selected="false"
+            class="tab-btn flex-1 min-w-[140px] px-4 py-3 rounded-lg text-sm font-semibold text-slate-600 hover:text-[var(--color-text)] data-[active=true]:bg-[var(--color-brand)] data-[active=true]:text-white transition" data-active="false">
+            RCP
+          </button>
+        </div>
+
+        <!-- Panels -->
+        <div class="mt-6 p-6 md:p-8 rounded-2xl bg-white border border-black/5">
+
+          <!-- Panel 1: Effective Permissions -->
+          <div data-panel="effective" id="panel-effective" role="tabpanel" aria-labelledby="tab-effective">
+            <h3 class="font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Effective permissions = the intersection of every layer</h3>
+            <p class="mt-3 text-base text-slate-700 leading-relaxed">When a principal calls an AWS API, the request runs through a deterministic chain of policy checks. The simulator's "Effective Permissions" view shows the conceptual layering. The actual rule, simplified:</p>
+            <div class="mt-4 p-4 rounded-lg bg-slate-50 border-l-4 border-[var(--color-accent)]">
+              <p class="text-base text-slate-800 leading-relaxed"><strong class="text-[var(--color-text)]">Explicit DENY anywhere wins. ALLOW must come from at least one applicable source. Anything outside what's allowed is an implicit deny.</strong></p>
+            </div>
+
+            <h4 class="mt-8 font-serif text-lg font-semibold text-[var(--color-text)]">The full evaluation chain</h4>
+            <ol class="mt-3 space-y-3 text-[15px] text-slate-700 leading-relaxed">
+              <li class="flex gap-3"><span class="font-mono text-xs font-semibold text-[var(--color-brand)] shrink-0 w-6 mt-0.5">01</span><span><strong class="text-[var(--color-text)]">Default deny</strong> — every request starts denied unless something allows it.</span></li>
+              <li class="flex gap-3"><span class="font-mono text-xs font-semibold text-[var(--color-brand)] shrink-0 w-6 mt-0.5">02</span><span><strong class="text-[var(--color-text)]">Service Control Policies (SCP)</strong> attached to the principal's account/OU. If any SCP explicitly denies, request is denied. SCPs only filter; they don't grant.</span></li>
+              <li class="flex gap-3"><span class="font-mono text-xs font-semibold text-[var(--color-brand)] shrink-0 w-6 mt-0.5">03</span><span><strong class="text-[var(--color-text)]">Resource Control Policies (RCP)</strong> attached to the resource owner's account/OU. Explicit deny here also wins. RCPs filter what can be done <em>to</em> resources owned by scoped accounts.</span></li>
+              <li class="flex gap-3"><span class="font-mono text-xs font-semibold text-[var(--color-brand)] shrink-0 w-6 mt-0.5">04</span><span><strong class="text-[var(--color-text)]">Resource-based policy</strong> — if the resource has one (S3 bucket, KMS key, SQS queue, Secrets Manager secret). Explicit deny → denied. Explicit allow → contributes to allow.</span></li>
+              <li class="flex gap-3"><span class="font-mono text-xs font-semibold text-[var(--color-brand)] shrink-0 w-6 mt-0.5">05</span><span><strong class="text-[var(--color-text)]">Identity-based policy</strong> — IAM policies attached to the user, role, or group making the call. Same rule: explicit deny wins; explicit allow contributes.</span></li>
+              <li class="flex gap-3"><span class="font-mono text-xs font-semibold text-[var(--color-brand)] shrink-0 w-6 mt-0.5">06</span><span><strong class="text-[var(--color-text)]">Permission boundary</strong> — if attached to the principal, must explicitly allow the action; otherwise denied (acts as a ceiling).</span></li>
+              <li class="flex gap-3"><span class="font-mono text-xs font-semibold text-[var(--color-brand)] shrink-0 w-6 mt-0.5">07</span><span><strong class="text-[var(--color-text)]">Session policies</strong> — if you used <code class="font-mono text-[13px] bg-slate-100 px-1 rounded">sts:AssumeRole</code> with a session policy, it's another ceiling for this session.</span></li>
+              <li class="flex gap-3"><span class="font-mono text-xs font-semibold text-[var(--color-brand)] shrink-0 w-6 mt-0.5">08</span><span><strong class="text-[var(--color-text)]">VPC endpoint policy</strong> — if the call goes through a VPC endpoint, the endpoint policy must allow it.</span></li>
+            </ol>
+
+            <p class="mt-6 text-[15px] text-slate-700 leading-relaxed">Cross-account calls add one more rule: both accounts have to allow it. The calling account's identity policy must allow the call, and the target account's resource policy (or SCP/RCP) must allow it from the external principal.</p>
+
+            <p class="mt-4 text-[15px] text-slate-700 leading-relaxed">Why this matters: a single permissive IAM policy doesn't grant access on its own — it has to survive every other layer. That's why <strong class="text-[var(--color-text)]">SCPs and RCPs are leverage</strong>: they live above IAM and can enforce invariants no individual team can override.</p>
+          </div>
+
+          <!-- Panel 2: Data Perimeter -->
+          <div data-panel="dp" id="panel-dp" role="tabpanel" aria-labelledby="tab-dp" hidden>
+            <h3 class="font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Data Perimeter — six concrete trust gaps to close</h3>
+            <p class="mt-3 text-base text-slate-700 leading-relaxed">A data perimeter is AWS's name for a set of always-on guardrails that ensure <em>only your trusted identities access your trusted resources from expected networks</em>. The "Data Perimeter" tab in the simulator walks through the six concrete control objectives.</p>
+
+            <p class="mt-4 text-base text-slate-700 leading-relaxed">Every API call asks three trust questions — about the <strong class="text-[var(--color-text)]">identity</strong>, the <strong class="text-[var(--color-text)]">resource</strong>, and the <strong class="text-[var(--color-text)]">network</strong>. Each cuts two ways, giving six cells:</p>
+
+            <div class="mt-6 overflow-x-auto">
+              <table class="w-full text-left text-[15px]">
+                <thead>
+                  <tr class="border-b-2 border-[var(--color-brand)]/20">
+                    <th class="py-2 pr-4 text-xs uppercase tracking-[0.12em] font-mono font-semibold text-[var(--color-brand)]">Perimeter</th>
+                    <th class="py-2 pr-4 text-xs uppercase tracking-[0.12em] font-mono font-semibold text-[var(--color-brand)]">Control objective</th>
+                    <th class="py-2 text-xs uppercase tracking-[0.12em] font-mono font-semibold text-[var(--color-brand)]">Enforced by</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-black/5"><td class="py-3 pr-4 font-semibold text-[var(--color-text)]">Identity</td><td class="py-3 pr-4 text-slate-700">Only trusted identities can access my resources</td><td class="py-3 text-slate-600 text-sm font-mono">RCP</td></tr>
+                  <tr class="border-b border-black/5"><td class="py-3 pr-4 font-semibold text-[var(--color-text)]">Identity</td><td class="py-3 pr-4 text-slate-700">Only trusted identities allowed from my network</td><td class="py-3 text-slate-600 text-sm font-mono">VPC endpoint</td></tr>
+                  <tr class="border-b border-black/5"><td class="py-3 pr-4 font-semibold text-[var(--color-text)]">Resource</td><td class="py-3 pr-4 text-slate-700">My identities access only trusted resources</td><td class="py-3 text-slate-600 text-sm font-mono">SCP</td></tr>
+                  <tr class="border-b border-black/5"><td class="py-3 pr-4 font-semibold text-[var(--color-text)]">Resource</td><td class="py-3 pr-4 text-slate-700">Only trusted resources accessed from my network</td><td class="py-3 text-slate-600 text-sm font-mono">VPC endpoint</td></tr>
+                  <tr class="border-b border-black/5"><td class="py-3 pr-4 font-semibold text-[var(--color-text)]">Network</td><td class="py-3 pr-4 text-slate-700">My identities access resources only from expected networks</td><td class="py-3 text-slate-600 text-sm font-mono">SCP</td></tr>
+                  <tr><td class="py-3 pr-4 font-semibold text-[var(--color-text)]">Network</td><td class="py-3 pr-4 text-slate-700">My resources only accessed from expected networks</td><td class="py-3 text-slate-600 text-sm font-mono">RCP</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h4 class="mt-8 font-serif text-lg font-semibold text-[var(--color-text)]">Key condition keys</h4>
+            <ul class="mt-3 space-y-2 text-[15px] text-slate-700 leading-relaxed">
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><code class="font-mono text-[13px] bg-slate-100 px-1 rounded">aws:PrincipalOrgID</code> — caller's AWS Organization. Use to deny access from outside your org.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><code class="font-mono text-[13px] bg-slate-100 px-1 rounded">aws:ResourceOrgID</code> — resource's AWS Organization. Use to deny your principals from touching external resources.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><code class="font-mono text-[13px] bg-slate-100 px-1 rounded">aws:SourceVpc</code> / <code class="font-mono text-[13px] bg-slate-100 px-1 rounded">aws:SourceVpce</code> — call originated from your VPC / VPC endpoint.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><code class="font-mono text-[13px] bg-slate-100 px-1 rounded">aws:ViaAWSService</code> — call was made by an AWS service on your behalf (use to exempt those from network conditions).</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><code class="font-mono text-[13px] bg-slate-100 px-1 rounded">aws:SourceIp</code> — caller's source IP, useful for static workloads with known egress.</span></li>
+            </ul>
+
+            <p class="mt-6 text-[15px] text-slate-700 leading-relaxed">AWS publishes ready-to-deploy example policies in <a href="https://github.com/aws-samples/data-perimeter-policy-examples" target="_blank" rel="noopener" class="text-[var(--color-brand)] hover:underline">aws-samples/data-perimeter-policy-examples</a>. Start there before writing your own.</p>
+          </div>
+
+          <!-- Panel 3: SCP -->
+          <div data-panel="scp" id="panel-scp" role="tabpanel" aria-labelledby="tab-scp" hidden>
+            <h3 class="font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Service Control Policy (SCP)</h3>
+            <p class="mt-3 text-base text-slate-700 leading-relaxed">A Service Control Policy is attached at the AWS Organizations level — to the org root, an OU, or an individual account. It acts as a <strong class="text-[var(--color-text)]">filter on what IAM principals in scoped accounts can do</strong>.</p>
+
+            <h4 class="mt-6 font-serif text-lg font-semibold text-[var(--color-text)]">Core rules</h4>
+            <ul class="mt-3 space-y-2 text-[15px] text-slate-700 leading-relaxed">
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">SCPs don't grant permissions.</strong> They only filter what IAM allows. A principal can do X only if their IAM policy allows X <em>and</em> no SCP denies X.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Apply to every IAM principal</strong> in the scoped account — IAM users, roles, federated identities. Service-linked roles are exempt.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Don't apply to the management account</strong> by default — always run workloads in member accounts.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Inherited down the OU tree.</strong> An SCP at the root applies to every account in every OU below it.</span></li>
+            </ul>
+
+            <h4 class="mt-8 font-serif text-lg font-semibold text-[var(--color-text)]">Two strategies</h4>
+            <div class="mt-3 grid md:grid-cols-2 gap-4">
+              <div class="p-5 rounded-xl bg-slate-50 border-l-[3px] border-[var(--color-brand)]">
+                <div class="font-semibold text-[var(--color-text)]">Allow-list</div>
+                <p class="mt-2 text-sm text-slate-700 leading-relaxed">Deny everything except an enumerated allow set. High security, very high maintenance — every new AWS service requires explicit allow.</p>
+              </div>
+              <div class="p-5 rounded-xl bg-slate-50 border-l-[3px] border-[var(--color-accent)]">
+                <div class="font-semibold text-[var(--color-text)]">Deny-list</div>
+                <p class="mt-2 text-sm text-slate-700 leading-relaxed">Allow everything except specific deny rules. Most common in practice. Use targeted denies for known-risky actions: privilege escalation primitives, security-service tampering, public-resource creation.</p>
+              </div>
+            </div>
+
+            <h4 class="mt-8 font-serif text-lg font-semibold text-[var(--color-text)]">Common patterns</h4>
+            <ul class="mt-3 space-y-2 text-[15px] text-slate-700 leading-relaxed">
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Region pinning</strong> — deny all calls outside approved regions.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Protect security services</strong> — deny disabling CloudTrail, GuardDuty, Config, Access Analyzer.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Block privilege escalation</strong> — deny <code class="font-mono text-[13px] bg-slate-100 px-1 rounded">iam:CreateAccessKey</code>, <code class="font-mono text-[13px] bg-slate-100 px-1 rounded">iam:UpdateAssumeRolePolicy</code>, etc. outside an admin role.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Outbound resource trust</strong> — deny touching resources outside your organization (using <code class="font-mono text-[13px] bg-slate-100 px-1 rounded">aws:ResourceOrgID</code>).</span></li>
+            </ul>
+
+            <p class="mt-6 text-[15px] text-slate-700 leading-relaxed">Working examples: <a href="https://github.com/aws-samples/service-control-policy-examples" target="_blank" rel="noopener" class="text-[var(--color-brand)] hover:underline">aws-samples/service-control-policy-examples</a>.</p>
+          </div>
+
+          <!-- Panel 4: RCP -->
+          <div data-panel="rcp" id="panel-rcp" role="tabpanel" aria-labelledby="tab-rcp" hidden>
+            <h3 class="font-serif text-xl md:text-2xl font-semibold text-[var(--color-text)]">Resource Control Policy (RCP)</h3>
+            <p class="mt-3 text-base text-slate-700 leading-relaxed">RCPs are the resource-side counterpart to SCPs. They went GA in late 2024. Like SCPs, they're attached at the AWS Organizations level — but they apply to <strong class="text-[var(--color-text)]">resources owned by accounts in scope</strong>, not to identities.</p>
+
+            <div class="mt-6 p-4 rounded-lg bg-slate-50 border-l-4 border-[var(--color-brand)]">
+              <p class="text-base text-slate-800 leading-relaxed">SCP answers: <em>"What can my identities do?"</em> · RCP answers: <em>"What can be done <strong>to</strong> my resources?"</em></p>
+            </div>
+
+            <h4 class="mt-8 font-serif text-lg font-semibold text-[var(--color-text)]">Why they exist</h4>
+            <p class="mt-3 text-base text-slate-700 leading-relaxed">SCPs only filter calls made <em>by</em> identities in your org. They can't stop an external principal — say, an attacker with valid credentials in their own AWS account — from calling your S3 bucket if the bucket policy allows it. RCPs close that gap. They apply to <em>every</em> caller (yours, theirs, AWS services), and they sit above resource-based policies in the evaluation chain.</p>
+
+            <h4 class="mt-8 font-serif text-lg font-semibold text-[var(--color-text)]">Core rules</h4>
+            <ul class="mt-3 space-y-2 text-[15px] text-slate-700 leading-relaxed">
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Filter, not grant.</strong> Like SCPs, RCPs only deny; they never grant access.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Apply across calling accounts.</strong> Whether the caller is in your org or external, your RCP applies.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Inherited down the OU tree</strong> just like SCPs.</span></li>
+              <li class="flex gap-3"><span class="text-[var(--color-accent)] font-bold shrink-0">▸</span><span><strong class="text-[var(--color-text)]">Service support is rolling out.</strong> At GA: S3, SQS, SNS, Secrets Manager, KMS, STS. More services follow.</span></li>
+            </ul>
+
+            <h4 class="mt-8 font-serif text-lg font-semibold text-[var(--color-text)]">When to use SCP vs RCP</h4>
+            <div class="mt-3 grid md:grid-cols-2 gap-4">
+              <div class="p-5 rounded-xl bg-slate-50 border-l-[3px] border-[var(--color-brand)]">
+                <div class="font-semibold text-[var(--color-text)]">Use SCP</div>
+                <p class="mt-2 text-sm text-slate-700 leading-relaxed">"My identities must never do X" — region restrictions, privilege escalation primitives, exfiltration to non-org resources. Anything keyed off the caller.</p>
+              </div>
+              <div class="p-5 rounded-xl bg-slate-50 border-l-[3px] border-[var(--color-accent)]">
+                <div class="font-semibold text-[var(--color-text)]">Use RCP</div>
+                <p class="mt-2 text-sm text-slate-700 leading-relaxed">"My resources must never be touched by Y" — block external accounts from reading S3, deny non-org callers to KMS, prevent public bucket access. Anything keyed off the resource.</p>
+              </div>
+            </div>
+
+            <p class="mt-6 text-[15px] text-slate-700 leading-relaxed">Most mature data perimeters use both: SCPs for outbound trust ("my identities can only call my resources") and RCPs for inbound trust ("only my identities can call my resources"). Examples: <a href="https://github.com/aws-samples/data-perimeter-policy-examples" target="_blank" rel="noopener" class="text-[var(--color-brand)] hover:underline">aws-samples/data-perimeter-policy-examples</a>.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Related ──────────────────────────────────────────────────────── -->
+    <section class="mx-auto max-w-3xl px-6 py-16">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-3">Want the full architecture story?</div>
+      <h2 class="font-serif text-2xl md:text-3xl font-semibold leading-tight tracking-tight text-[var(--color-text)]">See how these policies close real attacks.</h2>
+      <p class="mt-4 text-base md:text-lg text-slate-700 leading-relaxed">The simulator above shows the mechanics. The companion field guide walks through a live AI-driven AWS breach end to end — and maps each step of the attack to the architectural gap it exploits and the policy primitive that closes it.</p>
+      <a href="/learn/cloud-architecture-gaps" class="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[var(--color-text)] text-white font-semibold hover:opacity-90 transition">
+        Read the field guide →
+      </a>
+    </section>
+
+    <!-- ─── About ───────────────────────────────────────────────────────── -->
+    <section class="mx-auto max-w-3xl px-6 pb-20">
+      <div class="p-6 md:p-8 rounded-2xl border border-black/5 bg-white shadow-sm">
+        <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-slate-500 mb-3">About this guide</div>
+        <p class="text-[15px] text-slate-700 leading-relaxed">
+          Built by the team at <a href="/" class="font-semibold text-[var(--color-brand)] hover:underline">InstaSecure</a>. We build a guardrails platform for AWS that operationalizes SCPs, RCPs, and data perimeter controls across an entire organization. The simulator and the underlying techniques are AWS-native — everything here is implementable without InstaSecure. If you'd like help operationalizing it, <a href="/contact" class="font-semibold text-[var(--color-brand)] hover:underline">reach out</a>.
+        </p>
+      </div>
+
+      <div class="mt-12 text-center">
+        <a href="/learn" class="text-sm font-mono uppercase tracking-[0.12em] text-[var(--color-brand)] hover:opacity-80 transition">← Back to Learn</a>
+      </div>
+    </section>
+
+  </article>
+
+  <!-- Tab switcher — runs on first load and after Astro view transitions -->
+  <script is:inline>
+    (function () {
+      function initTabs() {
+        const tabs = document.querySelectorAll('[data-tab]');
+        if (!tabs.length) return;
+        tabs.forEach(btn => {
+          if (btn.dataset.tabBound === '1') return;
+          btn.dataset.tabBound = '1';
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.tab;
+            document.querySelectorAll('[data-tab]').forEach(b => {
+              const active = b.dataset.tab === id;
+              b.dataset.active = active ? 'true' : 'false';
+              b.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            document.querySelectorAll('[data-panel]').forEach(p => {
+              p.hidden = p.dataset.panel !== id;
+            });
+          });
+        });
+      }
+      document.addEventListener('astro:page-load', initTabs);
+      if (document.readyState !== 'loading') initTabs();
+      else document.addEventListener('DOMContentLoaded', initTabs);
+    })();
+  </script>
+</BaseLayout>
