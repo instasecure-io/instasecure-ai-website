@@ -1,0 +1,46 @@
+name: IndexNow ping
+
+# Pings the IndexNow API after a push to main lands on Vercel.
+# IndexNow is a single endpoint that propagates to Bing, Yandex, Naver, Seznam,
+# and any other participating engine — speeding up indexing of new content
+# from days to minutes.
+
+on:
+  push:
+    branches: [main]
+    # Skip pings for changes that don't affect URLs (docs, configs, CI, etc.)
+    paths-ignore:
+      - '.github/**'
+      - 'README.md'
+      - 'docs/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'private/**'
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: 'Specific URLs to ping (space-separated). Empty = ping every URL in the sitemap.'
+        required: false
+        default: ''
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Wait for Vercel's auto-deploy on the same push to finish.
+      # Static-site Astro builds typically take 30-60s on Vercel; 90s gives margin.
+      - name: Wait for Vercel deploy to settle
+        run: sleep 90
+
+      - name: Ping IndexNow
+        env:
+          INPUT_URLS: ${{ github.event.inputs.urls }}
+        # Pass the env var into Node, which splits + validates on its side.
+        # Avoids shell word-splitting / metacharacter handling entirely.
+        run: node scripts/indexnow-ping.mjs --from-env

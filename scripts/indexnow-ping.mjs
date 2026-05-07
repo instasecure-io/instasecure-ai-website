@@ -55,11 +55,27 @@ async function ping(urls) {
   }
 }
 
+function parseUrlList(s) {
+  // Split on any whitespace, drop empties, validate https://instasecure.ai prefix.
+  return s
+    .split(/\s+/)
+    .filter(Boolean)
+    .filter(u => /^https:\/\/instasecure\.ai\//.test(u));
+}
+
 const args = argv.slice(2);
 if (args.length === 0) {
-  console.log('Usage: node scripts/indexnow-ping.mjs <url1> [url2 ...]  |  --all');
+  console.log('Usage: node scripts/indexnow-ping.mjs <url1> [url2 ...]  |  --all  |  --from-env (reads INPUT_URLS env)');
   exit(1);
 }
 
-const urls = args[0] === '--all' ? await fetchSitemapUrls() : args;
+let urls;
+if (args[0] === '--all') {
+  urls = await fetchSitemapUrls();
+} else if (args[0] === '--from-env') {
+  const raw = process.env.INPUT_URLS || '';
+  urls = raw.trim() ? parseUrlList(raw) : await fetchSitemapUrls();
+} else {
+  urls = parseUrlList(args.join(' '));
+}
 await ping(urls);
