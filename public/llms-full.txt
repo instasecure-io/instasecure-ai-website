@@ -1,0 +1,256 @@
+# InstaSecure — Full Content for AI Search
+
+> Extended companion to [llms.txt](https://instasecure.ai/llms.txt). Full Markdown of the most-cited Learn pages, optimized for grounded citations by ChatGPT, Claude, Perplexity, Gemini, Bing Copilot, and other AI search tools.
+>
+> Authoritative source: https://instasecure.ai/
+
+InstaSecure is a preventive cloud-security platform for AWS. It enforces 50+ AWS-native preventive guardrails at the AWS Organizations level, automates remediation of CNAPP findings, and builds closed Data Perimeters for identity, resource, and network trust. The Learn space below contains vendor-neutral field guides that explain the underlying AWS-native techniques in depth.
+
+---
+
+# AWS Organizational Policy Controls — interactive simulator
+
+Canonical URL: https://instasecure.ai/learn/aws-organizational-policies
+
+**Author:** Rupesh Mishra (Founder & CEO, InstaSecure) — https://www.linkedin.com/in/rupeshmishra/
+**Published:** 2026-05-07
+
+AWS organizational policy is a layered system. **Service Control Policies (SCPs)**, **Resource Control Policies (RCPs)**, identity policies, resource policies, and VPC endpoint policies each close a specific class of attack. The interactive simulator on this page walks through six concrete trust scenarios; the deep-dive below covers each policy type and the AWS evaluation logic that ties them together.
+
+## Effective Permissions: how AWS evaluates a request
+
+When a principal calls an AWS API, the request runs through a deterministic chain of policy checks. The simplified rule:
+
+> **Explicit DENY anywhere wins. ALLOW must come from at least one applicable source. Anything outside what is allowed is an implicit deny.**
+
+The full evaluation chain:
+
+1. **Default deny.** Every request starts denied unless something allows it.
+2. **Service Control Policies (SCP)** attached to the principal's account or OU. If any SCP explicitly denies, the request is denied. SCPs only filter; they don't grant.
+3. **Resource Control Policies (RCP)** attached to the resource owner's account or OU. Explicit deny here also wins. RCPs filter what can be done *to* resources owned by scoped accounts.
+4. **Resource-based policy** if the resource has one (S3 bucket policy, KMS key policy, SQS queue policy, Secrets Manager secret policy). Explicit deny denies; explicit allow contributes to allow.
+5. **Identity-based policy** — IAM policies attached to the user, role, or group making the call. Same rule: explicit deny wins; explicit allow contributes.
+6. **Permission boundary** if attached to the principal — must explicitly allow the action; otherwise denied. Acts as a ceiling.
+7. **Session policies** if used with `sts:AssumeRole --policy` — another ceiling for this session.
+8. **VPC endpoint policy** if the call goes through a VPC endpoint, the endpoint policy must allow it.
+
+Cross-account calls add one rule: both accounts have to allow it. The calling account's identity policy must allow the call, and the target account's resource policy (or SCP/RCP) must allow it from the external principal.
+
+A single permissive IAM policy doesn't grant access on its own — it has to survive every other layer. That's why **SCPs and RCPs are leverage**: they live above IAM and can enforce invariants no individual team can override.
+
+## Data Perimeter: six concrete trust gaps to close
+
+A data perimeter is AWS's name for a set of always-on guardrails that ensure *only your trusted identities access your trusted resources from expected networks*. Every API call asks three trust questions — about the **identity**, the **resource**, and the **network**. Each cuts two ways, giving six cells:
+
+| Perimeter | Control objective                                       | Enforced by  |
+|-----------|---------------------------------------------------------|--------------|
+| Identity  | Only trusted identities can access my resources         | RCP          |
+| Identity  | Only trusted identities allowed from my network         | VPC endpoint |
+| Resource  | My identities access only trusted resources             | SCP          |
+| Resource  | Only trusted resources accessed from my network         | VPC endpoint |
+| Network   | My identities access resources only from expected nets  | SCP          |
+| Network   | My resources only accessed from expected networks       | RCP          |
+
+Key condition keys:
+
+- `aws:PrincipalOrgID` — caller's AWS Organization. Use to deny access from outside your org.
+- `aws:ResourceOrgID` — resource's AWS Organization. Use to deny your principals from touching external resources.
+- `aws:SourceVpc` / `aws:SourceVpce` — call originated from your VPC / VPC endpoint.
+- `aws:ViaAWSService` — call was made by an AWS service on your behalf.
+- `aws:SourceIp` — caller's source IP, useful for static workloads.
+
+Working policy examples: https://github.com/aws-samples/data-perimeter-policy-examples
+
+## Service Control Policy (SCP)
+
+A Service Control Policy is attached at the AWS Organizations level — to the org root, an OU, or an individual account. It acts as a **filter on what IAM principals in scoped accounts can do**.
+
+Core rules:
+
+- **SCPs don't grant permissions.** They only filter what IAM allows. A principal can do X only if their IAM policy allows X *and* no SCP denies X.
+- **Apply to every IAM principal** in the scoped account — IAM users, roles, federated identities. Service-linked roles are exempt.
+- **Don't apply to the management account** by default — always run workloads in member accounts.
+- **Inherited down the OU tree.** An SCP at the root applies to every account in every OU below it.
+
+Two strategies:
+
+- **Allow-list:** deny everything except an enumerated allow set. High security, very high maintenance.
+- **Deny-list:** allow everything except specific deny rules. Most common in practice. Use targeted denies for known-risky actions: privilege escalation primitives, security-service tampering, public-resource creation.
+
+Common patterns:
+
+- **Region pinning** — deny all calls outside approved regions.
+- **Protect security services** — deny disabling CloudTrail, GuardDuty, Config, Access Analyzer.
+- **Block privilege escalation** — deny `iam:CreateAccessKey`, `iam:UpdateAssumeRolePolicy`, etc. outside an admin role.
+- **Outbound resource trust** — deny touching resources outside your organization (using `aws:ResourceOrgID`).
+
+Working examples: https://github.com/aws-samples/service-control-policy-examples
+
+## Resource Control Policy (RCP)
+
+RCPs are the resource-side counterpart to SCPs. They went GA in late 2024. Like SCPs, they're attached at the AWS Organizations level — but they apply to **resources owned by accounts in scope**, not to identities.
+
+> **SCP answers:** *"What can my identities do?"*
+> **RCP answers:** *"What can be done to my resources?"*
+
+Why they exist: SCPs only filter calls made *by* identities in your org. They can't stop an external principal — say, an attacker with valid credentials in their own AWS account — from calling your S3 bucket if the bucket policy allows it. RCPs close that gap. They apply to *every* caller (yours, theirs, AWS services), and they sit above resource-based policies in the evaluation chain.
+
+Core rules:
+
+- **Filter, not grant.** Like SCPs, RCPs only deny; they never grant access.
+- **Apply across calling accounts.** Whether the caller is in your org or external, your RCP applies.
+- **Inherited down the OU tree** just like SCPs.
+- **Service support is rolling out.** At GA: S3, SQS, SNS, Secrets Manager, KMS, STS. More services follow.
+
+When to use SCP vs RCP:
+
+- Use **SCP** when the rule is keyed off the caller — region restrictions, privilege-escalation primitives, exfiltration to non-org resources.
+- Use **RCP** when the rule is keyed off the resource — block external accounts from reading S3, deny non-org callers to KMS, prevent public bucket access.
+- Most mature data perimeters use both: SCPs for outbound trust ("my identities can only call my resources") and RCPs for inbound trust ("only my identities can call my resources").
+
+Working examples: https://github.com/aws-samples/data-perimeter-policy-examples
+
+---
+
+# Cloud Hardening as a Proactive Defense Against Adversarial AI
+
+Canonical URL: https://instasecure.ai/learn/cloud-architecture-gaps
+
+**Author:** Rupesh Mishra (Founder & CEO, InstaSecure) — https://www.linkedin.com/in/rupeshmishra/
+**Published:** 2026-05-07
+**Source:** Adapted from a talk delivered at the AWS Meetup, May 2026 (https://luma.com/acba2605?tk=KghUCC). Recording forthcoming.
+
+## The 90-second adversarial AI playbook
+
+It's a Tuesday in 2026. An attacker has 90 seconds. A stolen access key falls into the hands of an LLM-driven agent — not a human red-teamer working a week-long engagement, but an autonomous loop that calls AWS APIs, reads the responses, decides what to do next, and never gets tired.
+
+- **0:00** — Stolen access key dropped into the agent.
+- **0:15** — Agent enumerates IAM roles, parses every trust policy.
+- **0:35** — Identifies a cross-account `sts:AssumeRole` into a sibling production account.
+- **0:55** — Generates the assume-role chain. Tests it.
+- **1:20** — Lateral move complete. Reads customer data from S3 in the production account.
+- **1:30** — GuardDuty hasn't fired yet. Five AWS API calls. No exploit.
+
+This isn't science fiction. The attack is recorded and embedded on the canonical page; open-source pentest frameworks paired with frontier models can do this work at this pace today.
+
+## Four shifts that broke at once
+
+### Shift 1 — Attackers got AI
+
+Reconnaissance work that used to take a red team a week — enumerating IAM paths, parsing trust chains, finding misconfigurations — now happens in minutes. LLMs are excellent at parsing JSON IAM policies and chaining valid AWS API calls. Frontier models from Anthropic and OpenAI have demonstrated something more dangerous: stitching multiple low-severity findings into a complete kill chain. A wildcard role here, a permissive bucket policy there, an over-broad cross-account assume — individually shrugged off in a pentest report, collectively a breach. The agent doesn't get tired and doesn't lose the thread.
+
+### Shift 2 — Defenders got more credentials
+
+Non-human identities — service roles, automation, third-party integrations, AI agents — now outnumber human principals roughly **45 to 1** in a typical enterprise (synthesis from CyberArk and Astrix industry data). Every new agent is a new credential. Humans become a rounding error in your principal count. Most NHIs are over-permissioned at creation and never reviewed. Each one is a potential adversary you've already authenticated.
+
+### Shift 3 — Every employee is a developer now
+
+Coding assistants, AI co-pilots, and low-code AI tooling have collapsed the line between "developer" and "everyone else". Marketing builds workflows. Finance builds analytics jobs. Sales builds chatbots. Each of these creates new credentials, new IAM roles, new third-party integrations — outside the change-management process security teams built for the old developer cohort. The attack surface that used to live in code review now lives in a thousand small pieces of generated config that nobody reviews.
+
+### Shift 4 — Detection economics broke (the consequence)
+
+Mean-time-to-compromise has collapsed. Mean-time-to-detect, in most organizations, is flat — minutes-of-attack against hours-of-response. The gap between them is what attackers live in. Trying to out-detect AI-speed adversaries with human-speed response is a losing race. Which is why the architectural framing below isn't about better detection. It's about closing the gaps that make the breach possible in the first place.
+
+## Three architectural problems
+
+Cloud has three structural problems. AI didn't create them — it weaponized them. If you trace any modern cloud breach back through its stages, you'll find the same three gaps showing up — alone or in combination.
+
+### Problem 1 — Tenancy
+
+Where is your trust boundary? In an on-prem world, tenancy is straightforward — networks isolate by physical reality. In the cloud, tenancy is logical, multi-layered, and almost entirely up to you to enforce. A 12-digit AWS account number is the only thing AWS sees. Whether that account is a sibling team, an attacker, or a developer's weekend sandbox — they're structurally identical at the API layer. Without explicit organization boundaries (SCPs, RCPs, `aws:PrincipalOrgID` conditions on assume-role), you treat them all the same.
+
+### Problem 2 — Perimeter
+
+Cloud APIs are public endpoints. Your network perimeter doesn't apply. When teams move to the cloud, they bring on-prem network thinking with them. They build VPCs, split public and private subnets, put WAFs in front of load balancers. All of that protects compute — the workload network surface. It does nothing for the cloud control plane, where most of the data actually lives.
+
+Your AWS estate has two halves of network attack surface, both reachable from the same public internet:
+
+- **AWS-managed (no customer perimeter):** sts, iam, organizations, sso, cloudtrail (control plane); s3, dynamodb, lambda, sqs, sns, kms, secretsmanager, bedrock (PaaS). Where most of your data lives. Reached via credentials, not via your network.
+- **Customer-managed (your perimeter):** security groups, NACLs, WAF, ALB, NAT, firewall (network controls); EC2, ECS, EKS, Lambda-in-VPC (compute). Where you spent most of the network-security budget. The smaller of the two surfaces.
+
+Same threats, two paths. An attacker with valid creds bypasses the right side entirely — there's nothing to bypass; your firewall doesn't sit on the path. A compromised EC2 inside the right side reaches out via the same AWS-managed endpoints — your perimeter sees nothing. A token works equally well from your prod VPC, your developer laptop, or an attacker's coffee shop. This is the **credential portability problem**.
+
+### Problem 3 — Blast Radius
+
+AI made this an insider problem. Pre-AI, cloud security focused on external attackers. Detection was about catching the unauthenticated outsider. Once an attacker landed, blast radius was a secondary concern — most NHIs lived inside trusted boundaries and got the benefit of the doubt. Post-AI, your NHI count exploded — every AI agent, every automation pipeline, every third-party integration is a new credential. Each one is a potential adversary you've already authenticated. The threat moved inside the perimeter without anyone deciding to let it in. The question shifts from "how do we keep attackers out?" to "what damage can each principal actually do, and how do we structurally cap that?"
+
+## The configuration tax
+
+AWS today has **350+ services, 17,000+ IAM actions, and 1,500+ resource types** (tracked at https://aws.permissions.cloud). Dozens of policy types. Conditions that interact in non-obvious ways. A steady drip of new permissions every quarter.
+
+> **Most cloud breaches aren't exploits. They're misconfigurations.** AI just makes finding them faster.
+
+You don't need a CVE to compromise an AWS account. You need an over-broad role, a wildcard, and patience.
+
+## Compromised credential, end to end
+
+How four configuration gaps become one breach:
+
+1. **Step 1 — Credential exfiltrated.** An EC2 instance with an IAM role is compromised — SSRF, malicious dependency, leaked GitHub key. The session token leaves the environment.
+2. **Perimeter — Credential is portable.** The attacker calls the AWS API from a laptop on a coffee-shop network. AWS accepts — no condition on source network, source VPC, or source IP. The control plane treats every signed request the same.
+3. **Blast Radius — Privilege escalation.** The compromised role has `iam:PassRole` and `sts:AssumeRole`. The attacker chains into a more privileged role meant for the deploy pipeline. Now they're effectively admin.
+4. **Tenancy — Cross-account data access.** The privileged role can assume a role in a sibling production account — no organization-level boundary blocks it. The attacker reads customer data from S3 in prod. They never touched prod's perimeter directly.
+5. **Step 5 — GuardDuty fires. Too late.** Detection eventually catches the anomalous behavior. The data is already gone. The clean-up is a six-figure incident response bill plus regulatory disclosure.
+
+Three of the four steps are architectural. None of them require an exploit. They require *configuration* — or rather, the absence of configuration that would have made them impossible.
+
+## The trust gap, named: six dimensions of trust
+
+Every AWS API call asks three trust questions — about the **identity** making the call, the **resource** being touched, and the **network** the call comes from. Each cuts two ways. That's six concrete control objectives. AWS calls the solution a *data perimeter*; the gap is what you have today.
+
+| Trust dimension  | Default gap                                                                                                  |
+|------------------|--------------------------------------------------------------------------------------------------------------|
+| Identity (in)    | Any principal in any AWS account on Earth can call your buckets, queues, KMS keys.                          |
+| Identity (net)   | A VPC endpoint accepts any external IAM identity that signs the request.                                     |
+| Resource (out)   | A leaked role can read or write any S3 bucket on Earth.                                                      |
+| Resource (net)   | A host inside your VPC can exfiltrate to any external bucket — invisible to network controls.               |
+| Network (id)     | Stolen creds work from any laptop on any network.                                                            |
+| Network (res)    | Every AWS API endpoint is on the public internet.                                                            |
+
+Framework reference: https://aws.amazon.com/identity/data-perimeters-on-aws/
+
+## Five-phase ladder, with example SCPs
+
+| Phase | What it does | Solves | Example SCPs |
+|---|---|---|---|
+| 1 · Foundation | Protect security services from being disabled (CloudTrail, GuardDuty, Config) | All three | https://github.com/aws-samples/service-control-policy-examples/tree/main/Deny-changes-to-security-services |
+| 2 · Scope | Deny non-approved regions, services, public-by-default resources | Tenancy, Perimeter | https://github.com/aws-samples/service-control-policy-examples/tree/main/Region-controls |
+| 3 · Hygiene | Mandatory tags, encryption, IMDSv2, no IAM users, no long-lived keys | Tenancy | https://github.com/aws-samples/service-control-policy-examples/tree/main/Service-specific-controls |
+| 4 · Depth | Block privilege escalation primitives, restrict destructive actions | Blast Radius | https://github.com/aws-samples/service-control-policy-examples/tree/main/Privileged-access-controls |
+| 5 · Perimeter | Identity / resource / network trust boundaries (Data Perimeter) | Tenancy, Perimeter | https://github.com/aws-samples/data-perimeter-policy-examples |
+
+Every phase is implementable with AWS-native primitives — Service Control Policies, Resource Control Policies (GA late 2024), VPC endpoint policies, IAM conditions. No third-party tooling required to start.
+
+## Take-home checklist — ten things to check tonight
+
+1. Run IAM Access Analyzer org-wide. Look at the public-resource and cross-account-access findings.
+2. Audit how many IAM users exist. Plan to delete them.
+3. Audit assume-role trust policies for `Principal: *` or wide patterns. Add `aws:PrincipalOrgID` conditions.
+4. Check whether CloudTrail can be disabled by any non-admin role. Ship the SCP that says no.
+5. List every active AWS region. Deny the ones you don't use.
+6. Require IMDSv2 on EC2 launches. SSRF + IMDSv1 is exactly how Capital One happened.
+7. Block S3 buckets from being made public via SCP — even if a misconfig tries.
+8. Identify your privilege-escalation IAM actions and deny them outside your IAM admin role.
+9. Inventory every NHI. For each, ask: does it ever call AWS from outside your VPC? If no, scope it to your VPCs.
+10. Ship a Data Perimeter — start with the AWS sample policies above.
+
+## References
+
+- AWS Data Perimeter — official pattern docs: https://aws.amazon.com/identity/data-perimeters-on-aws/
+- aws-samples/service-control-policy-examples: https://github.com/aws-samples/service-control-policy-examples
+- aws-samples/data-perimeter-policy-examples: https://github.com/aws-samples/data-perimeter-policy-examples
+- Resource Control Policies (RCP): https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_rcp.html
+- aws.permissions.cloud: https://aws.permissions.cloud
+- Rhino Security: AWS IAM Privilege Escalation: https://github.com/RhinoSecurityLabs/AWS-IAM-Privilege-Escalation
+- IAM Access Analyzer: https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-resource-types.html
+- Pacu (AWS exploitation framework): https://github.com/RhinoSecurityLabs/pacu
+
+---
+
+## About InstaSecure
+
+The team at InstaSecure operates a guardrails platform for AWS that operationalizes the techniques in these guides — preventive Service Control Policies, Resource Control Policies, VPC endpoint policies, and Data Perimeter controls applied at the AWS Organizations level. The techniques themselves are AWS-native and vendor-neutral; everything in these field guides is implementable without InstaSecure.
+
+- Site: https://instasecure.ai
+- Contact: https://instasecure.ai/contact
+- AWS Marketplace listing: https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs

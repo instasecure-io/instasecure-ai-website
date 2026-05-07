@@ -2,12 +2,27 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import StructuredData from '@/components/seo/StructuredData.astro';
 
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': 'https://instasecure.ai/about#rupesh-mishra',
+  name: 'Rupesh Mishra',
+  jobTitle: 'Founder & CEO',
+  url: 'https://instasecure.ai/about',
+  sameAs: ['https://www.linkedin.com/in/rupeshmishra/'],
+  worksFor: {
+    '@type': 'Organization',
+    name: 'InstaSecure',
+    url: 'https://instasecure.ai/',
+  },
+};
+
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'TechArticle',
   headline: 'AWS Organizational Policy Controls — interactive simulator',
   description: 'An interactive simulator for AWS organizational policies — Service Control Policies (SCP), Resource Control Policies (RCP), and the Data Perimeter pattern. See how each gate blocks a specific class of attack, with deep-dive docs on AWS policy evaluation.',
-  author: { '@type': 'Organization', name: 'InstaSecure', url: 'https://instasecure.ai/' },
+  author: { '@id': 'https://instasecure.ai/about#rupesh-mishra' },
   publisher: {
     '@type': 'Organization',
     name: 'InstaSecure',
@@ -33,14 +48,70 @@ const breadcrumbSchema = {
     { '@type': 'ListItem', position: 3, name: 'AWS Organizational Policy Controls', item: 'https://instasecure.ai/learn/aws-organizational-policies/' },
   ],
 };
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How does AWS evaluate an API request against organizational policies?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Every AWS API call runs through a deterministic chain: default deny → Service Control Policies (SCP) → Resource Control Policies (RCP) → resource-based policy → identity-based policy → permission boundary → session policy → VPC endpoint policy. The simplified rule: explicit DENY anywhere wins; ALLOW must come from at least one applicable source; anything outside what is allowed is an implicit deny. Cross-account calls require both the calling account and the target account to allow it.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is a Service Control Policy (SCP) in AWS?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A Service Control Policy is attached at the AWS Organizations level — to the org root, an Organizational Unit (OU), or an account. It acts as a filter on what IAM principals in scoped accounts can do. SCPs do not grant permissions; they only filter what IAM allows. Common patterns include region pinning, denying disablement of CloudTrail and GuardDuty, blocking IAM privilege escalation primitives, and enforcing an outbound resource trust boundary using the aws:ResourceOrgID condition key.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is a Resource Control Policy (RCP)?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A Resource Control Policy is the resource-side counterpart to an SCP, GA in late 2024. Like SCPs, RCPs attach at the AWS Organizations level. Unlike SCPs, they apply to resources owned by accounts in scope. They filter what can be done TO your resources, regardless of who is calling — including external principals with valid credentials. Currently supported on S3, SQS, SNS, Secrets Manager, KMS, and STS, with more services rolling out.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'When should I use SCP vs RCP?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Use an SCP when the rule is keyed off the caller — "my identities must never do X" — for example region restrictions, privilege escalation primitives, or exfiltration to non-org resources. Use an RCP when the rule is keyed off the resource — "my resources must never be touched by Y" — for example blocking external accounts from reading S3, denying non-org callers to KMS, or preventing public bucket access. Most mature data perimeters use both.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the AWS Data Perimeter pattern?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The AWS Data Perimeter is a set of always-on guardrails that ensure only your trusted identities access your trusted resources from expected networks. It maps to six concrete control objectives across three perimeter types — identity, resource, and network — each cutting two ways. Each cell is enforced by a specific AWS policy mechanism: SCPs, RCPs, or VPC endpoint policies. Working policy examples are published at github.com/aws-samples/data-perimeter-policy-examples.',
+      },
+    },
+  ],
+};
 ---
 <BaseLayout
   title="AWS Organizational Policy Controls — interactive simulator | InstaSecure Learn"
   description="Interactive simulator for AWS SCPs, RCPs, and the Data Perimeter pattern. Click six trust scenarios — see which gate blocks each, with policy deep-dives."
+  articleMeta={{
+    publishedTime: '2026-05-07T08:00:00-07:00',
+    modifiedTime: '2026-05-07T08:00:00-07:00',
+    author: 'Rupesh Mishra',
+    section: 'Cloud Security',
+    tags: ['AWS', 'IAM', 'SCP', 'RCP', 'Data Perimeter', 'AWS Organizations'],
+  }}
 >
   <Fragment slot="head">
+    <StructuredData data={personSchema} />
     <StructuredData data={articleSchema} />
     <StructuredData data={breadcrumbSchema} />
+    <StructuredData data={faqSchema} />
   </Fragment>
 
   <article class="bg-white">
