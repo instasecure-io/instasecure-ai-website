@@ -2,6 +2,8 @@
 
 > Preventive cloud security platform for AWS. Shifts cloud security from reactive alert triage to preventive, automated controls enforced at the organizational level — so misconfigurations, credential theft, and zero-day exploits are blocked before they cause breaches.
 
+> Extended content (full Markdown of the Learn field guides, optimized for grounded AI citations): https://instasecure.ai/llms-full.txt
+
 ## Products
 
 - [InstaAccess](https://instasecure.ai/instaaccess): Preventive cloud configuration hardening and automated remediation for **non-human identities** — service roles, automation agents, third-party integrations. Maps high-level security objectives to 50+ AWS-native preventive guardrails, then closes the loop on findings from CNAPP / CIEM / DSPM tools.

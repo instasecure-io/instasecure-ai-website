@@ -2,12 +2,27 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import StructuredData from '@/components/seo/StructuredData.astro';
 
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': 'https://instasecure.ai/about#rupesh-mishra',
+  name: 'Rupesh Mishra',
+  jobTitle: 'Founder & CEO',
+  url: 'https://instasecure.ai/about',
+  sameAs: ['https://www.linkedin.com/in/rupeshmishra/'],
+  worksFor: {
+    '@type': 'Organization',
+    name: 'InstaSecure',
+    url: 'https://instasecure.ai/',
+  },
+};
+
 const articleSchema = {
   '@context': 'https://schema.org',
   '@type': 'TechArticle',
   headline: 'Cloud Hardening as a Proactive Defense Against Adversarial AI',
   description: 'A field guide that walks through a live AI-driven AWS attack, names the three architectural gaps that make it possible — tenancy, perimeter, blast radius — and shows the AWS-native primitives that close them. Adapted from a talk at the AWS Meetup, May 2026.',
-  author: { '@type': 'Organization', name: 'InstaSecure', url: 'https://instasecure.ai/' },
+  author: { '@id': 'https://instasecure.ai/about#rupesh-mishra' },
   publisher: {
     '@type': 'Organization',
     name: 'InstaSecure',
@@ -38,8 +53,16 @@ const breadcrumbSchema = {
 <BaseLayout
   title="Cloud Hardening as a Proactive Defense Against Adversarial AI | InstaSecure Learn"
   description="A field guide tracing a live AI-driven AWS breach to three architectural gaps — tenancy, perimeter, blast radius — and the AWS-native primitives that close them."
+  articleMeta={{
+    publishedTime: '2026-05-07T08:00:00-07:00',
+    modifiedTime: '2026-05-07T08:00:00-07:00',
+    author: 'Rupesh Mishra',
+    section: 'Cloud Security',
+    tags: ['AWS', 'IAM', 'SCP', 'RCP', 'Data Perimeter', 'Cloud Architecture', 'Adversarial AI'],
+  }}
 >
   <Fragment slot="head">
+    <StructuredData data={personSchema} />
     <StructuredData data={articleSchema} />
     <StructuredData data={breadcrumbSchema} />
     <link rel="stylesheet" href="/vendor/asciinema-player.min.css" />
