@@ -195,6 +195,29 @@ const economicsAfter = {
     }}
   />
 
+  <section class="bg-[var(--color-text)] text-white">
+    <div class="mx-auto max-w-3xl px-6 py-20">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-accent-on-dark)] mb-4">A Tuesday in 2026</div>
+      <h2 class="font-serif text-2xl md:text-4xl font-semibold leading-tight tracking-tight">An attacker has 90 seconds.</h2>
+      <p class="mt-6 text-base md:text-lg text-white/80 leading-relaxed">A stolen access key, an LLM-driven agent, real AWS APIs. Not science fiction — recorded against real accounts. Five API calls, zero exploits, GuardDuty silent.</p>
+
+      <ol class="mt-10 space-y-4 text-base md:text-lg leading-relaxed">
+        <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">0:15</span><span class="text-white/90">Agent enumerates IAM roles, parses every trust policy.</span></li>
+        <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">0:35</span><span class="text-white/90">Identifies a cross-account <code class="font-mono text-[var(--color-accent-on-dark)]">sts:AssumeRole</code> into production.</span></li>
+        <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">1:20</span><span class="text-white/90">Lateral move complete. Reads customer data from S3.</span></li>
+        <li class="flex gap-5"><span class="font-mono text-[var(--color-accent-on-dark)] font-semibold shrink-0 w-14">1:30</span><span class="text-white/90">GuardDuty hasn't fired yet. Five AWS API calls. No exploit.</span></li>
+      </ol>
+
+      <a href="/learn/cloud-architecture-gaps/" class="mt-10 inline-flex items-center gap-2 text-[var(--color-accent-on-dark)] font-semibold hover:opacity-80 transition">
+        Watch the actual recording <span aria-hidden="true">→</span>
+      </a>
+
+      <blockquote class="mt-14 font-serif text-2xl md:text-3xl leading-[1.3] tracking-tight text-white border-l-2 border-[var(--color-accent-on-dark)] pl-6">
+        &ldquo;You can't out-detect an AI. You can out-prevent one. Guardrails are how.&rdquo;
+      </blockquote>
+    </div>
+  </section>
+
   <QuoteStrip
     quote="We closed 12,000 NHI exposure paths in 48 hours without touching a pipeline."
     attribution="Design Partner · Financial Services"
@@ -216,11 +239,6 @@ const economicsAfter = {
       before={gatesVsGuardrails.before}
       after={gatesVsGuardrails.after}
     />
-    <div class="mx-auto max-w-4xl px-6 pb-20 -mt-10 text-center">
-      <blockquote class="font-serif text-2xl md:text-3xl leading-[1.3] tracking-tight text-[var(--color-text)]">
-        &ldquo;You can't out-detect an AI. You can out-prevent one. Guardrails are how.&rdquo;
-      </blockquote>
-    </div>
   </div>
 
   <MaturityLadder
