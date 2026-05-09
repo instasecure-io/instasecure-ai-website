@@ -4,14 +4,21 @@ import Button from '@/components/ui/Button.astro';
 interface Props {
   eyebrow?: string;
   title: string;
+  /** Optional trailing emphasis. Rendered after `title` in --color-text; when set, the rest of the title renders in near-black. */
+  titleHighlight?: string;
   description: string;
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
   trustLine?: string;
   image?: { src: string; alt: string; width?: number; height?: number; poster?: string };
 }
-const { eyebrow, title, description, primaryCta, secondaryCta, trustLine, image } = Astro.props;
+const { eyebrow, title, titleHighlight, description, primaryCta, secondaryCta, trustLine, image } = Astro.props;
 const isVideo = !!image && /\.(mp4|webm)(\?|$)/i.test(image.src);
+const hasSlot = Astro.slots.has('default');
+// When titleHighlight is set, lead text is pure black to maximize the
+// luminance jump to the brand-indigo highlight; without highlight the
+// title keeps the page's standard --color-text indigo.
+const titleColorClass = titleHighlight ? 'text-black' : 'text-[var(--color-text)]';
 ---
 <section class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
   <div class="absolute top-0 right-0 w-96 h-96 bg-[var(--color-accent)]/10 rounded-full blur-3xl -z-10"></div>
@@ -19,7 +26,7 @@ const isVideo = !!image && /\.(mp4|webm)(\?|$)/i.test(image.src);
   <div class="mx-auto max-w-7xl px-6 pt-20 pb-24 grid md:grid-cols-2 gap-12 items-center relative">
     <div>
       {eyebrow && <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">{eyebrow}</div>}
-      <h1 class="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-[var(--color-text)]">{title}</h1>
+      <h1 class={`text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight ${titleColorClass}`}>{title}{titleHighlight && <span class="text-[var(--color-brand)]">{` ${titleHighlight}`}</span>}</h1>
       <p class="text-lg md:text-xl text-slate-800 mt-6 max-w-xl leading-relaxed">{description}</p>
       <div class="flex flex-wrap gap-3 mt-8">
         {primaryCta && <Button href={primaryCta.href} variant="accent" size="lg">{primaryCta.label}</Button>}
@@ -29,7 +36,11 @@ const isVideo = !!image && /\.(mp4|webm)(\?|$)/i.test(image.src);
         <p class="mt-5 text-sm font-mono uppercase tracking-[0.12em] text-slate-600">{trustLine}</p>
       )}
     </div>
-    {image && (
+    {hasSlot ? (
+      <div class="relative w-full">
+        <slot />
+      </div>
+    ) : image && (
       <div
         class="relative w-full"
         style={image.width && image.height ? `aspect-ratio: ${image.width} / ${image.height};` : undefined}

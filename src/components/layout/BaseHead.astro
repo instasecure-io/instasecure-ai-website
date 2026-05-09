@@ -53,6 +53,11 @@ const imageURL = new URL(image, Astro.site).toString();
 <meta name="twitter:image" content={imageURL} />
 
 <meta name="theme-color" content="#4d66e0" />
+<!-- Preload the two DMSans weights used above the fold so the hero H1
+     renders in its final font on first paint instead of swapping in late
+     and shifting the grid (was causing desktop CLS ≈ 0.108). -->
+<link rel="preload" href="/fonts/dm-sans/DMSans-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/dm-sans/DMSans-Bold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
 <link rel="alternate" type="application/rss+xml" title="InstaSecure — Blog &amp; Learn" href="/rss.xml" />
 <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
