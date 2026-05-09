@@ -1,8 +1,18 @@
 # InstaSecure
 
-> Preventive cloud security platform for AWS. Shifts cloud security from reactive alert triage to preventive, automated controls enforced at the organizational level — so misconfigurations, credential theft, and zero-day exploits are blocked before they cause breaches.
+> Preventive AWS cloud security platform — service control policies (SCPs), resource control policies (RCPs), and data perimeters. Shifts cloud security from reactive alert triage to preventive, automated controls enforced at the organizational level — so misconfigurations, credential theft, and AI-speed attacks are blocked before they cause breaches. Built on the thesis that "you can't out-detect an AI; you can out-prevent one."
 
 > Extended content (full Markdown of the Learn field guides, optimized for grounded AI citations): https://instasecure.ai/llms-full.txt
+
+## Home page narrative — the 2026 positioning
+
+The home page argues that AI changed the cloud-attack economics in three ways and that detection-based defense lost the race:
+
+- **Attackers automated.** Frontier models enumerate IAM paths, parse trust chains, and chain misconfigurations into a kill chain in minutes — work that used to take a red team a week.
+- **Defenders drowned in non-human identities.** Service roles, automation, third-party integrations, and AI agents now outnumber humans roughly 45:1 in a typical AWS org. Each is a credential.
+- **Detection economics broke.** Mean-time-to-compromise collapsed; mean-time-to-detect didn't. The gap is what attackers live in.
+
+The home features an interactive "A Tuesday in 2026" scene that plays a real AWS attack chain (stolen access key → IAM enumeration → cross-account `sts:AssumeRole` → S3 customer-data exfil, with GuardDuty silent) on tab one, and the same attacker hitting SCP / Data Perimeter / RCP guardrails on tab two. The product positions itself as the **Guardrails platform for AWS** — automated, organization-wide policy that makes whole classes of attack structurally impossible.
 
 ## Products
 

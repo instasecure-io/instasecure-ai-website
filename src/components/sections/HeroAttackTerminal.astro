@@ -1,0 +1,244 @@
+---
+// Self-contained animated terminal that simulates an AWS attack succeeding,
+// then the same attack being blocked by guardrails. Loops every ~8s.
+// No external deps — vanilla CSS + JS. Honors prefers-reduced-motion.
+---
+<div
+  class="is-terminal"
+  id="isTerminal"
+  role="img"
+  aria-label="Animated demonstration: an AWS attack reaches customer data on an unprotected account, then the same attack is blocked by SCPs, Data Perimeter, and RCPs."
+>
+  <div class="is-terminal__header">
+    <div class="is-terminal__dot"></div>
+    <div class="is-terminal__dot"></div>
+    <div class="is-terminal__dot"></div>
+    <div class="is-terminal__title">cloudtrail.live · prod-aws-org</div>
+    <div class="is-terminal__clock" id="isTermClock">00:00</div>
+  </div>
+  <div class="is-terminal__body" id="isTermBody"></div>
+</div>
+
+<style is:global>
+  /* === Namespaced under .is-terminal — declared global so the rules apply
+         to spans/divs created in the loop's JS (Astro's default style
+         scoping adds [data-astro-cid-xxx] to descendants, which JS-built
+         nodes don't carry, so the descendant color/spacing rules wouldn't
+         match). All selectors below are anchored at `.is-terminal` to
+         keep the CSS contained. === */
+
+  .is-terminal {
+    --is-bg-dark: #0e1230;
+    --is-header-bg: #1a1f3f;
+    --is-line-dark: #1f2547;
+    --is-brand: #4d66e0;
+    --is-brand-light: #7d92ec;
+    --is-ink-faint: #8a8fa8;
+    --is-accent-red: #ff5470;
+    --is-accent-amber: #f5a623;
+    --is-accent-green: #2dd4a8;
+
+    background: var(--is-bg-dark);
+    border-radius: 12px;
+    box-shadow: 0 30px 60px -15px rgba(14, 18, 48, 0.3),
+                0 0 0 1px rgba(77, 102, 224, 0.2);
+    overflow: hidden;
+    font-family: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+    font-size: 13px;
+    color: #c8cce0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .is-terminal *,
+  .is-terminal *::before,
+  .is-terminal *::after { box-sizing: border-box; }
+
+  .is-terminal__header {
+    background: var(--is-header-bg);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--is-line-dark);
+  }
+  .is-terminal__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #3a4060;
+  }
+  .is-terminal__title {
+    margin-left: 12px;
+    font-size: 12px;
+    color: var(--is-ink-faint);
+  }
+  .is-terminal__clock {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--is-accent-red);
+    font-weight: 600;
+  }
+  .is-terminal__body {
+    padding: 20px;
+    min-height: 360px;
+    max-height: 420px;
+    overflow: hidden;
+  }
+  .is-terminal__line {
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: isTermFadeIn 0.4s forwards;
+    word-break: break-word;
+    line-height: 1.5;
+  }
+  @keyframes isTermFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .is-terminal .ts { color: var(--is-ink-faint); margin-right: 12px; }
+  .is-terminal .api { color: var(--is-brand-light); }
+  .is-terminal .ok { color: var(--is-accent-green); }
+  .is-terminal .blocked { color: var(--is-accent-red); font-weight: 600; }
+  .is-terminal .warn { color: var(--is-accent-amber); }
+
+  .is-terminal__divider {
+    border-top: 1px dashed var(--is-line-dark);
+    margin: 16px 0;
+    position: relative;
+  }
+  .is-terminal__divider::after {
+    content: "GUARDRAIL ENGAGED";
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--is-bg-dark);
+    padding: 0 12px;
+    font-size: 10px;
+    color: var(--is-accent-green);
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .is-terminal__line { animation: none; opacity: 1; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var attackScript = [
+      { delay: 200,  segs: [['ts', '00:00'], ['api', '$ session start · access_key_id=AKIA...QX7K']] },
+      { delay: 600,  segs: [['ts', '00:15'], ['api', 'iam:ListRoles'],   [null, ' '], ['ok',      '→ 247 roles enumerated']] },
+      { delay: 1100, segs: [['ts', '00:35'], ['api', 'sts:AssumeRole'],  [null, ' '], ['warn',    '→ cross-account path found']] },
+      { delay: 1700, segs: [['ts', '01:00'], ['api', 'sts:AssumeRole'],  [null, ' '], ['ok',      '→ session::prod-admin']] },
+      { delay: 2300, segs: [['ts', '01:20'], ['api', 's3:GetObject'],    [null, ' '], ['ok',      '→ 4.2GB exfiltrated']] },
+      { delay: 2800, segs: [['ts', '01:30'], ['warn', 'GuardDuty: 0 findings · 0 alerts']] },
+      { delay: 3300, divider: true },
+      { delay: 3700, segs: [['ts', 'RUN 2'], ['api', 'iam:ListRoles'],   [null, ' '], ['blocked', '→ DENIED · SCP']] },
+      { delay: 4200, segs: [['ts', 'RUN 2'], ['api', 'sts:AssumeRole'],  [null, ' '], ['blocked', '→ DENIED · Data Perimeter']] },
+      { delay: 4700, segs: [['ts', 'RUN 2'], ['api', 's3:GetObject'],    [null, ' '], ['blocked', '→ DENIED · RCP']] },
+      { delay: 5200, segs: [['ok', '→ attack class structurally retired']] }
+    ];
+
+    // Module-scoped state. Each init() refreshes these from the current
+    // DOM, then teardown() empties them so the next view-transition arrival
+    // starts clean. The previous version captured DOM refs at IIFE parse
+    // time and registered no astro:page-load handler, so coming back to
+    // the home page after navigation left the terminal frozen.
+    var termBody = null;
+    var termClock = null;
+    var timeouts = [];
+    var clockInterval = null;
+
+    function teardown() {
+      timeouts.forEach(clearTimeout);
+      timeouts = [];
+      if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+    }
+
+    function buildLine(segs) {
+      var line = document.createElement('div');
+      line.className = 'is-terminal__line';
+      // Segments are author-supplied literals, but built via createElement +
+      // textContent so the DOM is XSS-safe by construction.
+      segs.forEach(function (s) {
+        if (s[0] === null) {
+          line.appendChild(document.createTextNode(s[1]));
+        } else {
+          var span = document.createElement('span');
+          span.className = s[0];
+          span.textContent = s[1];
+          line.appendChild(span);
+        }
+      });
+      return line;
+    }
+
+    function buildDivider() {
+      var div = document.createElement('div');
+      div.className = 'is-terminal__divider';
+      return div;
+    }
+
+    function startTerminal() {
+      teardown();
+      while (termBody.firstChild) termBody.removeChild(termBody.firstChild);
+      var startTime = Date.now();
+
+      // Clock: ~1 simulated second per 60ms real time, capped at 90s
+      clockInterval = setInterval(function () {
+        var t = Math.min(90, Math.floor((Date.now() - startTime) / 60));
+        var m = Math.floor(t / 60).toString().padStart(2, '0');
+        var s = (t % 60).toString().padStart(2, '0');
+        termClock.textContent = m + ':' + s;
+        if (t >= 90) { clearInterval(clockInterval); clockInterval = null; }
+      }, 50);
+
+      attackScript.forEach(function (step) {
+        var id = setTimeout(function () {
+          termBody.appendChild(step.divider ? buildDivider() : buildLine(step.segs));
+        }, step.delay);
+        timeouts.push(id);
+      });
+
+      timeouts.push(setTimeout(startTerminal, 8000));
+    }
+
+    function init() {
+      // Always tear down prior state — this same script is shared across
+      // initial-load + every view-transition arrival.
+      teardown();
+
+      termBody = document.getElementById('isTermBody');
+      termClock = document.getElementById('isTermClock');
+      if (!termBody || !termClock) return;
+
+      var reduceMotion = window.matchMedia &&
+                         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion) {
+        while (termBody.firstChild) termBody.removeChild(termBody.firstChild);
+        termClock.textContent = '01:30';
+        attackScript.forEach(function (step) {
+          if (step.divider) {
+            termBody.appendChild(buildDivider());
+          } else {
+            var line = buildLine(step.segs);
+            line.style.animation = 'none';
+            line.style.opacity = '1';
+            termBody.appendChild(line);
+          }
+        });
+        return;
+      }
+
+      startTerminal();
+    }
+
+    document.addEventListener('astro:page-load', init);
+    document.addEventListener('astro:before-swap', teardown);
+    if (document.readyState !== 'loading') init();
+    else document.addEventListener('DOMContentLoaded', init);
+  })();
+</script>

@@ -1,0 +1,1059 @@
+---
+// Two-stage interactive scene that replaces the prior "A Tuesday in 2026"
+// timeline. Tab 1 plays the attack succeeding; tab 2 plays the same
+// attacker hitting the guardrails and going inert. Auto-plays on scroll
+// into view. Self-contained — no external deps. Honors prefers-reduced-motion.
+---
+<section class="is-attack">
+  <div class="is-attack__container">
+    <div class="is-attack__eyebrow">A Tuesday in 2026</div>
+    <h2 class="is-attack__title">An attacker has 90 seconds.<br/>What happens next is up to you.</h2>
+    <p class="is-attack__sub">A stolen access key. An AI agent. Two of your AWS accounts. Watch the attack unfold — then watch it fail.</p>
+
+    <div class="is-attack__controls">
+      <div class="is-attack__tabs" role="tablist">
+        <button type="button" class="is-attack__tab is-active" data-target="attack" role="tab" aria-selected="true">Without InstaSecure</button>
+        <button type="button" class="is-attack__tab" data-target="defense" role="tab" aria-selected="false">With InstaSecure</button>
+      </div>
+      <div class="is-attack__controls-right">
+        <button type="button" class="is-attack__replay" data-replay>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Replay
+        </button>
+        <a class="is-attack__recording" href="/learn/cloud-architecture-gaps/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="10 8 16 12 10 16 10 8"/><circle cx="12" cy="12" r="10"/></svg>
+          <span class="is-attack__recording__label">Real recording</span>
+          Watch it happen
+        </a>
+      </div>
+    </div>
+
+    <!-- ATTACK STAGE -->
+    <div class="is-attack__stage" data-stage="attack">
+      <div class="is-attack__viz">
+        <div class="is-attack__scene">
+          <!-- Attacker bubble (animated across) -->
+          <div class="is-attacker" data-attacker>
+            <span class="is-attacker__dot"></span>
+            <span data-attacker-label>Attacker · stolen credential</span>
+          </div>
+
+          <!-- Account 1: Dev -->
+          <div class="is-account" data-account="dev">
+            <div class="is-account__header">
+              <div>
+                <div class="is-account__label">AWS Account 1</div>
+                <div class="is-account__name">dev-sandbox</div>
+                <div class="is-account__id">111122223333</div>
+              </div>
+              <div class="is-account__badge" data-badge>Foothold</div>
+            </div>
+            <div class="is-account__assets">
+              <div class="is-asset" data-asset="iam">
+                <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="is-asset__name">IAM roles &amp; trust policies</span>
+                <span class="is-asset__tag">enumerated</span>
+              </div>
+              <div class="is-asset" data-asset="role">
+                <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M3 11h18"/></svg>
+                <span class="is-asset__name">Cross-account role found</span>
+                <span class="is-asset__tag">discovered</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connection / lateral movement -->
+          <div class="is-link">
+            <svg width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+              <path
+                class="is-link__path"
+                data-link-path
+                d="M 5 40 L 115 40"
+                stroke="#ff5470"
+                stroke-width="2"
+                stroke-linecap="round"
+                fill="none"
+                marker-end="url(#arrowAtk)"
+              />
+              <defs>
+                <marker id="arrowAtk" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff5470"/>
+                </marker>
+              </defs>
+            </svg>
+            <span class="is-link__label" data-link-label>Lateral move</span>
+          </div>
+
+          <!-- Account 2: Prod -->
+          <div class="is-account" data-account="prod">
+            <div class="is-account__header">
+              <div>
+                <div class="is-account__label">AWS Account 2</div>
+                <div class="is-account__name">prod-payments</div>
+                <div class="is-account__id">444455556666</div>
+              </div>
+              <div class="is-account__badge" data-badge>Target</div>
+            </div>
+            <div class="is-account__assets">
+              <div class="is-asset" data-asset="admin">
+                <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span class="is-asset__name">Production admin session</span>
+                <span class="is-asset__tag">assumed</span>
+              </div>
+              <div class="is-asset" data-asset="s3">
+                <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+                <span class="is-asset__name">Customer data · S3</span>
+                <span class="is-asset__tag">4.2 GB out</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exfil callout -->
+          <div class="is-exfil" data-exfil>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            Customer data exfiltrated
+          </div>
+        </div>
+      </div>
+
+      <div class="is-attack__verdict">
+        <div class="is-verdict__text">The breach finishes before the alert begins.</div>
+        <div class="is-verdict__stats">
+          <div>
+            <div class="is-verdict__stat-num">90s</div>
+            <div class="is-verdict__stat-label">to exfiltration</div>
+          </div>
+          <div>
+            <div class="is-verdict__stat-num">0</div>
+            <div class="is-verdict__stat-label">alerts fired</div>
+          </div>
+          <div>
+            <div class="is-verdict__stat-num">5</div>
+            <div class="is-verdict__stat-label">API calls</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DEFENSE STAGE -->
+    <div class="is-attack__stage" data-stage="defense" hidden>
+      <div class="is-attack__viz">
+        <div class="is-attack__scene">
+          <div class="is-attacker" data-attacker>
+            <span class="is-attacker__dot"></span>
+            <span data-attacker-label>Attacker · stolen credential</span>
+          </div>
+
+          <div class="is-account" data-account="dev">
+            <div class="is-account__header">
+              <div>
+                <div class="is-account__label">AWS Account 1</div>
+                <div class="is-account__name">dev-sandbox</div>
+                <div class="is-account__id">111122223333</div>
+              </div>
+              <div class="is-account__badge" data-badge>Foothold</div>
+            </div>
+            <div class="is-account__assets">
+              <div class="is-asset" data-asset="iam">
+                <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="is-asset__name">IAM enumeration attempt</span>
+                <span class="is-asset__tag">denied · SCP</span>
+              </div>
+              <div class="is-asset" data-asset="role">
+                <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span class="is-asset__name">Credential rendered inert</span>
+                <span class="is-asset__tag">data perimeter</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="is-link">
+            <svg width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+              <path
+                class="is-link__path"
+                data-link-path
+                d="M 5 40 L 115 40"
+                stroke="#2dd4a8"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-dasharray="4 4"
+                fill="none"
+              />
+              <!-- Wall icon at the boundary -->
+              <g data-wall opacity="0">
+                <rect x="52" y="22" width="16" height="36" rx="2" fill="#2dd4a8" opacity="0.15"/>
+                <rect x="52" y="22" width="16" height="36" rx="2" fill="none" stroke="#2dd4a8" stroke-width="1.5"/>
+                <line x1="52" y1="34" x2="68" y2="34" stroke="#2dd4a8" stroke-width="1"/>
+                <line x1="52" y1="46" x2="68" y2="46" stroke="#2dd4a8" stroke-width="1"/>
+                <line x1="60" y1="22" x2="60" y2="58" stroke="#2dd4a8" stroke-width="1"/>
+              </g>
+            </svg>
+            <span class="is-link__label is-defended" data-link-label>Blocked at perimeter</span>
+          </div>
+
+          <div class="is-account" data-account="prod">
+            <div class="is-account__header">
+              <div>
+                <div class="is-account__label">AWS Account 2</div>
+                <div class="is-account__name">prod-payments</div>
+                <div class="is-account__id">444455556666</div>
+              </div>
+              <div class="is-account__badge" data-badge>Protected</div>
+            </div>
+            <div class="is-account__assets">
+              <div class="is-asset" data-asset="admin">
+                <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span class="is-asset__name">Production admin · sealed</span>
+                <span class="is-asset__tag">no path</span>
+              </div>
+              <div class="is-asset" data-asset="s3">
+                <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+                <span class="is-asset__name">Customer data · safe</span>
+                <span class="is-asset__tag">RCP enforced</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="is-attack__verdict is-good">
+        <div class="is-verdict__text">Same attacker. Same credential. No path exists.</div>
+        <div class="is-verdict__stats">
+          <div>
+            <div class="is-verdict__stat-num">0</div>
+            <div class="is-verdict__stat-label">API calls succeeded</div>
+          </div>
+          <div>
+            <div class="is-verdict__stat-num">0</div>
+            <div class="is-verdict__stat-label">data exposed</div>
+          </div>
+          <div>
+            <div class="is-verdict__stat-num">∞</div>
+            <div class="is-verdict__stat-label">attempts withstood</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shared thesis (applies to both tabs) -->
+    <blockquote class="is-attack__quote">
+      <span class="is-attack__quote-mark">&ldquo;</span>
+      <p class="is-attack__quote-text">You can't <em>out-detect</em> an AI.<br/>You can <em>out-prevent</em> one. Guardrails are how.</p>
+      <div class="is-attack__quote-attr">— The InstaSecure thesis</div>
+    </blockquote>
+  </div>
+</section>
+
+<style is:global>
+  /* === Namespaced under .is-attack — declared global so CSS variables and
+         descendant rules apply uniformly to all the static template
+         elements. All rules below are anchored at .is-attack so there's
+         no leakage. === */
+
+  .is-attack {
+    --is-bg-darker: #070924;
+    --is-line-dark: #1f2547;
+    --is-brand: #4d66e0;
+    --is-brand-light: #7d92ec;
+    --is-ink-faint: #a0a6c4;
+    --is-accent-red: #ff5470;
+    --is-accent-amber: #f5a623;
+    --is-accent-green: #2dd4a8;
+
+    background: var(--is-bg-darker);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    padding: 100px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  .is-attack *,
+  .is-attack *::before,
+  .is-attack *::after { box-sizing: border-box; }
+
+  .is-attack::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(77, 102, 224, 0.15), transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(255, 84, 112, 0.08), transparent 50%);
+    pointer-events: none;
+  }
+
+  .is-attack__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .is-attack__eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--is-accent-red);
+    margin-bottom: 16px;
+  }
+  .is-attack__title {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
+    color: white;
+    max-width: 720px;
+  }
+  .is-attack__sub {
+    font-size: 17px;
+    color: var(--is-ink-faint);
+    max-width: 640px;
+    margin: 0 0 40px;
+  }
+
+  /* Toolbar row: tabs left, replay + recording link right */
+  .is-attack__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .is-attack__controls-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Tabs */
+  .is-attack__tabs {
+    display: inline-flex;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .is-attack__tab {
+    padding: 10px 20px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--is-ink-faint);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+  }
+  .is-attack__tab.is-active {
+    background: var(--is-brand);
+    color: white;
+  }
+  .is-attack__tab:not(.is-active):hover { color: white; }
+
+  /* === STAGE WRAPPER === */
+  .is-attack__stage {
+    display: block;
+  }
+  .is-attack__stage[hidden] { display: none; }
+
+  /* === MAIN VIZ: two accounts + attacker === */
+  .is-attack__viz {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .is-attack__scene {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: stretch;
+    min-height: 280px;
+  }
+
+  /* Cloud account card */
+  .is-account {
+    background: rgba(14, 18, 48, 0.6);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .is-account.is-compromised {
+    border-color: var(--is-accent-red);
+    box-shadow: 0 0 0 1px var(--is-accent-red), 0 0 30px rgba(255, 84, 112, 0.2);
+  }
+  .is-account.is-defended {
+    border-color: var(--is-accent-green);
+    box-shadow: 0 0 0 1px var(--is-accent-green), 0 0 30px rgba(45, 212, 168, 0.15);
+  }
+
+  .is-account__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  }
+  .is-account__label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--is-ink-faint);
+  }
+  .is-account__name {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    margin-top: 2px;
+    font-family: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+  }
+  .is-account__id {
+    font-family: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+    font-size: 11px;
+    color: var(--is-ink-faint);
+  }
+  .is-account__badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--is-ink-faint);
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+  .is-account.is-compromised .is-account__badge {
+    background: rgba(255, 84, 112, 0.15);
+    color: var(--is-accent-red);
+  }
+  .is-account.is-defended .is-account__badge {
+    background: rgba(45, 212, 168, 0.15);
+    color: var(--is-accent-green);
+  }
+
+  .is-account__assets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .is-asset {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--is-ink-faint);
+    transition: all 0.4s ease;
+  }
+  .is-asset.is-active {
+    background: rgba(255, 84, 112, 0.1);
+    color: white;
+    transform: translateX(4px);
+  }
+  .is-asset.is-blocked {
+    background: rgba(45, 212, 168, 0.08);
+    color: white;
+  }
+  .is-asset__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--is-brand-light);
+  }
+  .is-asset.is-active .is-asset__icon { color: var(--is-accent-red); }
+  .is-asset.is-blocked .is-asset__icon { color: var(--is-accent-green); }
+  .is-asset__name { flex: 1; font-weight: 500; }
+  .is-asset__tag {
+    font-family: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.06);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .is-asset.is-active .is-asset__tag {
+    opacity: 1;
+    background: rgba(255, 84, 112, 0.2);
+    color: var(--is-accent-red);
+  }
+  .is-asset.is-blocked .is-asset__tag {
+    opacity: 1;
+    background: rgba(45, 212, 168, 0.2);
+    color: var(--is-accent-green);
+  }
+
+  /* Attacker bubble */
+  .is-attacker {
+    position: absolute;
+    top: -14px;
+    left: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--is-bg-darker);
+    border: 1.5px solid var(--is-accent-red);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--is-accent-red);
+    z-index: 3;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.4s ease, transform 0.4s ease, left 1s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .is-attacker.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .is-attacker.is-jumped {
+    left: calc(50% + 16px);
+  }
+  .is-attacker__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--is-accent-red);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(255, 84, 112, 0.6);
+    animation: isAttackerPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes isAttackerPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 84, 112, 0.6); }
+    50%      { box-shadow: 0 0 0 6px rgba(255, 84, 112, 0); }
+  }
+
+  /* Connection line between accounts (SVG) */
+  .is-link {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 120px;
+    height: 80px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .is-link__path {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    transition: stroke-dashoffset 1s cubic-bezier(0.65, 0, 0.35, 1);
+    marker-end: none;
+  }
+  .is-link__path.is-drawn {
+    stroke-dashoffset: 0;
+    marker-end: url(#arrowAtk);
+  }
+  .is-link__label {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-family: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--is-bg-darker);
+    border: 1px solid var(--is-accent-red);
+    color: var(--is-accent-red);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.5s;
+  }
+  .is-link__label.is-defended {
+    border-color: var(--is-accent-green);
+    color: var(--is-accent-green);
+  }
+  .is-link__label.is-visible { opacity: 1; }
+
+  /* Exfil arrow (data leaving) */
+  .is-exfil {
+    position: absolute;
+    bottom: -12px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--is-bg-darker);
+    border: 1.5px solid var(--is-accent-red);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--is-accent-red);
+    z-index: 3;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .is-exfil.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Outcome banner under viz */
+  .is-attack__verdict {
+    margin-top: 24px;
+    padding: 20px 24px;
+    background: rgba(255, 84, 112, 0.08);
+    border: 1px solid rgba(255, 84, 112, 0.25);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .is-attack__verdict.is-good {
+    background: rgba(45, 212, 168, 0.08);
+    border-color: rgba(45, 212, 168, 0.25);
+  }
+  .is-verdict__text {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+  }
+  .is-verdict__stats {
+    display: flex;
+    gap: 28px;
+  }
+  .is-verdict__stat-num {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+    line-height: 1;
+    color: var(--is-accent-red);
+  }
+  .is-attack__verdict.is-good .is-verdict__stat-num { color: var(--is-accent-green); }
+  .is-verdict__stat-label {
+    font-size: 11px;
+    color: var(--is-ink-faint);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Recording link — lives in the controls toolbar */
+  .is-attack__recording {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(77, 102, 224, 0.12);
+    border: 1px solid rgba(77, 102, 224, 0.4);
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .is-attack__recording:hover {
+    background: rgba(77, 102, 224, 0.2);
+    border-color: var(--is-brand-light);
+  }
+  .is-attack__recording svg {
+    width: 14px;
+    height: 14px;
+    color: var(--is-brand-light);
+  }
+  .is-attack__recording__label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--is-brand-light);
+    margin-right: 4px;
+  }
+
+  /* Pull quote — quiet coda below the demo. The previous treatment was a
+     gradient card that competed visually with the attack viz; this version
+     reads like a chapter ending: a thin top divider, centered serif text,
+     and only the two emphasized verbs in brand color. */
+  .is-attack__quote {
+    margin: 56px auto 0;
+    padding: 32px 0 0;
+    background: none;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0;
+    position: relative;
+    max-width: 640px;
+    text-align: center;
+  }
+  .is-attack__quote-mark {
+    display: none;
+  }
+  .is-attack__quote-text {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.82);
+    letter-spacing: 0;
+    margin: 0 0 14px;
+    padding-left: 0;
+  }
+  .is-attack__quote-text em {
+    color: var(--is-brand-light);
+    font-style: italic;
+    font-weight: 500;
+  }
+  .is-attack__quote-attr {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    padding-left: 0;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Replay button — lives in the controls toolbar */
+  .is-attack__replay {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .is-attack__replay:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .is-attack__replay svg { width: 14px; height: 14px; }
+
+  /* Mobile */
+  @media (max-width: 900px) {
+    .is-attack { padding: 60px 0; }
+    .is-attack__title { font-size: 30px; }
+    .is-attack__viz { padding: 24px 16px 16px; }
+    .is-attack__scene { grid-template-columns: 1fr; gap: 60px; margin-top: 56px; }
+    .is-link { display: none; }
+    .is-attacker { left: 16px; }
+    .is-attacker.is-jumped {
+      left: 16px;
+      top: calc(50% + 16px);
+    }
+    .is-attack__controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .is-attack__controls-right {
+      justify-content: space-between;
+      flex-wrap: nowrap;
+    }
+    .is-attack__tabs { width: 100%; }
+    .is-attack__tab { flex: 1; padding: 10px 12px; font-size: 13px; }
+    .is-verdict__stats { gap: 20px; }
+    .is-attack__replay { flex-shrink: 0; }
+    .is-attack__quote {
+      margin-top: 40px;
+      padding: 28px 16px 0;
+    }
+    .is-attack__quote-text {
+      font-size: 18px;
+      padding-left: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .is-attack__tab,
+    .is-attacker,
+    .is-asset,
+    .is-account,
+    .is-link__path,
+    .is-link__label,
+    .is-exfil { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function init() {
+      var section = document.querySelector('.is-attack');
+      if (!section || section.dataset.attackInit === '1') return;
+      section.dataset.attackInit = '1';
+
+      var tabs = section.querySelectorAll('.is-attack__tab');
+      var stages = section.querySelectorAll('.is-attack__stage');
+      var reduceMotion = window.matchMedia &&
+                         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var activeTimers = [];
+      var observer = null;
+
+      function clearTimers() {
+        activeTimers.forEach(clearTimeout);
+        activeTimers = [];
+      }
+      function later(fn, ms) {
+        var id = setTimeout(fn, ms);
+        activeTimers.push(id);
+      }
+
+      function resetStage(stage) {
+        var attacker = stage.querySelector('[data-attacker]');
+        var attackerLabel = stage.querySelector('[data-attacker-label]');
+        var devAccount = stage.querySelector('[data-account="dev"]');
+        var prodAccount = stage.querySelector('[data-account="prod"]');
+        var assets = stage.querySelectorAll('.is-asset');
+        var linkPath = stage.querySelector('[data-link-path]');
+        var linkLabel = stage.querySelector('[data-link-label]');
+        var exfil = stage.querySelector('[data-exfil]');
+        var wall = stage.querySelector('[data-wall]');
+
+        if (attacker) {
+          attacker.classList.remove('is-visible', 'is-jumped');
+          if (attackerLabel) attackerLabel.textContent = 'Attacker · stolen credential';
+        }
+        if (devAccount) devAccount.classList.remove('is-compromised', 'is-defended');
+        if (prodAccount) prodAccount.classList.remove('is-compromised', 'is-defended');
+        assets.forEach(function (a) { a.classList.remove('is-active', 'is-blocked'); });
+        if (linkPath) linkPath.classList.remove('is-drawn');
+        if (linkLabel) linkLabel.classList.remove('is-visible');
+        if (exfil) exfil.classList.remove('is-visible');
+        if (wall) wall.setAttribute('opacity', '0');
+      }
+
+      function playAttack(stage) {
+        clearTimers();
+        resetStage(stage);
+
+        var attacker = stage.querySelector('[data-attacker]');
+        var attackerLabel = stage.querySelector('[data-attacker-label]');
+        var devAccount = stage.querySelector('[data-account="dev"]');
+        var prodAccount = stage.querySelector('[data-account="prod"]');
+        var iamAsset = stage.querySelector('[data-asset="iam"]');
+        var roleAsset = stage.querySelector('[data-asset="role"]');
+        var adminAsset = stage.querySelector('[data-asset="admin"]');
+        var s3Asset = stage.querySelector('[data-asset="s3"]');
+        var linkPath = stage.querySelector('[data-link-path]');
+        var linkLabel = stage.querySelector('[data-link-label]');
+        var exfil = stage.querySelector('[data-exfil]');
+
+        if (reduceMotion) {
+          if (attacker) attacker.classList.add('is-visible', 'is-jumped');
+          if (devAccount) devAccount.classList.add('is-compromised');
+          if (prodAccount) prodAccount.classList.add('is-compromised');
+          [iamAsset, roleAsset, adminAsset, s3Asset].forEach(function (a) { if (a) a.classList.add('is-active'); });
+          if (linkPath) linkPath.classList.add('is-drawn');
+          if (linkLabel) linkLabel.classList.add('is-visible');
+          if (exfil) exfil.classList.add('is-visible');
+          return;
+        }
+
+        // 0.4s: attacker appears at dev account
+        later(function () { if (attacker) attacker.classList.add('is-visible'); }, 400);
+
+        // 1.5s: dev account compromised, IAM asset activates
+        later(function () {
+          if (devAccount) devAccount.classList.add('is-compromised');
+          if (iamAsset) iamAsset.classList.add('is-active');
+        }, 1500);
+
+        // 2.9s: role discovered
+        later(function () {
+          if (roleAsset) roleAsset.classList.add('is-active');
+        }, 2900);
+
+        // 4.4s: lateral move begins — line draws + label appears
+        later(function () {
+          if (linkPath) linkPath.classList.add('is-drawn');
+          if (linkLabel) linkLabel.classList.add('is-visible');
+          if (attackerLabel) attackerLabel.textContent = 'Lateral move in progress';
+        }, 4400);
+
+        // 5.5s: attacker jumps once line is fully drawn (line transition is 1s)
+        later(function () {
+          if (attacker) attacker.classList.add('is-jumped');
+        }, 5500);
+
+        // 7.0s: prod account compromised, admin asset activates
+        later(function () {
+          if (prodAccount) prodAccount.classList.add('is-compromised');
+          if (adminAsset) adminAsset.classList.add('is-active');
+          if (attackerLabel) attackerLabel.textContent = 'Attacker · in production';
+        }, 7000);
+
+        // 8.5s: S3 read
+        later(function () { if (s3Asset) s3Asset.classList.add('is-active'); }, 8500);
+
+        // 10.0s: exfil callout
+        later(function () { if (exfil) exfil.classList.add('is-visible'); }, 10000);
+      }
+
+      function playDefense(stage) {
+        clearTimers();
+        resetStage(stage);
+
+        var attacker = stage.querySelector('[data-attacker]');
+        var attackerLabel = stage.querySelector('[data-attacker-label]');
+        var devAccount = stage.querySelector('[data-account="dev"]');
+        var prodAccount = stage.querySelector('[data-account="prod"]');
+        var iamAsset = stage.querySelector('[data-asset="iam"]');
+        var roleAsset = stage.querySelector('[data-asset="role"]');
+        var adminAsset = stage.querySelector('[data-asset="admin"]');
+        var s3Asset = stage.querySelector('[data-asset="s3"]');
+        var linkLabel = stage.querySelector('[data-link-label]');
+        var wall = stage.querySelector('[data-wall]');
+
+        if (reduceMotion) {
+          if (attacker) attacker.classList.add('is-visible');
+          if (devAccount) devAccount.classList.add('is-defended');
+          if (prodAccount) prodAccount.classList.add('is-defended');
+          [iamAsset, roleAsset, adminAsset, s3Asset].forEach(function (a) { if (a) a.classList.add('is-blocked'); });
+          if (linkLabel) linkLabel.classList.add('is-visible');
+          if (wall) wall.setAttribute('opacity', '1');
+          return;
+        }
+
+        // 0.4s: attacker appears
+        later(function () { if (attacker) attacker.classList.add('is-visible'); }, 400);
+
+        // 1.5s: dev account is the foothold but it's protected — show defended state
+        later(function () {
+          if (devAccount) devAccount.classList.add('is-defended');
+          if (iamAsset) iamAsset.classList.add('is-blocked');
+        }, 1500);
+
+        // 3.0s: credential blocked at perimeter
+        later(function () {
+          if (roleAsset) roleAsset.classList.add('is-blocked');
+          if (attackerLabel) attackerLabel.textContent = 'Attacker · denied at perimeter';
+        }, 3000);
+
+        // 4.5s: wall appears in middle, link label shows
+        later(function () {
+          if (wall) wall.setAttribute('opacity', '1');
+          if (linkLabel) linkLabel.classList.add('is-visible');
+        }, 4500);
+
+        // 6.0s: prod account defended state, assets stay safe (no path)
+        later(function () {
+          if (prodAccount) prodAccount.classList.add('is-defended');
+          if (adminAsset) adminAsset.classList.add('is-blocked');
+        }, 6000);
+
+        // 7.5s: S3 sealed
+        later(function () { if (s3Asset) s3Asset.classList.add('is-blocked'); }, 7500);
+      }
+
+      function playStage(stage) {
+        var which = stage.getAttribute('data-stage');
+        if (which === 'attack') playAttack(stage);
+        else playDefense(stage);
+      }
+
+      function getActiveStage() {
+        for (var i = 0; i < stages.length; i++) {
+          if (!stages[i].hasAttribute('hidden')) return stages[i];
+        }
+        return null;
+      }
+
+      // Tab switching
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var target = tab.getAttribute('data-target');
+
+          tabs.forEach(function (t) {
+            var isActive = t === tab;
+            t.classList.toggle('is-active', isActive);
+            t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          });
+
+          stages.forEach(function (stage) {
+            var match = stage.getAttribute('data-stage') === target;
+            resetStage(stage);
+            if (match) {
+              stage.removeAttribute('hidden');
+              playStage(stage);
+            } else {
+              stage.setAttribute('hidden', '');
+            }
+          });
+        });
+      });
+
+      // Replay button — now lives outside the stages, so closest() falls
+      // through to getActiveStage() and replays whichever tab is showing.
+      section.querySelectorAll('[data-replay]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var stage = btn.closest('.is-attack__stage') || getActiveStage();
+          if (stage) playStage(stage);
+        });
+      });
+
+      // Play when the section is centered in the viewport (not just barely
+      // peeking from the bottom). The rootMargin shrinks the viewport top
+      // by 15% and bottom by 30%, so the section has to be solidly in the
+      // user's reading zone before the trigger fires. The high-threshold
+      // entry of 0.4 + a low-threshold reset of 0 lets us re-arm after the
+      // user scrolls past and back.
+      if ('IntersectionObserver' in window) {
+        var hasPlayed = false;
+        observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            var active = getActiveStage();
+            if (!active) return;
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+              if (!hasPlayed) {
+                hasPlayed = true;
+                playStage(active);
+              }
+            } else if (!entry.isIntersecting) {
+              hasPlayed = false;
+              resetStage(active);
+            }
+          });
+        }, {
+          rootMargin: '-15% 0px -30% 0px',
+          threshold: [0, 0.4, 0.6],
+        });
+        observer.observe(section);
+      } else {
+        var initial = getActiveStage();
+        if (initial) playStage(initial);
+      }
+
+      // Stop timers + observer if Astro view-transitions away
+      document.addEventListener('astro:before-swap', function () {
+        clearTimers();
+        if (observer) observer.disconnect();
+      }, { once: true });
+    }
+
+    document.addEventListener('astro:page-load', init);
+    if (document.readyState !== 'loading') init();
+    else document.addEventListener('DOMContentLoaded', init);
+  })();
+</script>
