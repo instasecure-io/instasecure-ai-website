@@ -127,18 +127,21 @@
 
 <script is:inline>
   (function () {
+    // ~1.5× slower again from the prior pacing — total ~2.25× of the
+    // original timing. Each beat now sits ~1.1-1.3s in view, slow enough
+    // to read but still purposeful.
     var attackScript = [
-      { delay: 200,  segs: [['ts', '00:00'], ['api', '$ session start · access_key_id=AKIA...QX7K']] },
-      { delay: 600,  segs: [['ts', '00:15'], ['api', 'iam:ListRoles'],   [null, ' '], ['ok',      '→ 247 roles enumerated']] },
-      { delay: 1100, segs: [['ts', '00:35'], ['api', 'sts:AssumeRole'],  [null, ' '], ['warn',    '→ cross-account path found']] },
-      { delay: 1700, segs: [['ts', '01:00'], ['api', 'sts:AssumeRole'],  [null, ' '], ['ok',      '→ session::prod-admin']] },
-      { delay: 2300, segs: [['ts', '01:20'], ['api', 's3:GetObject'],    [null, ' '], ['ok',      '→ 4.2GB exfiltrated']] },
-      { delay: 2800, segs: [['ts', '01:30'], ['warn', 'GuardDuty: 0 findings · 0 alerts']] },
-      { delay: 3300, divider: true },
-      { delay: 3700, segs: [['ts', 'RUN 2'], ['api', 'iam:ListRoles'],   [null, ' '], ['blocked', '→ DENIED · SCP']] },
-      { delay: 4200, segs: [['ts', 'RUN 2'], ['api', 'sts:AssumeRole'],  [null, ' '], ['blocked', '→ DENIED · Data Perimeter']] },
-      { delay: 4700, segs: [['ts', 'RUN 2'], ['api', 's3:GetObject'],    [null, ' '], ['blocked', '→ DENIED · RCP']] },
-      { delay: 5200, segs: [['ok', '→ attack class structurally retired']] }
+      { delay: 450,   segs: [['ts', '00:00'], ['api', '$ session start · access_key_id=AKIA...QX7K']] },
+      { delay: 1400,  segs: [['ts', '00:15'], ['api', 'iam:ListRoles'],   [null, ' '], ['ok',      '→ 247 roles enumerated']] },
+      { delay: 2600,  segs: [['ts', '00:35'], ['api', 'sts:AssumeRole'],  [null, ' '], ['warn',    '→ cross-account path found']] },
+      { delay: 3900,  segs: [['ts', '01:00'], ['api', 'sts:AssumeRole'],  [null, ' '], ['ok',      '→ session::prod-admin']] },
+      { delay: 5100,  segs: [['ts', '01:20'], ['api', 's3:GetObject'],    [null, ' '], ['ok',      '→ 4.2GB exfiltrated']] },
+      { delay: 6300,  segs: [['ts', '01:30'], ['warn', 'GuardDuty: 0 findings · 0 alerts']] },
+      { delay: 7500,  divider: true },
+      { delay: 8600,  segs: [['ts', 'RUN 2'], ['api', 'iam:ListRoles'],   [null, ' '], ['blocked', '→ DENIED · SCP']] },
+      { delay: 9700,  segs: [['ts', 'RUN 2'], ['api', 'sts:AssumeRole'],  [null, ' '], ['blocked', '→ DENIED · Data Perimeter']] },
+      { delay: 10800, segs: [['ts', 'RUN 2'], ['api', 's3:GetObject'],    [null, ' '], ['blocked', '→ DENIED · RCP']] },
+      { delay: 12000, segs: [['ok', '→ attack class structurally retired']] }
     ];
 
     // Module-scoped state. Each init() refreshes these from the current
@@ -186,14 +189,16 @@
       while (termBody.firstChild) termBody.removeChild(termBody.firstChild);
       var startTime = Date.now();
 
-      // Clock: ~1 simulated second per 60ms real time, capped at 90s
+      // Clock: ~1 simulated second per 130ms real time, capped at 90s.
+      // Synced to the slower attack script (last line at ~12s) so the
+      // wall-clock hits 01:30 around when the last attack line lands.
       clockInterval = setInterval(function () {
-        var t = Math.min(90, Math.floor((Date.now() - startTime) / 60));
+        var t = Math.min(90, Math.floor((Date.now() - startTime) / 130));
         var m = Math.floor(t / 60).toString().padStart(2, '0');
         var s = (t % 60).toString().padStart(2, '0');
         termClock.textContent = m + ':' + s;
         if (t >= 90) { clearInterval(clockInterval); clockInterval = null; }
-      }, 50);
+      }, 100);
 
       attackScript.forEach(function (step) {
         var id = setTimeout(function () {
@@ -202,7 +207,8 @@
         timeouts.push(id);
       });
 
-      timeouts.push(setTimeout(startTerminal, 8000));
+      // Loop after the last line + ~5s hold
+      timeouts.push(setTimeout(startTerminal, 17000));
     }
 
     function init() {

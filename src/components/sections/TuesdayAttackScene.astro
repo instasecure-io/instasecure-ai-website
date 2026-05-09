@@ -756,8 +756,29 @@
     .is-attack { padding: 60px 0; }
     .is-attack__title { font-size: 30px; }
     .is-attack__viz { padding: 24px 16px 16px; }
-    .is-attack__scene { grid-template-columns: 1fr; gap: 60px; margin-top: 56px; }
-    .is-link { display: none; }
+    .is-attack__scene { grid-template-columns: 1fr; gap: 80px; margin-top: 56px; }
+    /* Mobile arrow: the desktop SVG is horizontal; for the stacked
+       single-column layout we show a vertical-pointing label centered in
+       the gap between the two cards. */
+    .is-link {
+      display: block;
+      width: auto;
+      max-width: none;
+      height: auto;
+      pointer-events: none;
+    }
+    .is-link svg { display: none; }
+    .is-link__label {
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 6px 12px;
+    }
+    .is-link__label::before {
+      content: '↓';
+      display: inline-block;
+      margin-right: 6px;
+      font-weight: 700;
+    }
     .is-attacker { left: 16px; }
     .is-attacker.is-jumped {
       left: 16px;
@@ -1013,27 +1034,23 @@
         });
       });
 
-      // Play when the section is centered in the viewport (not just barely
-      // peeking from the bottom). The rootMargin shrinks the viewport top
-      // by 15% and bottom by 30%, so the section has to be solidly in the
-      // user's reading zone before the trigger fires. The high-threshold
-      // entry of 0.4 + a low-threshold reset of 0 lets us re-arm after the
-      // user scrolls past and back.
+      // Auto-play once when the section is solidly in view, then disconnect.
+      // Earlier versions also reset-on-leave so a scroll-out + scroll-in
+      // would replay, but on mobile that fired resets while the click
+      // handler was already running its own resetStage + replay (the
+      // browser's focus-scroll on the Replay button changes the
+      // intersectionRatio just enough to trip a threshold). The collision
+      // showed up as a full-section "shake" right after clicking Replay.
+      // Single-shot autoplay; user drives subsequent replays via Replay
+      // button or tab switches.
       if ('IntersectionObserver' in window) {
-        var hasPlayed = false;
         observer = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
+            if (!entry.isIntersecting || entry.intersectionRatio < 0.4) return;
             var active = getActiveStage();
             if (!active) return;
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
-              if (!hasPlayed) {
-                hasPlayed = true;
-                playStage(active);
-              }
-            } else if (!entry.isIntersecting) {
-              hasPlayed = false;
-              resetStage(active);
-            }
+            playStage(active);
+            if (observer) { observer.disconnect(); observer = null; }
           });
         }, {
           rootMargin: '-15% 0px -30% 0px',
