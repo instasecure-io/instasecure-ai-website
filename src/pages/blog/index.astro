@@ -11,8 +11,8 @@ const posts = (await getCollection('blog'))
 const dateFmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 ---
 <BaseLayout
-  title="Blog | InstaSecure"
-  description="Writing on preventive cloud security, AWS IAM, credential compromise, compliance, and the InstaSecure platform — from the team building the product."
+  title="Blog — Preventive Cloud Security & AWS IAM | InstaSecure"
+  description="Writing on preventive AWS cloud security controls, IAM, credential compromise, data perimeters, and the InstaSecure platform — from the team building the product."
 >
   <Hero
     eyebrow="Blog"
@@ -34,7 +34,15 @@ const dateFmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
               <div class="grid md:grid-cols-2 gap-0">
                 {p.data.heroImage && (
                   <div class="bg-slate-50 flex items-center justify-center p-6 md:p-10 aspect-[16/10] md:aspect-auto">
-                    <img src={p.data.heroImage.src} alt="" class="max-w-full max-h-full object-contain" />
+                    <img
+                      src={p.data.heroImage.src}
+                      alt={p.data.title}
+                      width={p.data.heroImage.width}
+                      height={p.data.heroImage.height}
+                      class="max-w-full max-h-full object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </div>
                 )}
                 <div class="p-8 md:p-10 flex flex-col justify-center">
@@ -65,7 +73,15 @@ const dateFmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
                   <a href={`/blog/${p.slug}`} class="group block rounded-2xl overflow-hidden bg-white border border-black/5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition flex flex-col">
                     {p.data.heroImage && (
                       <div class="bg-slate-50 aspect-[4/3] flex items-center justify-center p-5">
-                        <img src={p.data.heroImage.src} alt="" class="max-w-full max-h-full object-contain" />
+                        <img
+                          src={p.data.heroImage.src}
+                          alt={p.data.title}
+                          width={p.data.heroImage.width}
+                          height={p.data.heroImage.height}
+                          class="max-w-full max-h-full object-contain"
+                          loading="lazy"
+                          decoding="async"
+                        />
                       </div>
                     )}
                     <div class="p-6 flex flex-col flex-1">

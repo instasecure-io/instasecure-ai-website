@@ -43,7 +43,16 @@ const dateFmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
     </header>
 
     {heroImage && (
-      <img src={heroImage.src} alt="" class="w-full rounded-2xl shadow-md mb-10" loading="eager" />
+      <img
+        src={heroImage.src}
+        alt={title}
+        width={heroImage.width}
+        height={heroImage.height}
+        class="w-full rounded-2xl shadow-md mb-10"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
     )}
 
     <div class="prose prose-slate prose-lg max-w-none

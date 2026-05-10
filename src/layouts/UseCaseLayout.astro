@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/sections/Hero.astro';
 import CTAStripe from '@/components/sections/CTAStripe.astro';
 import Breadcrumbs from '@/components/ui/Breadcrumbs.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
 
 interface Props {
   title: string;
@@ -39,8 +40,32 @@ const crumbs = [
   breadcrumbCategory,
   { label: heroTitle },
 ];
+
+// Mirror the visible breadcrumbs into a BreadcrumbList JSON-LD so SERPs
+// can render the breadcrumb path under the result. The trailing item
+// (current page) doesn't get an `item` URL per Google's spec.
+const siteOrigin = Astro.site ? Astro.site.origin : 'https://instasecure.ai';
+const currentUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => {
+    const item: any = {
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.label,
+    };
+    if (i === crumbs.length - 1) {
+      item.item = currentUrl;
+    } else if (c.href) {
+      item.item = new URL(c.href, siteOrigin).toString();
+    }
+    return item;
+  }),
+};
 ---
 <BaseLayout {title} {description}>
+  <StructuredData slot="head" data={breadcrumbSchema} />
   <Breadcrumbs crumbs={crumbs} />
 
   <Hero

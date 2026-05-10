@@ -59,8 +59,8 @@ const managementOptions = [
 ];
 ---
 <BaseLayout
-  title="InstaAccess — Non-Human Identity Security & Preventive AWS Controls | InstaSecure"
-  description="Secure non-human identities on AWS — service roles, automation pipelines, third-party integrations, and AI agents. InstaAccess turns high-level objectives into preventive cloud controls (SCPs, RCPs, permission boundaries) and continuously remediates CNAPP / CIEM / DSPM findings."
+  title="InstaAccess — Non-Human Identity Security on AWS"
+  description="Secure non-human identities on AWS — service roles, automation, AI agents — with preventive cloud controls (SCPs, RCPs, permission boundaries). Closed-loop CNAPP remediation."
 >
   <StructuredData slot="head" data={{
     '@context': 'https://schema.org',
@@ -105,7 +105,7 @@ const managementOptions = [
           subtitle="InstaAccess establishes a strong, compliant, and resilient cloud posture — translating strategic goals into tangible, automated controls. It integrates with your existing security stack to create a closed-loop remediation system: detection becomes immediate prevention."
         />
       </div>
-      <img src={howItWorks.src} alt="Diagram showing CNAPP findings automatically grouped and mapped to preventive cloud controls." class="w-full max-w-5xl mx-auto" />
+      <img src={howItWorks.src} alt="Diagram showing CNAPP findings automatically grouped and mapped to preventive cloud controls." width={howItWorks.width} height={howItWorks.height} loading="lazy" decoding="async" class="w-full max-w-5xl mx-auto" />
     </section>
   </div>
 
@@ -140,7 +140,7 @@ const managementOptions = [
       'Spot inactive or dormant permissions that should be revoked',
       'Detect untrusted third-party network access, excessive permissions, privilege escalation risks, and toxic permission combinations',
     ]}
-    image={{ src: ft01.src, alt: 'Line graph with scattered data points showing identity access risk signals over time.' }}
+    image={{ src: ft01.src, alt: 'Line graph with scattered data points showing identity access risk signals over time.', width: ft01.width, height: ft01.height }}
     imagePosition="right"
   />
   <FeatureRow
@@ -151,7 +151,7 @@ const managementOptions = [
       'Findings from external CNAPP tools are integrated to highlight the most risky permission combinations',
       'Focus on the security issues that matter most to your organization',
     ]}
-    image={{ src: ft02.src, alt: 'Risk-priority diagram showing three risk levels: high (cross-account access), medium (sensitive permissions), high (write access).' }}
+    image={{ src: ft02.src, alt: 'Risk-priority diagram showing three risk levels: high (cross-account access), medium (sensitive permissions), high (write access).', width: ft02.width, height: ft02.height }}
     imagePosition="left"
   />
   <FeatureRow
@@ -162,7 +162,7 @@ const managementOptions = [
       'Analyze permission boundaries, conditions, and tags',
       'Identify complex permission interactions and inheritance patterns',
     ]}
-    image={{ src: ft03.src, alt: 'Venn diagram with three overlapping circles representing layered policy analysis.' }}
+    image={{ src: ft03.src, alt: 'Venn diagram with three overlapping circles representing layered policy analysis.', width: ft03.width, height: ft03.height }}
     imagePosition="right"
   />
   <FeatureRow
@@ -173,7 +173,7 @@ const managementOptions = [
       'Implement Data Perimeters and Sensitive Permission Restrictions to define access boundaries and limit critical resource exposure',
       'Scale access controls consistently across teams and business units',
     ]}
-    image={{ src: ft04.src, alt: 'Digital interface showing an enterprise-wide control rollout.' }}
+    image={{ src: ft04.src, alt: 'Digital interface showing an enterprise-wide control rollout.', width: ft04.width, height: ft04.height }}
     imagePosition="left"
   />
   <FeatureRow
@@ -184,7 +184,7 @@ const managementOptions = [
       'Works with Jira, Terraform, CI/CD pipelines, GitHub, and AWS for easy automation',
       'Tag-based deployment reduces time to enforcement significantly',
     ]}
-    image={{ src: ft05.src, alt: 'Icons representing cloud, GitHub, Terraform, and AWS — deployment integration surfaces.' }}
+    image={{ src: ft05.src, alt: 'Icons representing cloud, GitHub, Terraform, and AWS — deployment integration surfaces.', width: ft05.width, height: ft05.height }}
     imagePosition="right"
   />
   <FeatureRow
@@ -195,7 +195,7 @@ const managementOptions = [
       'Validate access events and usage with CloudTrail logs, Last Used Activity insights, and historical data',
       'Identify untrusted access risks — exposed credentials, third-party access, toxic permission combos',
     ]}
-    image={{ src: ft06.src, alt: 'Checklist illustration with green check marks and red minus signs — impact assessment report.' }}
+    image={{ src: ft06.src, alt: 'Checklist illustration with green check marks and red minus signs — impact assessment report.', width: ft06.width, height: ft06.height }}
     imagePosition="left"
   />
   <FeatureRow
@@ -206,7 +206,7 @@ const managementOptions = [
       'Enhance security while ensuring business continuity and operational efficiency',
       'Support business requirements with fine-tuned permissions that balance security and productivity',
     ]}
-    image={{ src: ft07.src, alt: 'Bar chart with active and pending exceptions tracked over time.' }}
+    image={{ src: ft07.src, alt: 'Bar chart with active and pending exceptions tracked over time.', width: ft07.width, height: ft07.height }}
     imagePosition="right"
   />
 

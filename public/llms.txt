@@ -16,15 +16,19 @@ The home features an interactive "A Tuesday in 2026" scene that plays a real AWS
 
 ## Products
 
-- [InstaAccess](https://instasecure.ai/instaaccess): Preventive cloud configuration hardening and automated remediation for **non-human identities** — service roles, automation agents, third-party integrations. Maps high-level security objectives to 50+ AWS-native preventive guardrails, then closes the loop on findings from CNAPP / CIEM / DSPM tools.
+- [InstaAccess](https://instasecure.ai/instaaccess): Preventive AWS cloud security controls (SCPs, RCPs, permission boundaries) for **non-human identities** — service roles, automation pipelines, third-party integrations, and AI agents. Maps high-level security objectives to 50+ AWS-native preventive guardrails, then closes the loop on findings from CNAPP / CIEM / DSPM tools without disrupting workloads.
 - [InstaWorkforce](https://instasecure.ai/instaworkforce): Secure **human access** to AWS — least-privilege, just-in-time, policy-aligned. Agentless engine connects IdP (Okta / Azure AD), AWS Identity Center, and AWS accounts to compute true end-to-end permissions ("who can actually access what"), detect dormant admins, and automate right-sizing.
 
 ## Core Value Proposition
 
-- **50+ AWS-native preventive guardrails** for AI, data, and identity — applied organization-wide, not asset-by-asset.
-- **Real-time remediation** via virtual patches — policy changes enforced at the control plane in minutes, not days.
-- **Closed-loop integration** with existing CNAPP, IdP, and IaC tools — no pipeline changes, no developer involvement required.
-- **Three-pillar Data Perimeter** for AWS: trusted identities, trusted resources, expected networks — blocks stolen credentials even with valid keys.
+- **50+ preventive AWS cloud security controls** — service control policies (SCPs), resource control policies (RCPs), permission boundaries, IAM resource policies, and VPC endpoint policies — applied organization-wide, not asset-by-asset.
+- **Real-time remediation** via virtual patches — policy changes enforced at the AWS control plane in minutes, not days.
+- **Closed-loop integration** with existing CNAPP, CIEM, DSPM, IdP, and IaC tools — no pipeline changes, no developer involvement required.
+- **Three-pillar AWS Data Perimeter**: trusted identities, trusted resources, expected networks — blocks stolen credentials even with valid keys, and blocks AI insider threats from rogue networks.
+
+## Target keywords (we cover these topics in depth)
+
+Preventive AWS cloud security controls · AWS Data Perimeter · AWS service control policies (SCPs) · AWS resource control policies (RCPs) · AWS permission boundaries · credential compromise on AWS · stolen AWS credentials · cloud zero-day attack defense · AI-driven cloud attacks · AI insider threat · non-human identity (NHI) security · workforce IAM security on AWS · AWS Identity Center · IAM blast radius · least privilege on AWS · cloud configuration hardening · CNAPP remediation · AWS guardrails platform.
 
 ## Key Pages
 
