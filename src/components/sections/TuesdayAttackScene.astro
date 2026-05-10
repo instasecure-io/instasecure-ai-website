@@ -815,6 +815,19 @@
     .is-link__label,
     .is-exfil { transition: none !important; animation: none !important; }
   }
+
+  /* When resetStage runs, snap every animated property back to its
+     start state instantly. Without this, the simultaneous reversal of
+     border-color, box-shadow, transform, opacity, and stroke-dashoffset
+     transitions on every element batches into a single repaint that
+     reads as a full-section shake on mobile. */
+  .is-attack__stage.is-resetting,
+  .is-attack__stage.is-resetting *,
+  .is-attack__stage.is-resetting *::before,
+  .is-attack__stage.is-resetting *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 </style>
 
 <script is:inline>
@@ -842,6 +855,14 @@
       }
 
       function resetStage(stage) {
+        // Snap-reset: disable transitions, remove all play-state classes,
+        // force reflow, then re-enable on the next frame. Without this the
+        // simultaneous reversal of border-color, box-shadow, transform,
+        // opacity, and stroke-dashoffset transitions on every element
+        // batched into one repaint — visible on mobile as a full-section
+        // shake right after clicking Replay.
+        stage.classList.add('is-resetting');
+
         var attacker = stage.querySelector('[data-attacker]');
         var attackerLabel = stage.querySelector('[data-attacker-label]');
         var devAccount = stage.querySelector('[data-account="dev"]');
@@ -863,6 +884,13 @@
         if (linkLabel) linkLabel.classList.remove('is-visible');
         if (exfil) exfil.classList.remove('is-visible');
         if (wall) wall.setAttribute('opacity', '0');
+
+        // Force layout to commit the snap-back, then re-enable transitions
+        // so the play sequence animates in normally.
+        void stage.offsetHeight;
+        requestAnimationFrame(function () {
+          stage.classList.remove('is-resetting');
+        });
       }
 
       function playAttack(stage) {
@@ -1027,26 +1055,31 @@
 
       // Replay button — now lives outside the stages, so closest() falls
       // through to getActiveStage() and replays whichever tab is showing.
+      // blur() the button so its focus state doesn't trigger a focus-scroll
+      // on mobile (which compounded the visual shake on tap).
       section.querySelectorAll('[data-replay]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+          if (e.currentTarget && e.currentTarget.blur) e.currentTarget.blur();
           var stage = btn.closest('.is-attack__stage') || getActiveStage();
           if (stage) playStage(stage);
         });
       });
 
-      // Auto-play once when the section is solidly in view, then disconnect.
-      // Earlier versions also reset-on-leave so a scroll-out + scroll-in
-      // would replay, but on mobile that fired resets while the click
-      // handler was already running its own resetStage + replay (the
-      // browser's focus-scroll on the Replay button changes the
-      // intersectionRatio just enough to trip a threshold). The collision
-      // showed up as a full-section "shake" right after clicking Replay.
-      // Single-shot autoplay; user drives subsequent replays via Replay
-      // button or tab switches.
+      // Auto-play once when the section enters the user's reading band,
+      // then disconnect. Single-shot — subsequent replays are user-driven.
+      //
+      // Earlier this checked entry.intersectionRatio >= 0.4 inside a
+      // shrunk root (rootMargin -15%/-30%). On a tall mobile section
+      // (~1800px) inside an ~844px viewport, the maximum achievable ratio
+      // against the shrunk root is (844*0.55)/1800 ≈ 0.26 — below 0.4 —
+      // so the observer never fired and the demo silently stayed dormant
+      // until the user clicked Replay. Threshold 0 + isIntersecting fires
+      // the instant any pixel of the section enters the central band,
+      // which is what we want.
       if ('IntersectionObserver' in window) {
         observer = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
-            if (!entry.isIntersecting || entry.intersectionRatio < 0.4) return;
+            if (!entry.isIntersecting) return;
             var active = getActiveStage();
             if (!active) return;
             playStage(active);
@@ -1054,7 +1087,7 @@
           });
         }, {
           rootMargin: '-15% 0px -30% 0px',
-          threshold: [0, 0.4, 0.6],
+          threshold: 0,
         });
         observer.observe(section);
       } else {
