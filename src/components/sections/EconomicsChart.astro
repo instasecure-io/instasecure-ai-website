@@ -1,0 +1,328 @@
+---
+// "The exposure gap" chart for the Economics section. Static SVG +
+// two columns of bullets (CSPM/SOC vs InstaSecure guardrails).
+// Section-level header (eyebrow + h2 + lede) lives on the page via
+// <SectionHeader>; this component renders only the panel.
+//
+// Polished to match the site: drops the Inter font override (inherits
+// DM Sans), inline color hex literals harmonized with site tokens
+// (var(--color-text), slate-700/500, var(--color-brand),
+// rgba(0,0,0,0.05) borders). Severity colors stay literal —
+// graph-signaling content, not chrome.
+---
+<div class="econ">
+  <div class="econ__head">
+    <div class="econ__head-left">
+      <div class="econ__kicker">Risk × cost · over time, in the AI era</div>
+      <h3 class="econ__h3">The exposure gap widens. <span class="econ__accent">The prevention line doesn't move.</span></h3>
+    </div>
+    <div class="econ__legend">
+      <span class="econ__legend-item"><span class="econ__sw econ__sw--red"></span>Attacker capability</span>
+      <span class="econ__legend-item"><span class="econ__sw econ__sw--warm"></span>Detection coverage</span>
+      <span class="econ__legend-item"><span class="econ__sw econ__sw--gap"></span>Exposure window</span>
+      <span class="econ__legend-item"><span class="econ__sw econ__sw--blue"></span>Prevention boundary</span>
+    </div>
+  </div>
+
+  <svg class="econ__chart" viewBox="0 0 1180 520" width="100%" aria-hidden="true">
+    <defs>
+      <linearGradient id="econGapFill" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#ff5470" stop-opacity="0.24" />
+        <stop offset="100%" stop-color="#ff5470" stop-opacity="0.05" />
+      </linearGradient>
+      <filter id="econPrevGlow" x="-20%" y="-200%" width="140%" height="500%">
+        <feGaussianBlur stdDeviation="3" />
+      </filter>
+    </defs>
+
+    <g>
+      <rect x="96"  y="70" width="236" height="310" fill="#fafbfe" />
+      <rect x="332" y="70" width="236" height="310" fill="#ffffff" />
+      <rect x="568" y="70" width="236" height="310" fill="#fafbfe" />
+      <rect x="804" y="70" width="236" height="310" fill="#ffffff" />
+    </g>
+
+    <line x1="96" y1="70"  x2="96"   y2="380" stroke="rgba(0,0,0,0.10)" stroke-width="1" />
+    <line x1="96" y1="380" x2="1040" y2="380" stroke="rgba(0,0,0,0.10)" stroke-width="1" />
+
+    <g stroke="rgba(0,0,0,0.04)" stroke-width="1">
+      <line x1="96" y1="70"  x2="1040" y2="70"  />
+      <line x1="96" y1="147" x2="1040" y2="147" />
+      <line x1="96" y1="225" x2="1040" y2="225" />
+      <line x1="96" y1="302" x2="1040" y2="302" />
+    </g>
+
+    <g stroke="rgba(0,0,0,0.08)" stroke-width="1" stroke-dasharray="2 5" opacity="0.7">
+      <line x1="332" y1="70" x2="332" y2="380" />
+      <line x1="568" y1="70" x2="568" y2="380" />
+      <line x1="804" y1="70" x2="804" y2="380" />
+    </g>
+
+    <g font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10.5" fill="#475569" letter-spacing="0.22em" font-weight="600">
+      <text x="214" y="402" text-anchor="middle">PRE-AI</text>
+      <text x="450" y="402" text-anchor="middle">EARLY-AI</text>
+      <text x="686" y="402" text-anchor="middle">ADVERSARIAL-AI</text>
+      <text x="922" y="402" text-anchor="middle">AGENTIC-AI</text>
+    </g>
+
+    <g font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="9.5" fill="#64748b" letter-spacing="0.18em">
+      <text x="88" y="74"  text-anchor="end">EXTREME</text>
+      <text x="88" y="151" text-anchor="end">HIGH</text>
+      <text x="88" y="229" text-anchor="end">MED</text>
+      <text x="88" y="306" text-anchor="end">LOW</text>
+    </g>
+    <text transform="translate(34 270) rotate(-90)" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#475569" letter-spacing="0.22em" font-weight="600" text-anchor="middle">RISK · EXPOSURE</text>
+
+    <path d="M 96 340
+             C 200 335, 280 328, 332 320
+             C 450 310, 540 270, 568 220
+             C 660 150, 760 130, 804 120
+             C 920 100, 990 88, 1040 75
+             L 1040 180
+             C 990 200, 920 220, 804 240
+             C 760 252, 660 265, 568 285
+             C 540 305, 450 325, 332 332
+             C 280 336, 200 340, 96 342 Z"
+          fill="url(#econGapFill)" />
+
+    <path d="M 96 342 C 200 340, 280 336, 332 332 C 450 325, 540 305, 568 285 C 660 265, 760 252, 804 240 C 920 220, 990 200, 1040 180"
+          fill="none" stroke="#f59f3c" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 5" />
+
+    <path d="M 96 340 C 200 335, 280 328, 332 320 C 450 310, 540 270, 568 220 C 660 150, 760 130, 804 120 C 920 100, 990 88, 1040 75"
+          fill="none" stroke="#ff5470" stroke-width="3" stroke-linecap="round" />
+
+    <g>
+      <circle cx="332"  cy="320" r="4.5" fill="#ff5470" stroke="#ffffff" stroke-width="2" />
+      <circle cx="568"  cy="220" r="4.5" fill="#ff5470" stroke="#ffffff" stroke-width="2" />
+      <circle cx="804"  cy="120" r="4.5" fill="#ff5470" stroke="#ffffff" stroke-width="2" />
+      <circle cx="1040" cy="75"  r="5"   fill="#ff5470" stroke="#ffffff" stroke-width="2" />
+      <circle cx="332"  cy="332" r="4.5" fill="#f59f3c" stroke="#ffffff" stroke-width="2" />
+      <circle cx="568"  cy="285" r="4.5" fill="#f59f3c" stroke="#ffffff" stroke-width="2" />
+      <circle cx="804"  cy="240" r="4.5" fill="#f59f3c" stroke="#ffffff" stroke-width="2" />
+      <circle cx="1040" cy="180" r="5"   fill="#f59f3c" stroke="#ffffff" stroke-width="2" />
+    </g>
+
+    <g font-size="12.5" font-weight="600">
+      <g transform="translate(1030 60)">
+        <rect x="-160" y="-13" width="160" height="22" rx="11" fill="#ffffff" stroke="#ff5470" stroke-width="1" opacity="0.96" />
+        <text x="-12" y="4" fill="#ff5470" text-anchor="end">Attacker capability</text>
+      </g>
+      <g transform="translate(1030 165)">
+        <rect x="-186" y="-13" width="186" height="22" rx="11" fill="#ffffff" stroke="#cc7a1f" stroke-width="1" opacity="0.96" />
+        <text x="-12" y="4" fill="#cc7a1f" text-anchor="end">Detection (AI-augmented)</text>
+      </g>
+    </g>
+
+    <g text-anchor="middle">
+      <text x="690" y="200" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#1d2f71" letter-spacing="0.24em" font-weight="700">EXPOSURE WINDOW</text>
+      <text x="690" y="218" font-size="11.5" fill="#475569" font-weight="500" letter-spacing="0.01em">grows with attacker capability</text>
+    </g>
+
+    <line x1="96" y1="408" x2="1040" y2="408" stroke="rgba(0,0,0,0.04)" stroke-width="1" stroke-dasharray="2 5" />
+
+    <text x="96"  y="438" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#4d66e0" font-weight="700" letter-spacing="0.22em">PREVENTION BOUNDARY</text>
+    <text x="296" y="438" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#64748b" font-weight="500" letter-spacing="0.18em">— flat at any attacker capability</text>
+
+    <g>
+      <rect x="96" y="452" width="944" height="8" rx="4" fill="#4d66e0" opacity="0.22" filter="url(#econPrevGlow)" />
+      <rect x="96" y="455" width="944" height="3" rx="1.5" fill="#4d66e0" />
+    </g>
+
+    <g font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" font-weight="500">
+      <g transform="translate(214 482)">
+        <line x1="0" y1="-22" x2="0" y2="-13" stroke="#4d66e0" stroke-width="1.5" stroke-linecap="round" />
+        <rect x="-76" y="-13" width="152" height="22" rx="11" fill="#ffffff" stroke="#4d66e0" stroke-width="1" />
+        <circle cx="-62" cy="-2" r="3" fill="#4d66e0" />
+        <text x="-52" y="2" fill="#4d66e0" letter-spacing="0.04em">S3 public · retired</text>
+      </g>
+      <g transform="translate(450 482)">
+        <line x1="0" y1="-22" x2="0" y2="-13" stroke="#4d66e0" stroke-width="1.5" stroke-linecap="round" />
+        <rect x="-79" y="-13" width="158" height="22" rx="11" fill="#ffffff" stroke="#4d66e0" stroke-width="1" />
+        <circle cx="-65" cy="-2" r="3" fill="#4d66e0" />
+        <text x="-55" y="2" fill="#4d66e0" letter-spacing="0.04em">CloudTrail · retired</text>
+      </g>
+      <g transform="translate(686 482)">
+        <line x1="0" y1="-22" x2="0" y2="-13" stroke="#4d66e0" stroke-width="1.5" stroke-linecap="round" />
+        <rect x="-84" y="-13" width="168" height="22" rx="11" fill="#ffffff" stroke="#4d66e0" stroke-width="1" />
+        <circle cx="-70" cy="-2" r="3" fill="#4d66e0" />
+        <text x="-60" y="2" fill="#4d66e0" letter-spacing="0.04em">IAM escalation · retired</text>
+      </g>
+      <g transform="translate(922 482)">
+        <line x1="0" y1="-22" x2="0" y2="-13" stroke="#4d66e0" stroke-width="1.5" stroke-linecap="round" />
+        <rect x="-79" y="-13" width="158" height="22" rx="11" fill="#ffffff" stroke="#4d66e0" stroke-width="1" />
+        <circle cx="-65" cy="-2" r="3" fill="#4d66e0" />
+        <text x="-55" y="2" fill="#4d66e0" letter-spacing="0.04em">novel class · retired</text>
+      </g>
+    </g>
+  </svg>
+
+  <div class="econ__bullets">
+    <div class="econ__col">
+      <h4 class="econ__col-label">CSPM + SOC · even AI-augmented</h4>
+      <ul>
+        <li>
+          <span class="econ__b-head">Triage-bound</span>
+          <span class="econ__b-body">AI helps you review findings faster, not retire categories. Same volume, faster spin — the treadmill just runs at a higher RPM.</span>
+        </li>
+        <li>
+          <span class="econ__b-head">Sub-linear coverage</span>
+          <span class="econ__b-body">Every novel attack path becomes a rule <em>after</em> the first incident. Adversarial AI generates novel paths faster than any catalog can grow.</span>
+        </li>
+        <li>
+          <span class="econ__b-head">A race you can't win</span>
+          <span class="econ__b-body">Detection latency vs. exploit-at-machine-speed isn't a fair contest. The exposure window widens with every model release on the wrong side.</span>
+        </li>
+      </ul>
+    </div>
+    <div class="econ__col econ__col--us">
+      <h4 class="econ__col-label">InstaSecure guardrails</h4>
+      <ul>
+        <li>
+          <span class="econ__b-head">Category retirement</span>
+          <span class="econ__b-body">One guardrail eliminates a class of finding org-wide, forever. Not a faster fix — a structurally different fix.</span>
+        </li>
+        <li>
+          <span class="econ__b-head">Deterministic coverage</span>
+          <span class="econ__b-body">Impossibility doesn't degrade with attacker speed. A retired category stays retired against tomorrow's tools, too.</span>
+        </li>
+        <li>
+          <span class="econ__b-head">Pre-commits, doesn't react</span>
+          <span class="econ__b-body">The policy plane decides before the action runs. Tempo-independent by construction — there's nothing to outrun.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .econ {
+    /* Site-aligned tokens; severity colors stay literal because they're
+       chart-signaling content, not chrome. */
+    --econ-ink: var(--color-text);
+    --econ-muted: rgb(51 65 85); /* slate-700 */
+    --econ-faint: rgb(100 116 139); /* slate-500 */
+    --econ-line: rgba(0, 0, 0, 0.05);
+    --econ-accent: var(--color-brand);
+    --econ-hot: #ff5470;
+    --econ-warm: #f59f3c;
+
+    background: #ffffff;
+    border: 1px solid var(--econ-line);
+    border-radius: 1rem; /* rounded-2xl */
+    padding: 2rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 18px 40px -28px rgba(29, 47, 113, 0.18);
+    color: var(--econ-ink);
+  }
+
+  .econ__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.125rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .econ__head-left { min-width: 0; }
+  .econ__kicker {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    color: var(--econ-faint);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  .econ__h3 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+    color: var(--econ-ink);
+  }
+  .econ__accent { color: var(--econ-accent); }
+
+  .econ__legend {
+    display: flex;
+    gap: 1.125rem;
+    font-size: 0.78125rem;
+    color: var(--econ-muted);
+    flex-wrap: wrap;
+  }
+  .econ__legend-item { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .econ__sw { width: 24px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+  .econ__sw--red { background: var(--econ-hot); }
+  .econ__sw--warm { background: var(--econ-warm); }
+  .econ__sw--blue { background: var(--econ-accent); }
+  .econ__sw--gap { background: rgba(255, 84, 112, 0.18); height: 12px; border-radius: 3px; }
+
+  .econ__chart { display: block; height: auto; }
+
+  .econ__bullets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 2rem;
+    border-top: 1px solid var(--econ-line);
+  }
+  .econ__col { padding: 1.625rem 1.75rem; }
+  .econ__col + .econ__col { border-left: 1px solid var(--econ-line); }
+  .econ__col--us {
+    background: linear-gradient(180deg, rgba(77, 102, 224, 0.04), rgba(77, 102, 224, 0));
+  }
+  .econ__col-label {
+    margin: 0 0 1rem;
+    font-size: 0.6875rem;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--econ-faint);
+    font-weight: 600;
+  }
+  .econ__col--us .econ__col-label { color: var(--econ-accent); }
+  .econ__col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+  }
+  .econ__col li {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--econ-muted);
+    position: relative;
+  }
+  .econ__b-head {
+    display: block;
+    font-size: 0.90625rem;
+    color: var(--econ-ink);
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    margin-bottom: 0.25rem;
+    padding-left: 1.125rem;
+    position: relative;
+  }
+  .econ__b-head::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 10px;
+    height: 1.5px;
+    background: var(--econ-hot);
+    border-radius: 1px;
+  }
+  .econ__col--us .econ__b-head::before { background: var(--econ-accent); }
+  .econ__b-body { padding-left: 1.125rem; display: block; }
+
+  @media (max-width: 900px) {
+    .econ { padding: 1.25rem; }
+    .econ__h3 { font-size: 1.125rem; }
+    .econ__bullets { grid-template-columns: 1fr; }
+    .econ__col + .econ__col {
+      border-left: none;
+      border-top: 1px solid var(--econ-line);
+    }
+  }
+</style>
