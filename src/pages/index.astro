@@ -72,6 +72,12 @@ const threats = [
 const gatesVsGuardrails = {
   before: {
     label: 'Gates',
+    image: {
+      src: '/home/gates.svg',
+      alt: 'A pipeline gate is a single wall segment between PR build steps and AWS prod. The attacker walks around it via a stolen credential — the wall has no top and no sides.',
+      width: 440,
+      height: 270,
+    },
     bullets: [
       'CI/CD scanners, IaC linters, PR blockers at deploy time',
       'Slow developers to catch attackers who don\'t use your pipeline',
@@ -81,6 +87,12 @@ const gatesVsGuardrails = {
   },
   after: {
     label: 'Guardrails',
+    image: {
+      src: '/home/guardrails.svg',
+      alt: 'The same wall material wraps the entire AWS Organization — prod, stage, dev, data, security, audit, network and future accounts. The attacker hits the perimeter (SCP, RCP, org policy) and is denied regardless of how they arrived.',
+      width: 500,
+      height: 270,
+    },
     bullets: [
       'Policy enforced at the organization edge, above every account',
       'Invisible to developers — zero pipeline friction, zero PR gates',
@@ -205,8 +217,8 @@ const economicsAfter = {
 
   <div class="bg-slate-50">
     <VersusBlock
-      eyebrow="The inflection"
-      title="Gates stopped scaling. Guardrails just started."
+      eyebrow="The choice"
+      title="Two ways to stop a misconfiguration. Only one stops an attacker."
       subtitle="The industry moved from scanning to preventing — because there's no other way to keep up with AI-speed attackers."
       before={gatesVsGuardrails.before}
       after={gatesVsGuardrails.after}

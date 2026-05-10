@@ -4,6 +4,8 @@ import { Icon } from 'astro-icon/components';
 export interface Side {
   label: string;
   bullets: string[];
+  /** Optional desktop-only illustration (hidden below 768px). */
+  image?: { src: string; alt: string; width?: number; height?: number };
 }
 
 interface Props {
@@ -24,6 +26,17 @@ const { eyebrow, title, subtitle, before, after } = Astro.props;
   )}
   <div class="grid md:grid-cols-2 gap-4 md:gap-6 items-stretch">
     <article class="rounded-2xl border border-black/10 bg-slate-50 p-8 md:p-10 relative">
+      {before.image && (
+        <img
+          src={before.image.src}
+          alt={before.image.alt}
+          width={before.image.width}
+          height={before.image.height}
+          loading="lazy"
+          decoding="async"
+          class="hidden md:block w-full max-w-[480px] mx-auto mb-7 aspect-[440/270]"
+        />
+      )}
       <div class="flex items-center gap-2 text-slate-500 text-sm font-mono uppercase tracking-[0.12em] mb-5">
         <Icon name="lucide:x-circle" class="w-4 h-4" />
         {before.label}
@@ -38,6 +51,17 @@ const { eyebrow, title, subtitle, before, after } = Astro.props;
       </ul>
     </article>
     <article class="rounded-2xl border-2 border-[var(--color-brand)] bg-white p-8 md:p-10 relative shadow-md shadow-[var(--color-brand)]/10">
+      {after.image && (
+        <img
+          src={after.image.src}
+          alt={after.image.alt}
+          width={after.image.width}
+          height={after.image.height}
+          loading="lazy"
+          decoding="async"
+          class="hidden md:block w-full max-w-[480px] mx-auto mb-7 aspect-[500/270]"
+        />
+      )}
       <div class="flex items-center gap-2 text-[var(--color-brand)] text-sm font-mono uppercase tracking-[0.12em] mb-5">
         <Icon name="lucide:check-circle-2" class="w-4 h-4" />
         {after.label}

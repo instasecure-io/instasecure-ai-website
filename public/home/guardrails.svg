@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="470 56 500 270" role="img" aria-labelledby="guardrails-title guardrails-desc" preserveAspectRatio="xMidYMid meet" style="display:block;font-family:Inter,ui-sans-serif,system-ui,sans-serif">
+  <title id="guardrails-title">Guardrails — the whole wall</title>
+  <desc id="guardrails-desc">The same wall material wraps the entire AWS Organization. The attacker hits the perimeter and is denied, regardless of how they arrived.</desc>
+
+  <defs>
+    <symbol id="vb-block" viewBox="0 0 24 12" overflow="visible">
+      <rect x="0.5" y="0.5" width="23" height="11" rx="1.5" fill="#eef1fc" stroke="#4d66e0" stroke-width="1"></rect>
+    </symbol>
+    <marker id="vb-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4d66e0"></path>
+    </marker>
+    <marker id="vb-arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ff5470"></path>
+    </marker>
+    <linearGradient id="vb-ground" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0e1230" stop-opacity="0.06"></stop>
+      <stop offset="100%" stop-color="#0e1230" stop-opacity="0"></stop>
+    </linearGradient>
+    <radialGradient id="vb-impact" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff5470" stop-opacity="0.55"></stop>
+      <stop offset="60%" stop-color="#ff5470" stop-opacity="0.12"></stop>
+      <stop offset="100%" stop-color="#ff5470" stop-opacity="0"></stop>
+    </radialGradient>
+</defs>
+
+  
+  <line x1="490" y1="298" x2="960" y2="298" stroke="#e5e7f0" stroke-width="1"></line>
+
+  <g id="guardrails">
+
+    
+    <g transform="translate(540 92)">
+      <circle cx="14" cy="14" r="14" fill="#fff0f3" stroke="#ff5470" stroke-width="1.4"></circle>
+      <path d="M14 6 L22 20 L6 20 Z" fill="#ff5470"></path>
+      <rect x="13.2" y="11" width="1.6" height="6" rx="0.8" fill="#ffffff"></rect>
+      <circle cx="14" cy="18.4" r="0.9" fill="#ffffff"></circle>
+    </g>
+    <text x="540" y="142" font-size="11" fill="#0e1230" font-weight="600">Attacker</text>
+    <text x="540" y="156" font-size="9.5" fill="#4a4f6e" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace">same key</text>
+
+    
+    <g id="enclosure">
+      <use href="#vb-block" x="576" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="598" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="620" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="642" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="664" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="686" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="708" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="730" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="752" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="774" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="796" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="818" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="840" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="862" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="884" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="906" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="928" y="150" width="22" height="11"></use>
+      <use href="#vb-block" x="587" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="609" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="631" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="653" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="675" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="697" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="719" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="741" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="763" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="785" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="807" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="829" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="851" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="873" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="895" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="917" y="161" width="22" height="11"></use>
+      <use href="#vb-block" x="576" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="598" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="620" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="642" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="664" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="686" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="708" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="730" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="752" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="774" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="796" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="818" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="840" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="862" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="884" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="906" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="928" y="266" width="22" height="11"></use>
+      <use href="#vb-block" x="587" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="609" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="631" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="653" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="675" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="697" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="719" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="741" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="763" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="785" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="807" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="829" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="851" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="873" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="895" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="917" y="277" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="172" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="183" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="194" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="205" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="216" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="227" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="238" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="249" width="22" height="11"></use>
+      <use href="#vb-block" x="566" y="260" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="172" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="183" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="194" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="205" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="216" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="227" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="238" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="249" width="22" height="11"></use>
+      <use href="#vb-block" x="942" y="260" width="22" height="11"></use>
+    </g>
+
+    
+    <text x="600" y="186" font-size="9.5" fill="#8a8fa8" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" letter-spacing="1.4">AWS ORGANIZATION</text>
+
+    
+    <g>
+      <rect x="600" y="194" width="76" height="30" rx="5" fill="#eef1fc" stroke="#7d92ec" stroke-width="1"></rect>
+      <circle cx="610" cy="205" r="2.2" fill="#4d66e0"></circle>
+      <text x="620" y="207.5" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#0e1230" text-anchor="start" font-weight="500">prod</text>
+      <text x="620" y="218" font-size="8.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#8a8fa8" text-anchor="start" letter-spacing="0.4">4218</text>
+    </g>
+    <g>
+      <rect x="684" y="194" width="76" height="30" rx="5" fill="#eef1fc" stroke="#7d92ec" stroke-width="1"></rect>
+      <circle cx="694" cy="205" r="2.2" fill="#4d66e0"></circle>
+      <text x="704" y="207.5" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#0e1230" text-anchor="start" font-weight="500">stage</text>
+      <text x="704" y="218" font-size="8.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#8a8fa8" text-anchor="start" letter-spacing="0.4">7104</text>
+    </g>
+    <g>
+      <rect x="768" y="194" width="76" height="30" rx="5" fill="#eef1fc" stroke="#7d92ec" stroke-width="1"></rect>
+      <circle cx="778" cy="205" r="2.2" fill="#4d66e0"></circle>
+      <text x="788" y="207.5" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#0e1230" text-anchor="start" font-weight="500">dev</text>
+      <text x="788" y="218" font-size="8.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#8a8fa8" text-anchor="start" letter-spacing="0.4">9012</text>
+    </g>
+    <g>
+      <rect x="852" y="194" width="76" height="30" rx="5" fill="#eef1fc" stroke="#7d92ec" stroke-width="1"></rect>
+      <circle cx="862" cy="205" r="2.2" fill="#4d66e0"></circle>
+      <text x="872" y="207.5" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#0e1230" text-anchor="start" font-weight="500">data</text>
+      <text x="872" y="218" font-size="8.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#8a8fa8" text-anchor="start" letter-spacing="0.4">5566</text>
+    </g>
+    <g>
+      <rect x="600" y="230" width="76" height="30" rx="5" fill="#eef1fc" stroke="#7d92ec" stroke-width="1"></rect>
+      <circle cx="610" cy="241" r="2.2" fill="#4d66e0"></circle>
+      <text x="620" y="243.5" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#0e1230" text-anchor="start" font-weight="500">security</text>
+      <text x="620" y="254" font-size="8.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#8a8fa8" text-anchor="start" letter-spacing="0.4">0001</text>
+    </g>
+    <g>
+      <rect x="684" y="230" width="76" height="30" rx="5" fill="#eef1fc" stroke="#7d92ec" stroke-width="1"></rect>
+      <circle cx="694" cy="241" r="2.2" fill="#4d66e0"></circle>
+      <text x="704" y="243.5" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#0e1230" text-anchor="start" font-weight="500">audit</text>
+      <text x="704" y="254" font-size="8.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#8a8fa8" text-anchor="start" letter-spacing="0.4">0002</text>
+    </g>
+    <g>
+      <rect x="768" y="230" width="76" height="30" rx="5" fill="#eef1fc" stroke="#7d92ec" stroke-width="1"></rect>
+      <circle cx="778" cy="241" r="2.2" fill="#4d66e0"></circle>
+      <text x="788" y="243.5" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#0e1230" text-anchor="start" font-weight="500">network</text>
+      <text x="788" y="254" font-size="8.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#8a8fa8" text-anchor="start" letter-spacing="0.4">3340</text>
+    </g>
+    <g>
+      <rect x="852" y="230" width="76" height="30" rx="5" fill="#f5f7fd" stroke="#c9d2f3" stroke-width="1" stroke-dasharray="3 3"></rect>
+      
+      <text x="890" y="243.5" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#0e1230" text-anchor="middle" font-weight="400">+ N future</text>
+      <text x="890" y="254" font-size="8.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#8a8fa8" text-anchor="middle" letter-spacing="0.4">auto</text>
+    </g>
+
+    
+    <g transform="translate(670 138)">
+      <rect x="0" y="0" width="180" height="20" rx="10" fill="#4d66e0"></rect>
+      <text x="90" y="13.5" text-anchor="middle" font-size="10" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#ffffff" letter-spacing="1.6">SCP · RCP · ORG POLICY</text>
+    </g>
+
+    
+    <g id="impact">
+      <path d="M 568 124 C 600 130, 612 138, 613 148" fill="none" stroke="#ff5470" stroke-width="2.6" stroke-linecap="round"></path>
+      <circle cx="613" cy="148" r="30" fill="url(#vb-impact)"></circle>
+      <circle cx="613" cy="148" r="11" fill="#ffffff" stroke="#ff5470" stroke-width="2.2"></circle>
+      <circle cx="613" cy="148" r="4.5" fill="#ff5470"></circle>
+      <g stroke="#ff5470" stroke-width="1.6" stroke-linecap="round" opacity="0.9">
+        <line x1="613" y1="148" x2="592" y2="124"></line>
+        <line x1="613" y1="148" x2="608" y2="116"></line>
+        <line x1="613" y1="148" x2="628" y2="118"></line>
+        <line x1="613" y1="148" x2="644" y2="128"></line>
+      </g>
+      <path d="M 613 148 C 596 122, 572 96, 540 78" fill="none" stroke="#ff5470" stroke-width="2.6" stroke-linecap="round" marker-end="url(#vb-arrow-red)"></path>
+      <line x1="613" y1="88" x2="613" y2="132" stroke="#ff5470" stroke-width="1" stroke-dasharray="2 2" opacity="0.7"></line>
+      <g transform="translate(573 64)">
+        <rect x="0" y="0" width="80" height="22" rx="11" fill="#ff5470"></rect>
+        <text x="40" y="14.5" text-anchor="middle" font-size="10.5" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" fill="#ffffff" font-weight="600" letter-spacing="2">DENIED</text>
+      </g>
+    </g>
+  </g>
+</svg>
