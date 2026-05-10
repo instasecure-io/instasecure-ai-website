@@ -11,18 +11,19 @@
 // graph-signaling content, not chrome.
 ---
 <div class="econ">
-  <div class="econ__head">
-    <div class="econ__head-left">
-      <div class="econ__kicker">Risk × cost · over time, in the AI era</div>
-      <h3 class="econ__h3">The exposure gap widens. <span class="econ__accent">The prevention line doesn't move.</span></h3>
+  <div class="econ__panel">
+    <div class="econ__head">
+      <div class="econ__head-left">
+        <div class="econ__kicker">Risk × cost · over time, in the AI era</div>
+        <h3 class="econ__h3">The exposure gap widens. <span class="econ__accent">The prevention line doesn't move.</span></h3>
+      </div>
+      <div class="econ__legend">
+        <span class="econ__legend-item"><span class="econ__sw econ__sw--red"></span>Attacker capability</span>
+        <span class="econ__legend-item"><span class="econ__sw econ__sw--warm"></span>Detection coverage</span>
+        <span class="econ__legend-item"><span class="econ__sw econ__sw--gap"></span>Exposure window</span>
+        <span class="econ__legend-item"><span class="econ__sw econ__sw--blue"></span>Prevention boundary</span>
+      </div>
     </div>
-    <div class="econ__legend">
-      <span class="econ__legend-item"><span class="econ__sw econ__sw--red"></span>Attacker capability</span>
-      <span class="econ__legend-item"><span class="econ__sw econ__sw--warm"></span>Detection coverage</span>
-      <span class="econ__legend-item"><span class="econ__sw econ__sw--gap"></span>Exposure window</span>
-      <span class="econ__legend-item"><span class="econ__sw econ__sw--blue"></span>Prevention boundary</span>
-    </div>
-  </div>
 
   <svg class="econ__chart" viewBox="0 0 1180 520" width="100%" aria-hidden="true">
     <defs>
@@ -156,9 +157,18 @@
     </g>
   </svg>
 
+  </div>
+
   <div class="econ__bullets">
-    <div class="econ__col">
-      <h4 class="econ__col-title">CSPM + SOC · even AI-augmented</h4>
+    <article class="econ__col econ__col--before">
+      <div class="econ__col-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="m15 9-6 6" />
+          <path d="m9 9 6 6" />
+        </svg>
+        CSPM + SOC · even AI-augmented
+      </div>
       <ul class="econ__list">
         <li>
           <h5 class="econ__item-name">Triage-bound</h5>
@@ -173,9 +183,15 @@
           <p class="econ__item-body">Detection latency vs. exploit-at-machine-speed isn't a fair contest. The exposure window widens with every model release on the wrong side.</p>
         </li>
       </ul>
-    </div>
-    <div class="econ__col econ__col--us">
-      <h4 class="econ__col-title">InstaSecure guardrails</h4>
+    </article>
+    <article class="econ__col econ__col--us">
+      <div class="econ__col-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+        InstaSecure guardrails
+      </div>
       <ul class="econ__list">
         <li>
           <h5 class="econ__item-name">Category retirement</h5>
@@ -190,7 +206,7 @@
           <p class="econ__item-body">The policy plane decides before the action runs. Tempo-independent by construction — there's nothing to outrun.</p>
         </li>
       </ul>
-    </div>
+    </article>
   </div>
 </div>
 
@@ -206,12 +222,16 @@
     --econ-hot: #ff5470;
     --econ-warm: #f59f3c;
 
+    color: var(--econ-ink);
+  }
+
+  /* Chart panel — the visual on top */
+  .econ__panel {
     background: #ffffff;
     border: 1px solid var(--econ-line);
     border-radius: 1rem; /* rounded-2xl */
     padding: 2rem;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 18px 40px -28px rgba(29, 47, 113, 0.18);
-    color: var(--econ-ink);
   }
 
   .econ__head {
@@ -257,30 +277,56 @@
 
   .econ__chart { display: block; height: auto; }
 
+  /* Bullets row — two distinct cards below the chart, mirroring the
+     VersusBlock "The choice" pattern: slate-50 + neutral border for the
+     before side, brand-bordered white + soft shadow for the us side.
+     Stacks cleanly on mobile (single column) so each card reads in
+     full width without competing with its neighbor. */
   .econ__bullets {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    margin-top: 2rem;
-    border-top: 1px solid var(--econ-line);
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    align-items: stretch;
   }
-  .econ__col { padding: 1.625rem 1.75rem; }
-  .econ__col + .econ__col { border-left: 1px solid var(--econ-line); }
+  @media (min-width: 768px) {
+    .econ__bullets { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  }
+
+  .econ__col {
+    border-radius: 1rem;
+    padding: 2rem 2rem 1.75rem;
+  }
+  .econ__col--before {
+    background: rgb(248 250 252); /* slate-50 */
+    border: 1px solid rgba(0, 0, 0, 0.10);
+  }
   .econ__col--us {
-    background: linear-gradient(180deg, rgba(77, 102, 224, 0.04), rgba(77, 102, 224, 0));
+    background: #ffffff;
+    border: 2px solid var(--econ-accent);
+    box-shadow: 0 6px 20px -6px rgba(77, 102, 224, 0.18);
   }
-  /* Column title: regular case, site-convention h4 sizing — drops the
-     small mono uppercase eyebrow look that didn't match the rest of
-     the page's "text below an image" pattern (FeatureGrid / FeatureRow
-     style: bold heading + paragraph, no decorative markers). */
-  .econ__col-title {
-    margin: 0 0 1.25rem;
-    font-size: 1.0625rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: var(--econ-ink);
+
+  /* Card head — small mono uppercase tag with a status icon, matching
+     the VersusBlock "Gates" / "Guardrails" labels exactly. */
+  .econ__col-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 1.375rem;
+    font-weight: 500;
   }
-  .econ__col--us .econ__col-title { color: var(--econ-accent); }
+  .econ__col-head svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+  .econ__col--before .econ__col-head { color: rgb(100 116 139); /* slate-500 */ }
+  .econ__col--us .econ__col-head { color: var(--econ-accent); }
 
   .econ__list {
     list-style: none;
@@ -293,7 +339,7 @@
   .econ__list > li { margin: 0; padding: 0; }
 
   .econ__item-name {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--econ-ink);
     letter-spacing: -0.005em;
@@ -301,19 +347,17 @@
     line-height: 1.4;
   }
   .econ__item-body {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     line-height: 1.55;
     color: var(--econ-muted);
     margin: 0;
   }
 
   @media (max-width: 900px) {
-    .econ { padding: 1.25rem; }
+    .econ__panel { padding: 1.25rem; }
     .econ__h3 { font-size: 1.125rem; }
-    .econ__bullets { grid-template-columns: 1fr; }
-    .econ__col + .econ__col {
-      border-left: none;
-      border-top: 1px solid var(--econ-line);
-    }
+    .econ__col { padding: 1.5rem 1.5rem 1.25rem; }
+    .econ__item-name { font-size: 0.9375rem; }
+    .econ__item-body { font-size: 0.875rem; }
   }
 </style>
