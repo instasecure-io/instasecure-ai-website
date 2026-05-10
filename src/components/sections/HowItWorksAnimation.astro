@@ -109,6 +109,12 @@
         <button class="hiw__bar" data-step="2" aria-label="Step 3: Enforce"></button>
         <button class="hiw__bar" data-step="3" aria-label="Step 4: Extend"></button>
       </div>
+      <div class="hiw__replay-row">
+        <button class="hiw__replay" type="button">
+          <svg width="11" height="11" viewBox="0 0 10 10" aria-hidden="true"><polygon points="2,1 9,5 2,9" fill="currentColor" /></svg>
+          Replay animation
+        </button>
+      </div>
     </div>
 
     <div class="hiw__steps">
@@ -141,13 +147,6 @@
         </span>
       </button>
     </div>
-  </div>
-
-  <div class="hiw__replay-row">
-    <button class="hiw__replay" type="button">
-      <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><polygon points="2,1 9,5 2,9" fill="currentColor" /></svg>
-      Replay
-    </button>
   </div>
 </div>
 
@@ -299,12 +298,18 @@
     color: var(--hiw-ink);
   }
 
+  /* Steps left, animated canvas right — this section's visual flips
+     versus the PhasesSection above (chart left, panel right) so the
+     two adjacent sections don't feel like a single repeated block. */
   .hiw__grid {
     display: grid;
-    grid-template-columns: 1fr 420px;
+    grid-template-columns: 420px 1fr;
+    grid-template-areas: "steps canvas";
     gap: 40px;
     align-items: stretch;
   }
+  .hiw__steps { grid-area: steps; }
+  .hiw__canvas-wrap { grid-area: canvas; }
 
   .hiw__canvas-wrap {
     background: #ffffff;
@@ -400,25 +405,33 @@
   }
   .hiw__step[data-active="true"] .hiw__step-blurb { max-height: 200px; opacity: 1; }
 
-  .hiw__replay-row { margin-top: 22px; display: flex; justify-content: flex-end; }
+  /* Replay button — sits inside the canvas card just below the
+     progress bars so it's anchored to the thing it controls, with a
+     brand-tinted fill so it's actually noticeable. */
+  .hiw__replay-row { display: flex; justify-content: flex-end; padding: 4px 4px 0; }
   .hiw__replay {
     appearance: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 14px;
+    padding: 8px 16px;
     border-radius: 999px;
-    border: 1px solid var(--hiw-line);
-    background: #ffffff;
+    border: 1px solid color-mix(in srgb, var(--hiw-accent) 25%, transparent);
+    background: color-mix(in srgb, var(--hiw-accent) 10%, white);
+    color: var(--hiw-accent);
     font: inherit;
     font-family: ui-monospace, 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--hiw-muted);
-    letter-spacing: 0.16em;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    transition: background 200ms ease, border-color 200ms ease;
   }
-  .hiw__replay:hover { color: var(--hiw-accent); }
+  .hiw__replay:hover {
+    background: color-mix(in srgb, var(--hiw-accent) 18%, white);
+    border-color: color-mix(in srgb, var(--hiw-accent) 45%, transparent);
+  }
   .hiw__replay:focus-visible { outline: 2px solid var(--hiw-accent); outline-offset: 2px; }
 
   /* Canvas state machine */
@@ -459,7 +472,13 @@
   .hiw[data-mode="extend"] .hiw-extend .hiw-node[data-band="hot"] { fill: var(--hiw-hot); stroke: var(--hiw-hot); opacity: 1; }
 
   @media (max-width: 900px) {
-    .hiw__grid { grid-template-columns: 1fr; gap: 24px; }
+    /* Mobile: stack with canvas on top (the eye-catching piece) and
+       steps below — keeps the same first-impression as desktop. */
+    .hiw__grid {
+      grid-template-columns: 1fr;
+      grid-template-areas: "canvas" "steps";
+      gap: 24px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
