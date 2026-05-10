@@ -1,0 +1,469 @@
+---
+// Animated canvas + step list for the "How it works" section.
+// Plays once on first scroll-into-view (3.4s/step), pauses on hover or
+// click, scrubs via the bars below the canvas or the step buttons on
+// the right. Header (eyebrow + h2 + subtitle) lives on the page via
+// <SectionHeader>, not in this component.
+//
+// Site-aligned typography: drops the Inter override and inherits DM
+// Sans from body. Color tokens use the site's --color-* and slate-*
+// scale where possible; severity-color literals (#ff5470, #c9d2f3)
+// stay because they're content (graph risk-band signaling) not chrome.
+---
+<div class="hiw" data-mode="discover" data-hiw-root>
+  <div class="hiw__grid">
+    <div class="hiw__canvas-wrap">
+      <svg class="hiw__canvas" viewBox="0 0 700 500" aria-hidden="true">
+        <defs>
+          <radialGradient id="hiw-aura" cx="50%" cy="50%" r="50%">
+            <stop offset="60%" stop-color="#4d66e0" stop-opacity="0" />
+            <stop offset="100%" stop-color="#4d66e0" stop-opacity="0.10" />
+          </radialGradient>
+          <radialGradient id="hiw-pulse" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ff5470" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#ff5470" stop-opacity="0" />
+          </radialGradient>
+          <pattern id="hiw-dots" width="22" height="22" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.7" fill="#dfe3f0" />
+          </pattern>
+        </defs>
+
+        <rect x="0" y="0" width="700" height="500" fill="#ffffff" />
+        <rect x="0" y="0" width="700" height="500" fill="url(#hiw-dots)" opacity="0.55" />
+
+        <g class="hiw-perimeter">
+          <ellipse cx="350" cy="260" rx="320" ry="220" fill="url(#hiw-aura)" />
+          <rect x="40" y="50" width="620" height="420" rx="22" fill="none" stroke="#4d66e0" stroke-width="2.2" />
+          <rect x="46" y="56" width="608" height="408" rx="18" fill="none" stroke="#4d66e0" stroke-width="0.8" stroke-dasharray="1 4" opacity="0.7" />
+          <g transform="translate(248 38)">
+            <rect x="0" y="0" width="204" height="22" rx="11" fill="#4d66e0" />
+            <text x="102" y="14.5" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#ffffff" letter-spacing="0.18em">SCP · RCP · ORG POLICY</text>
+          </g>
+        </g>
+
+        <g class="hiw-edges">
+          <line class="hiw-edge" data-hot="true"  x1="140" y1="110" x2="290" y2="200" />
+          <line class="hiw-edge"                  x1="140" y1="110" x2="180" y2="240" />
+          <line class="hiw-edge" data-hot="true"  x1="510" y1="130" x2="430" y2="280" />
+          <line class="hiw-edge"                  x1="510" y1="130" x2="460" y2="80"  />
+          <line class="hiw-edge"                  x1="100" y1="360" x2="180" y2="240" />
+          <line class="hiw-edge"                  x1="100" y1="360" x2="230" y2="440" />
+          <line class="hiw-edge" data-hot="true"  x1="290" y1="200" x2="430" y2="280" />
+          <line class="hiw-edge" data-hot="true"  x1="290" y1="200" x2="180" y2="240" />
+          <line class="hiw-edge" data-hot="true"  x1="430" y1="280" x2="540" y2="380" />
+          <line class="hiw-edge" data-hot="true"  x1="430" y1="280" x2="350" y2="380" />
+          <line class="hiw-edge"                  x1="180" y1="240" x2="230" y2="440" />
+          <line class="hiw-edge"                  x1="350" y1="380" x2="540" y2="380" />
+          <line class="hiw-edge" data-hot="true"  x1="460" y1="80"  x2="430" y2="280" />
+          <line class="hiw-edge" data-hot="true"  x1="590" y1="230" x2="430" y2="280" />
+          <line class="hiw-edge"                  x1="590" y1="230" x2="540" y2="380" />
+          <line class="hiw-edge"                  x1="540" y1="380" x2="350" y2="380" />
+          <line class="hiw-edge"                  x1="230" y1="440" x2="180" y2="240" />
+        </g>
+
+        <g class="hiw-pulses">
+          <circle cx="290" cy="200" r="22" fill="url(#hiw-pulse)" />
+          <circle cx="430" cy="280" r="22" fill="url(#hiw-pulse)" />
+        </g>
+
+        <g class="hiw-nodes">
+          <circle class="hiw-node" data-band="mid"  cx="140" cy="110" r="9" />
+          <circle class="hiw-node" data-band="low"  cx="510" cy="130" r="9" />
+          <circle class="hiw-node" data-band="low"  cx="100" cy="360" r="9" />
+
+          <rect   class="hiw-node" data-band="hot"  x="281" y="191" width="18" height="18" rx="4" />
+          <rect   class="hiw-node" data-band="hot"  x="421" y="271" width="18" height="18" rx="4" />
+          <rect   class="hiw-node" data-band="mid"  x="171" y="231" width="18" height="18" rx="4" />
+          <rect   class="hiw-node" data-band="mid"  x="341" y="371" width="18" height="18" rx="4" />
+
+          <polygon class="hiw-node" data-band="high" points="548.66,375 548.66,385 540,390 531.34,385 531.34,375 540,370" />
+          <polygon class="hiw-node" data-band="mid"  points="238.66,435 238.66,445 230,450 221.34,445 221.34,435 230,430" />
+
+          <polygon class="hiw-node" data-band="high" points="460,69 469.53,85.5 450.47,85.5" />
+          <polygon class="hiw-node" data-band="mid"  points="590,219 599.53,235.5 580.47,235.5" />
+        </g>
+
+        <g class="hiw-tags" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="9" letter-spacing="0.06em">
+          <text x="155" y="113">human</text>
+          <text x="305" y="203">service</text>
+          <text x="445" y="283">service</text>
+          <text x="475" y="83">agent</text>
+          <text x="555" y="383">pipeline</text>
+        </g>
+
+        <g class="hiw-extend">
+          <path d="M 690 20 C 670 30, 655 45, 644 58" fill="none" stroke="#ff5470" stroke-width="1.6" stroke-dasharray="3 3" opacity="0.7" />
+          <polygon class="hiw-node" data-band="hot" points="640,49 649.53,65.5 630.47,65.5" />
+          <g transform="translate(560 28)">
+            <rect x="0" y="0" width="76" height="20" rx="10" fill="#ffffff" stroke="#4d66e0" stroke-width="1.2" />
+            <text x="38" y="13.5" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="9.5" fill="#4d66e0" letter-spacing="0.16em">+ NEW RULE</text>
+          </g>
+        </g>
+
+        <text class="hiw-step-caption" x="40" y="32" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10.5" letter-spacing="0.22em">STEP 01</text>
+      </svg>
+
+      <div class="hiw__progress">
+        <button class="hiw__bar" data-step="0" aria-label="Step 1: Discover"></button>
+        <button class="hiw__bar" data-step="1" aria-label="Step 2: Prioritize"></button>
+        <button class="hiw__bar" data-step="2" aria-label="Step 3: Enforce"></button>
+        <button class="hiw__bar" data-step="3" aria-label="Step 4: Extend"></button>
+      </div>
+    </div>
+
+    <div class="hiw__steps">
+      <button class="hiw__step" data-step="0" data-active="true">
+        <span class="hiw__step-num">01</span>
+        <span class="hiw__step-body">
+          <span class="hiw__step-name">Discover</span>
+          <span class="hiw__step-blurb">Map every identity — human, service, pipeline, agent — and the actions each one can actually take across your AWS org.</span>
+        </span>
+      </button>
+      <button class="hiw__step" data-step="1">
+        <span class="hiw__step-num">02</span>
+        <span class="hiw__step-body">
+          <span class="hiw__step-name">Prioritize</span>
+          <span class="hiw__step-blurb">Build the attack graph. Calculate blast radius per identity. Rank the exposures that matter before attackers rank them.</span>
+        </span>
+      </button>
+      <button class="hiw__step" data-step="2">
+        <span class="hiw__step-num">03</span>
+        <span class="hiw__step-body">
+          <span class="hiw__step-name">Enforce</span>
+          <span class="hiw__step-blurb">Deploy the guardrail set. Policy installs at the organization edge — no pipeline changes, no developer tickets, no code.</span>
+        </span>
+      </button>
+      <button class="hiw__step" data-step="3">
+        <span class="hiw__step-num">04</span>
+        <span class="hiw__step-body">
+          <span class="hiw__step-name">Extend</span>
+          <span class="hiw__step-blurb">Your guardrails library grows with attacker capability. New attack class → new guardrail → org-wide, continuously.</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <div class="hiw__replay-row">
+    <button class="hiw__replay" type="button">
+      <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><polygon points="2,1 9,5 2,9" fill="currentColor" /></svg>
+      Replay
+    </button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var MODES = ['discover', 'prioritize', 'enforce', 'extend'];
+    var LABELS = ['STEP 01', 'STEP 02', 'STEP 03', 'STEP 04'];
+    var STEP_MS = 3400;
+
+    function bind(root) {
+      if (!root || root.dataset.hiwBound === 'true') return;
+      root.dataset.hiwBound = 'true';
+
+      var steps = root.querySelectorAll('.hiw__step');
+      var bars = root.querySelectorAll('.hiw__bar');
+      var caption = root.querySelector('.hiw-step-caption');
+      var replayBtn = root.querySelector('.hiw__replay');
+
+      var i = 0;
+      var timer = null;
+      var paused = false;
+      var observer = null;
+
+      function render(idx) {
+        i = idx;
+        root.dataset.mode = MODES[idx];
+        if (caption) caption.textContent = LABELS[idx];
+        steps.forEach(function (el) {
+          var s = Number(el.dataset.step);
+          el.dataset.active = s === idx ? 'true' : 'false';
+          el.dataset.past = s < idx ? 'true' : 'false';
+        });
+        bars.forEach(function (el) {
+          var s = Number(el.dataset.step);
+          el.dataset.filled = s <= idx ? 'true' : 'false';
+        });
+      }
+
+      function advance() {
+        var next = i + 1;
+        if (next >= MODES.length) {
+          stop();
+          return;
+        }
+        render(next);
+      }
+
+      function start() {
+        stop();
+        timer = setInterval(advance, STEP_MS);
+      }
+      function stop() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+      function pause() {
+        if (paused) return;
+        paused = true;
+        stop();
+      }
+
+      steps.forEach(function (el) {
+        el.addEventListener('click', function () {
+          pause();
+          render(Number(el.dataset.step));
+        });
+      });
+      bars.forEach(function (el) {
+        el.addEventListener('click', function () {
+          pause();
+          render(Number(el.dataset.step));
+        });
+      });
+      root.addEventListener('mouseenter', pause);
+      if (replayBtn) {
+        replayBtn.addEventListener('click', function () {
+          paused = false;
+          render(0);
+          start();
+        });
+      }
+
+      function teardown() {
+        stop();
+        if (observer) {
+          observer.disconnect();
+          observer = null;
+        }
+      }
+      root._hiwTeardown = teardown;
+
+      if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting && !paused && !timer) {
+              render(0);
+              start();
+              if (observer) {
+                observer.disconnect();
+                observer = null;
+              }
+            }
+          });
+        }, { threshold: 0.35 });
+        observer.observe(root);
+      } else {
+        render(0);
+        start();
+      }
+    }
+
+    function init() {
+      document.querySelectorAll('[data-hiw-root]').forEach(bind);
+    }
+
+    function teardownAll() {
+      document.querySelectorAll('[data-hiw-root]').forEach(function (root) {
+        if (root._hiwTeardown) root._hiwTeardown();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init, { once: true });
+    } else {
+      init();
+    }
+    document.addEventListener('astro:page-load', init);
+    document.addEventListener('astro:before-swap', teardownAll);
+  })();
+</script>
+
+<style>
+  .hiw {
+    /* Site-aligned tokens; only the severity-band colors are local
+       (graph signaling, not chrome). */
+    --hiw-accent: var(--color-brand);
+    --hiw-ink: var(--color-text);
+    --hiw-muted: rgb(51 65 85); /* slate-700 */
+    --hiw-faint: rgb(100 116 139); /* slate-500 */
+    --hiw-line: rgba(0, 0, 0, 0.05);
+    --hiw-grey: #c9d2f3;
+    --hiw-grey-2: #7d92ec;
+    --hiw-low: #7d92ec;
+    --hiw-mid: #a16fc4;
+    --hiw-high: #e25a86;
+    --hiw-hot: #ff5470;
+    color: var(--hiw-ink);
+  }
+
+  .hiw__grid {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 40px;
+    align-items: stretch;
+  }
+
+  .hiw__canvas-wrap {
+    background: #ffffff;
+    border: 1px solid var(--hiw-line);
+    border-radius: 1rem; /* rounded-2xl */
+    padding: 16px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 18px 40px -28px rgba(29, 47, 113, 0.18);
+  }
+  .hiw__canvas { display: block; width: 100%; height: auto; }
+  .hiw-step-caption { fill: var(--hiw-faint); }
+  .hiw-tags text { fill: var(--hiw-faint); }
+
+  .hiw__progress {
+    display: flex;
+    gap: 6px;
+    padding: 12px 8px 4px;
+  }
+  .hiw__bar {
+    appearance: none;
+    flex: 1;
+    height: 3px;
+    border: 0;
+    padding: 0;
+    border-radius: 2px;
+    background: var(--hiw-line);
+    cursor: pointer;
+    transition: background 300ms ease;
+  }
+  .hiw[data-mode="discover"]   .hiw__bar[data-step="0"],
+  .hiw[data-mode="prioritize"] .hiw__bar[data-step="0"],
+  .hiw[data-mode="prioritize"] .hiw__bar[data-step="1"],
+  .hiw[data-mode="enforce"]    .hiw__bar[data-step="0"],
+  .hiw[data-mode="enforce"]    .hiw__bar[data-step="1"],
+  .hiw[data-mode="enforce"]    .hiw__bar[data-step="2"],
+  .hiw[data-mode="extend"]     .hiw__bar { background: var(--hiw-accent); }
+  .hiw__bar:focus-visible { outline: 2px solid var(--hiw-accent); outline-offset: 3px; }
+
+  .hiw__steps { display: flex; flex-direction: column; gap: 8px; }
+  .hiw__step {
+    appearance: none;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    border: 1px solid var(--hiw-line);
+    background: transparent;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    transition: all 220ms ease;
+    overflow: hidden;
+  }
+  .hiw__step[data-active="true"] {
+    border: 1.5px solid var(--hiw-accent);
+    background: #ffffff;
+    box-shadow: 0 12px 28px -22px rgba(29, 47, 113, 0.25);
+  }
+  .hiw__step:focus-visible { outline: 2px solid var(--hiw-accent); outline-offset: 2px; }
+
+  .hiw__step-num {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--hiw-faint);
+  }
+  .hiw__step[data-active="true"] .hiw__step-num { color: var(--hiw-accent); }
+  .hiw__step[data-past="true"] .hiw__step-num { color: var(--hiw-muted); }
+
+  .hiw__step-body { display: block; }
+  .hiw__step-name {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--hiw-faint);
+    transition: color 220ms ease, margin 220ms ease;
+  }
+  .hiw__step[data-active="true"] .hiw__step-name { color: var(--hiw-ink); margin-bottom: 6px; }
+  .hiw__step[data-past="true"] .hiw__step-name { color: var(--hiw-muted); }
+
+  .hiw__step-blurb {
+    display: block;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--hiw-muted);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 320ms ease, opacity 220ms ease;
+  }
+  .hiw__step[data-active="true"] .hiw__step-blurb { max-height: 200px; opacity: 1; }
+
+  .hiw__replay-row { margin-top: 22px; display: flex; justify-content: flex-end; }
+  .hiw__replay {
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--hiw-line);
+    background: #ffffff;
+    font: inherit;
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--hiw-muted);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .hiw__replay:hover { color: var(--hiw-accent); }
+  .hiw__replay:focus-visible { outline: 2px solid var(--hiw-accent); outline-offset: 2px; }
+
+  /* Canvas state machine */
+  .hiw-node, .hiw-edge {
+    transition: fill 600ms ease, stroke 600ms ease, opacity 600ms ease, stroke-dasharray 600ms ease, stroke-width 600ms ease;
+  }
+  .hiw-node { stroke-width: 1.5; }
+
+  .hiw[data-mode="discover"] .hiw-node { fill: var(--hiw-grey); stroke: var(--hiw-grey-2); }
+  .hiw[data-mode="discover"] .hiw-edge { stroke: var(--hiw-grey); stroke-width: 1.1; }
+  .hiw-perimeter, .hiw-pulses, .hiw-extend { opacity: 0; transition: opacity 700ms ease; }
+
+  .hiw[data-mode="prioritize"] .hiw-node[data-band="low"]  { fill: var(--hiw-low);  stroke: var(--hiw-low);  }
+  .hiw[data-mode="prioritize"] .hiw-node[data-band="mid"]  { fill: var(--hiw-mid);  stroke: var(--hiw-mid);  }
+  .hiw[data-mode="prioritize"] .hiw-node[data-band="high"] { fill: var(--hiw-high); stroke: var(--hiw-high); }
+  .hiw[data-mode="prioritize"] .hiw-node[data-band="hot"]  { fill: var(--hiw-hot);  stroke: var(--hiw-hot);  }
+  .hiw[data-mode="prioritize"] .hiw-edge                   { stroke: var(--hiw-grey); stroke-width: 1.1; }
+  .hiw[data-mode="prioritize"] .hiw-edge[data-hot="true"]  { stroke: var(--hiw-hot); stroke-width: 1.8; }
+  .hiw[data-mode="prioritize"] .hiw-pulses                 { opacity: 1; }
+
+  .hiw[data-mode="enforce"] .hiw-node[data-band="low"]  { fill: var(--hiw-low);  stroke: var(--hiw-low);  }
+  .hiw[data-mode="enforce"] .hiw-node[data-band="mid"]  { fill: var(--hiw-mid);  stroke: var(--hiw-mid);  }
+  .hiw[data-mode="enforce"] .hiw-node[data-band="high"] { fill: var(--hiw-high); stroke: var(--hiw-high); }
+  .hiw[data-mode="enforce"] .hiw-node[data-band="hot"]  { fill: #eef1fc; stroke: var(--hiw-grey-2); opacity: 0.55; }
+  .hiw[data-mode="enforce"] .hiw-edge                   { stroke: var(--hiw-grey-2); stroke-width: 1.1; }
+  .hiw[data-mode="enforce"] .hiw-edge[data-hot="true"]  { stroke: var(--hiw-grey); stroke-dasharray: 3 4; opacity: 0.55; }
+  .hiw[data-mode="enforce"] .hiw-perimeter              { opacity: 1; }
+
+  .hiw[data-mode="extend"] .hiw-node[data-band="low"]  { fill: var(--hiw-low);  stroke: var(--hiw-low);  }
+  .hiw[data-mode="extend"] .hiw-node[data-band="mid"]  { fill: var(--hiw-mid);  stroke: var(--hiw-mid);  }
+  .hiw[data-mode="extend"] .hiw-node[data-band="high"] { fill: var(--hiw-high); stroke: var(--hiw-high); }
+  .hiw[data-mode="extend"] .hiw-node[data-band="hot"]  { fill: #eef1fc; stroke: var(--hiw-grey-2); opacity: 0.55; }
+  .hiw[data-mode="extend"] .hiw-edge                   { stroke: var(--hiw-grey-2); stroke-width: 1.1; }
+  .hiw[data-mode="extend"] .hiw-edge[data-hot="true"]  { stroke: var(--hiw-grey); stroke-dasharray: 3 4; opacity: 0.55; }
+  .hiw[data-mode="extend"] .hiw-perimeter              { opacity: 1; }
+  .hiw[data-mode="extend"] .hiw-extend                 { opacity: 1; transform: translate(0, 0); }
+  .hiw-extend { transform: translate(60px, -40px); transition: opacity 600ms ease, transform 800ms cubic-bezier(.2,.8,.2,1); }
+  .hiw[data-mode="extend"] .hiw-extend .hiw-node[data-band="hot"] { fill: var(--hiw-hot); stroke: var(--hiw-hot); opacity: 1; }
+
+  @media (max-width: 900px) {
+    .hiw__grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hiw-node, .hiw-edge, .hiw-perimeter, .hiw-pulses, .hiw-extend,
+    .hiw__step, .hiw__step-blurb, .hiw__bar { transition: none; }
+  }
+</style>

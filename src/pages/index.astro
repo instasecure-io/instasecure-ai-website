@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Button from '@/components/ui/Button.astro';
 import Hero from '@/components/sections/Hero.astro';
 import FeatureGrid from '@/components/sections/FeatureGrid.astro';
-import StepFlow from '@/components/sections/StepFlow.astro';
+import HowItWorksAnimation from '@/components/sections/HowItWorksAnimation.astro';
 import VersusBlock from '@/components/sections/VersusBlock.astro';
 import PhasesSection from '@/components/sections/PhasesSection.astro';
 import TestimonialRow from '@/components/sections/TestimonialRow.astro';
@@ -101,13 +101,6 @@ const gatesVsGuardrails = {
   },
 };
 
-const steps = [
-  { icon: 'lucide:search', title: 'Discover', description: 'Map every identity — human, service, pipeline, agent — and the actions each one can actually take across your AWS org.' },
-  { icon: 'lucide:workflow', title: 'Prioritize', description: 'Build the attack graph. Calculate blast radius per identity. Rank the exposures that matter before attackers rank them.' },
-  { icon: 'lucide:shield-check', title: 'Enforce', description: 'Deploy the guardrail set. Policy installs at the organization edge — no pipeline changes, no developer tickets, no code.' },
-  { icon: 'lucide:plus-circle', title: 'Extend', description: 'Your guardrails library grows with attacker capability. New attack class → new guardrail → org-wide, continuously.' },
-];
-
 const economicsBefore = {
   label: 'CSPM + SOC',
   bullets: [
@@ -164,12 +157,16 @@ const economicsAfter = {
   <PhasesSection defaultActive={3} defaultMaturity={1} showMaturity={true} />
 
   <div class="bg-slate-50">
-    <StepFlow
-      eyebrow="How it works"
-      title="Zero code. Org-wide. Minutes to enforced."
-      subtitle="No pipeline changes. No developer tickets. Just policy, installed at the control plane."
-      steps={steps}
-    />
+    <section class="mx-auto max-w-7xl px-6 py-20">
+      <SectionHeader
+        eyebrow="How it works"
+        title="Zero code. Org-wide. Minutes to enforced."
+        subtitle="No pipeline changes. No developer tickets. Just policy, installed at the control plane."
+      />
+      <div class="mt-14">
+        <HowItWorksAnimation />
+      </div>
+    </section>
   </div>
 
   <section class="mx-auto max-w-5xl px-6 py-20">
