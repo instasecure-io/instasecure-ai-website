@@ -6,7 +6,7 @@ import FeatureGrid from '@/components/sections/FeatureGrid.astro';
 import QuoteStrip from '@/components/sections/QuoteStrip.astro';
 import StepFlow from '@/components/sections/StepFlow.astro';
 import VersusBlock from '@/components/sections/VersusBlock.astro';
-import MaturityLadder from '@/components/sections/MaturityLadder.astro';
+import PhasesSection from '@/components/sections/PhasesSection.astro';
 import TestimonialRow from '@/components/sections/TestimonialRow.astro';
 import SectionHeader from '@/components/sections/SectionHeader.astro';
 import CTAStripe from '@/components/sections/CTAStripe.astro';
@@ -102,69 +102,6 @@ const gatesVsGuardrails = {
   },
 };
 
-const phases = [
-  {
-    number: '01',
-    title: 'Basic Governance',
-    summary: 'Lock down the security services themselves. Nothing your team relies on can be silently disabled.',
-    examples: [
-      'CloudTrail can never be disabled',
-      'GuardDuty, Config, SecurityHub protected',
-      'Billing and root-contact details frozen',
-      'Critical IAM roles immutable',
-    ],
-    tagline: 'Foundation · Mandatory',
-  },
-  {
-    number: '02',
-    title: 'Attack Surface Reduction',
-    summary: 'Draw the line. Regions, services, and public-access defaults get explicit approval — or they\'re denied.',
-    examples: [
-      'Deny non-approved AWS regions',
-      'Deny non-approved AWS services',
-      'Deny creation of default VPC / public Lambda URLs',
-      'Enforce S3 public-access block',
-    ],
-    tagline: 'Scope · Strongly recommended',
-  },
-  {
-    number: '03',
-    title: 'Best Practice Enforcement',
-    summary: 'Industry best practices stop being aspirational. Mandatory tags, encryption, IMDSv2, no root, no new IAM users.',
-    examples: [
-      'Require owner tags on EC2, RDS',
-      'Enforce EBS encryption, IMDSv2',
-      'Prevent root-user activity outside assume-root',
-      'Block new long-lived IAM users and keys',
-    ],
-    tagline: 'Hygiene · Strongly recommended',
-  },
-  {
-    number: '04',
-    title: 'Advanced Attack Patterns',
-    summary: 'Eliminate the escalation paths and exfil routes attackers use. Privilege escalation, destructive actions, backdoor creation — all structurally blocked.',
-    examples: [
-      'Prevent IAM privilege escalation',
-      'Prevent credential leakage via API responses',
-      'Limit high-impact destructive actions',
-      'Block backdoor resource-policy modifications',
-    ],
-    tagline: 'Depth · Critical',
-  },
-  {
-    number: '05',
-    title: 'Data Perimeter',
-    summary: 'Close the organization. Only trusted identities from trusted networks access trusted resources. Cross-org RAM, VPN, SAML federation — all bounded.',
-    examples: [
-      'Trusted-resource + trusted-network policy',
-      'Deny RAM shares outside the OU',
-      'Block S3 access from outside the Organization',
-      'Lock SAML and IAM federation creation',
-    ],
-    tagline: 'Perimeter · Critical',
-  },
-];
-
 const steps = [
   { icon: 'lucide:search', title: 'Discover', description: 'Map every identity — human, service, pipeline, agent — and the actions each one can actually take across your AWS org.' },
   { icon: 'lucide:workflow', title: 'Prioritize', description: 'Build the attack graph. Calculate blast radius per identity. Rank the exposures that matter before attackers rank them.' },
@@ -225,12 +162,7 @@ const economicsAfter = {
     />
   </div>
 
-  <MaturityLadder
-    eyebrow="The platform"
-    title="Five phases of guardrails. Wherever you are, there's a set for that."
-    subtitle="50+ preventive AWS cloud security controls — service control policies (SCPs), resource control policies (RCPs), and data-perimeter guardrails — mapped to a maturity ladder and aligned with NIST, ISO 27001, CIS v8, and CSA CCM."
-    phases={phases}
-  />
+  <PhasesSection defaultActive={3} defaultMaturity={1} showMaturity={true} />
 
   <div class="bg-slate-50">
     <StepFlow
