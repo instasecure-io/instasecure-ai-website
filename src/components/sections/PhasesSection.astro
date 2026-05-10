@@ -1,0 +1,711 @@
+---
+interface Props {
+  defaultActive?: 0 | 1 | 2 | 3 | 4;
+  defaultMaturity?: 0 | 1 | 2 | 3 | 4;
+  showMaturity?: boolean;
+}
+const { defaultActive = 3, defaultMaturity = 1, showMaturity = true } = Astro.props;
+
+const PHASES = [
+  {
+    n: '01',
+    name: 'Basic Governance',
+    tag: 'Foundation',
+    severity: 'Mandatory',
+    sevColor: '#4d66e0',
+    promise: 'Lock down the security services themselves. Nothing your team relies on can be silently disabled.',
+    controls: [
+      'CloudTrail can never be disabled',
+      'GuardDuty, Config, SecurityHub protected',
+      'Billing & root-contact details frozen',
+      'Critical IAM roles immutable',
+    ],
+    count: 8,
+    maturityNote: "If you're here, you've stopped the silent disable — but the perimeter is wide open.",
+  },
+  {
+    n: '02',
+    name: 'Attack Surface Reduction',
+    tag: 'Scope',
+    severity: 'Strongly recommended',
+    sevColor: '#7a7fe0',
+    promise: "Draw the line. Regions, services, and public-access defaults get explicit approval — or they're denied.",
+    controls: [
+      'Deny non-approved AWS regions',
+      'Deny non-approved AWS services',
+      'Deny default VPC / public Lambda URLs',
+      'Enforce S3 public-access block',
+    ],
+    count: 11,
+    maturityNote: 'Where most AWS orgs sit. The gap from here to phase 5 is where breaches happen.',
+  },
+  {
+    n: '03',
+    name: 'Best Practice Enforcement',
+    tag: 'Hygiene',
+    severity: 'Strongly recommended',
+    sevColor: '#7a7fe0',
+    promise: 'Industry best practices stop being aspirational. Tags, encryption, IMDSv2, no root, no new IAM users.',
+    controls: [
+      'Require owner tags on EC2, RDS',
+      'Enforce EBS encryption, IMDSv2',
+      'Prevent root-user activity outside assume-root',
+      'Block new long-lived IAM users & keys',
+    ],
+    count: 12,
+    maturityNote: 'Hygiene enforced. The escalation paths attackers actually use are still open.',
+  },
+  {
+    n: '04',
+    name: 'Advanced Attack Patterns',
+    tag: 'Depth',
+    severity: 'Critical',
+    sevColor: '#ff5470',
+    promise: 'Eliminate the escalation paths and exfil routes attackers use — privilege escalation, destructive actions, backdoors.',
+    controls: [
+      'Prevent IAM privilege escalation',
+      'Prevent credential leakage via API responses',
+      'Limit high-impact destructive actions',
+      'Block backdoor resource-policy modifications',
+    ],
+    count: 10,
+    maturityNote: 'Escalation paths closed. One layer left: the organization perimeter itself.',
+  },
+  {
+    n: '05',
+    name: 'Data Perimeter',
+    tag: 'Perimeter',
+    severity: 'Critical',
+    sevColor: '#ff5470',
+    promise: 'Close the organization. Only trusted identities from trusted networks access trusted resources.',
+    controls: [
+      'Trusted-resource + trusted-network policy',
+      'Deny RAM shares outside the OU',
+      'Block S3 access from outside the Organization',
+      'Lock SAML and IAM federation creation',
+    ],
+    count: 9,
+    maturityNote: "You're closed. Cross-org RAM, VPN, SAML federation — all bounded.",
+  },
+];
+
+const FRAMEWORKS = ['NIST', 'ISO 27001', 'CIS v8', 'CSA CCM'];
+
+const RING_CENTER = 270;
+const RING_RADII = [70, 115, 160, 205, 250];
+const PIN_ANGLE = -Math.PI / 4;
+
+function ringPath(idx: number): string {
+  const outer = RING_RADII[idx];
+  const inner = idx === 0 ? 0 : RING_RADII[idx - 1] + 3;
+  const c = RING_CENTER;
+  if (inner === 0) {
+    return `M ${c} ${c - outer} A ${outer} ${outer} 0 1 1 ${c} ${c + outer} A ${outer} ${outer} 0 1 1 ${c} ${c - outer} Z`;
+  }
+  return (
+    `M ${c} ${c - outer} A ${outer} ${outer} 0 1 1 ${c} ${c + outer} A ${outer} ${outer} 0 1 1 ${c} ${c - outer} Z ` +
+    `M ${c} ${c - inner} A ${inner} ${inner} 0 1 0 ${c} ${c + inner} A ${inner} ${inner} 0 1 0 ${c} ${c - inner} Z`
+  );
+}
+
+function labelArcPath(idx: number): string {
+  const outer = RING_RADII[idx];
+  const inner = idx === 0 ? 0 : RING_RADII[idx - 1] + 3;
+  const r = (outer + inner) / 2;
+  const c = RING_CENTER;
+  const span = 130;
+  const startA = -90 - span / 2;
+  const endA = -90 + span / 2;
+  const sx = c + r * Math.cos((startA * Math.PI) / 180);
+  const sy = c + r * Math.sin((startA * Math.PI) / 180);
+  const ex = c + r * Math.cos((endA * Math.PI) / 180);
+  const ey = c + r * Math.sin((endA * Math.PI) / 180);
+  return `M ${sx} ${sy} A ${r} ${r} 0 0 1 ${ex} ${ey}`;
+}
+
+function ringFill(idx: number, active: number, maturity: number, sevColor: string, show: boolean): string {
+  const isActive = idx === active;
+  const isCovered = show && idx <= maturity;
+  const isCritical = sevColor === '#ff5470';
+  const alphaActive = isCritical ? 0.18 : 0.16;
+  const alphaCovered = 0.06 + idx * 0.05;
+  if (isActive) {
+    const hex = Math.round(alphaActive * 255).toString(16).padStart(2, '0');
+    return `${sevColor}${hex}`;
+  }
+  if (isCovered) return `rgba(77, 102, 224, ${alphaCovered})`;
+  return 'rgba(77, 102, 224, 0.02)';
+}
+
+function ringStroke(idx: number, active: number, maturity: number, sevColor: string, show: boolean): string {
+  const isActive = idx === active;
+  const isCovered = show && idx <= maturity;
+  if (isActive) return sevColor;
+  if (isCovered) return '#7d92ec';
+  return '#c9d2f3';
+}
+
+function labelFill(idx: number, active: number, maturity: number, show: boolean): string {
+  if (idx === active) return '#0e1230';
+  if (show && idx <= maturity) return '#4a4f6e';
+  return '#8a8fa8';
+}
+
+const pinR = RING_RADII[defaultMaturity];
+const pinX = RING_CENTER + pinR * Math.cos(PIN_ANGLE);
+const pinY = RING_CENTER + pinR * Math.sin(PIN_ANGLE);
+const pinX2 = RING_CENTER + (pinR + 26) * Math.cos(PIN_ANGLE);
+const pinY2 = RING_CENTER + (pinR + 26) * Math.sin(PIN_ANGLE);
+
+// Pre-computed initial state per phase, used to render the strip and panels.
+// Astro's template parser dislikes JSX-adjacent `<=` comparisons inside
+// multi-statement arrow function bodies, so we resolve flags in frontmatter.
+const isCoveredAt = (idx: number) => showMaturity && idx <= defaultMaturity;
+const phaseInitial = PHASES.map((p, idx) => {
+  const isActive = idx === defaultActive;
+  const isCovered = isCoveredAt(idx);
+  const isMaturity = showMaturity && idx === defaultMaturity;
+  const cls = ['strip__btn'];
+  if (isActive) cls.push('is-active');
+  if (isCovered) cls.push('is-covered');
+  if (isMaturity) cls.push('is-maturity');
+  return { p, idx, isActive, isCovered, stripCls: cls.join(' ') };
+});
+---
+<section
+  class="phases"
+  data-phases-section
+  data-active={defaultActive}
+  data-maturity={defaultMaturity}
+  data-show-maturity={showMaturity ? 'true' : 'false'}
+>
+  <div class="phases__head">
+    <div class="phases__eyebrow">The platform</div>
+    <h2 class="phases__title">
+      Five phases of guardrails. <span class="phases__title-soft">Wherever you are, there's a set for that.</span>
+    </h2>
+    <p class="phases__lede">
+      50+ preventive AWS cloud security controls — service control policies (SCPs), resource control policies (RCPs), and data-perimeter guardrails — mapped to a maturity ladder and aligned with NIST, ISO&nbsp;27001, CIS&nbsp;v8, and CSA&nbsp;CCM.
+    </p>
+  </div>
+
+  <div class="phases__grid">
+    <div class="phases__chart-wrap">
+      <svg class="phases__chart" viewBox="0 0 540 540" role="img" aria-label="Concentric ring diagram of five guardrail phases. Click a ring to inspect that phase.">
+        <defs>
+          {PHASES.map((_, i) => (
+            <path id={`pog-label-arc-${i}`} d={labelArcPath(i)} fill="none" />
+          ))}
+          <radialGradient id="pog-aura" cx="50%" cy="50%" r="50%">
+            <stop offset="60%" stop-color="#4d66e0" stop-opacity="0" />
+            <stop offset="100%" stop-color="#4d66e0" stop-opacity="0.10" />
+          </radialGradient>
+        </defs>
+
+        <circle cx={RING_CENTER} cy={RING_CENTER} r="262" fill="url(#pog-aura)" />
+
+        {[4, 3, 2, 1, 0].map((idx) => {
+          const phase = PHASES[idx];
+          const sevKey = phase.severity === 'Critical' ? 'critical' : phase.severity === 'Mandatory' ? 'mandatory' : 'recommended';
+          const isActive = idx === defaultActive;
+          const isCovered = showMaturity && idx <= defaultMaturity;
+          return (
+            <path
+              data-ring-idx={idx}
+              data-severity={sevKey}
+              data-sev-color={phase.sevColor}
+              d={ringPath(idx)}
+              fill={ringFill(idx, defaultActive, defaultMaturity, phase.sevColor, showMaturity)}
+              fill-rule="evenodd"
+              stroke={ringStroke(idx, defaultActive, defaultMaturity, phase.sevColor, showMaturity)}
+              stroke-width={isActive ? '2.2' : '1'}
+              stroke-dasharray={!isCovered && showMaturity ? '4 5' : '0'}
+              tabindex="0"
+              role="button"
+              aria-label={`Phase ${phase.n} ${phase.name}`}
+              aria-pressed={isActive ? 'true' : 'false'}
+            />
+          );
+        })}
+
+        {PHASES.map((phase, idx) => {
+          if (idx === 0) return null;
+          return (
+            <text
+              data-label-idx={idx}
+              font-family="ui-monospace, 'JetBrains Mono', monospace"
+              font-size="11"
+              font-weight="600"
+              letter-spacing="0.18em"
+              fill={labelFill(idx, defaultActive, defaultMaturity, showMaturity)}
+              style="pointer-events:none;transition:fill 220ms ease"
+            >
+              <textPath href={`#pog-label-arc-${idx}`} startOffset="50%" text-anchor="middle">
+                {phase.n}  ·  {phase.tag.toUpperCase()}
+              </textPath>
+            </text>
+          );
+        })}
+
+        <g style="pointer-events:none">
+          <text
+            data-center-label
+            x={RING_CENTER}
+            y={RING_CENTER - 18}
+            text-anchor="middle"
+            font-size="11"
+            font-weight="600"
+            letter-spacing="0.18em"
+            font-family="ui-monospace, 'JetBrains Mono', monospace"
+            fill={labelFill(0, defaultActive, defaultMaturity, showMaturity)}
+            style="transition:fill 220ms ease"
+          >01  ·  FOUNDATION</text>
+          <text x={RING_CENTER} y={RING_CENTER + 4} text-anchor="middle" font-size="11" fill="#4a4f6e" letter-spacing="0.04em">50+ controls</text>
+          <text x={RING_CENTER} y={RING_CENTER + 22} text-anchor="middle" font-size="9.5" font-family="ui-monospace, 'JetBrains Mono', monospace" fill="#8a8fa8" letter-spacing="0.18em">5 PHASES</text>
+        </g>
+
+        {showMaturity && (
+          <g data-maturity-pin style="pointer-events:none">
+            <line data-pin-line x1={pinX} y1={pinY} x2={pinX2} y2={pinY2} stroke="#0e1230" stroke-width="1.4" />
+            <circle data-pin-outer cx={pinX} cy={pinY} r="6" fill="#ffffff" stroke="#0e1230" stroke-width="1.6" />
+            <circle data-pin-inner cx={pinX} cy={pinY} r="2.4" fill="#0e1230" />
+            <g data-pin-label transform={`translate(${pinX2 + 6}, ${pinY2 - 12})`}>
+              <rect x="0" y="0" width="86" height="22" rx="11" fill="#0e1230" />
+              <text x="43" y="14.5" text-anchor="middle" font-size="10" font-family="ui-monospace, monospace" fill="#ffffff" letter-spacing="0.16em">YOUR TEAM</text>
+            </g>
+          </g>
+        )}
+      </svg>
+    </div>
+
+    <div class="phases__panels">
+      {phaseInitial.map(({ p: phase, idx, isCovered }) => (
+        <div class="panel" data-panel-idx={idx} data-covered={isCovered ? 'true' : 'false'}>
+          <div class="panel__meta">
+            <span class="panel__phase-num">PHASE {phase.n}</span>
+            <span class="panel__tag">{phase.tag}</span>
+            {showMaturity && (
+              <span class="panel__cov-state" data-covered-text>{isCovered ? '● Covered' : '○ Gap'}</span>
+            )}
+          </div>
+          <h3 class="panel__name">{phase.name}</h3>
+          <p class="panel__promise">{phase.promise}</p>
+          <div class="panel__sev-row">
+            <span class="sev-badge" style={`--sev: ${phase.sevColor}`}>
+              <span class="sev-badge__dot"></span>
+              {phase.severity}
+            </span>
+            <span class="panel__count">{phase.count} controls</span>
+          </div>
+          <div class="panel__controls-wrap">
+            <div class="panel__controls-label">Representative controls</div>
+            <ul class="panel__controls">
+              {phase.controls.map((c) => (
+                <li>
+                  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                    <circle cx="7" cy="7" r="6" fill="none" stroke={phase.sevColor} stroke-width="1.4" />
+                    <path d="M3.8 7.2 L6 9.4 L10.4 4.6" fill="none" stroke={phase.sevColor} stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <span>{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="phases__strip">
+    {showMaturity && (
+      <div class="strip__lede">
+        <span class="strip__lede-label">Where are you?</span>
+        <span class="strip__lede-text" data-maturity-note>{PHASES[defaultMaturity].maturityNote}</span>
+      </div>
+    )}
+    <div class="strip__buttons">
+      {phaseInitial.map(({ p, idx, isActive, stripCls }) => (
+        <button
+          type="button"
+          class={stripCls}
+          data-strip-idx={idx}
+          data-sev-color={p.sevColor}
+          aria-pressed={isActive ? 'true' : 'false'}
+          aria-label={`Phase ${p.n} ${p.name}, ${p.count} controls`}
+        >
+          <div class="strip__btn-top">
+            <span class="strip__btn-num">{p.n}</span>
+            <span class="strip__btn-you">YOU</span>
+          </div>
+          <div class="strip__btn-tag">{p.tag}</div>
+          <div class="strip__btn-count">{p.count} controls</div>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="phases__frameworks">
+    <span class="frameworks__label">Aligned with</span>
+    {FRAMEWORKS.map((f) => <span class="frameworks__chip">{f}</span>)}
+  </div>
+</section>
+
+<script is:inline define:vars={{ PHASES, RING_CENTER, RING_RADII }}>
+  (function () {
+    var PIN_ANGLE = -Math.PI / 4;
+
+    function ringFill(idx, active, maturity, sevColor, show) {
+      var isActive = idx === active;
+      var isCovered = show && idx <= maturity;
+      var isCritical = sevColor === '#ff5470';
+      var alphaActive = isCritical ? 0.18 : 0.16;
+      var alphaCovered = 0.06 + idx * 0.05;
+      if (isActive) {
+        var hex = Math.round(alphaActive * 255).toString(16);
+        if (hex.length < 2) hex = '0' + hex;
+        return sevColor + hex;
+      }
+      if (isCovered) return 'rgba(77, 102, 224, ' + alphaCovered + ')';
+      return 'rgba(77, 102, 224, 0.02)';
+    }
+
+    function ringStroke(idx, active, maturity, sevColor, show) {
+      if (idx === active) return sevColor;
+      if (show && idx <= maturity) return '#7d92ec';
+      return '#c9d2f3';
+    }
+
+    function labelFill(idx, active, maturity, show) {
+      if (idx === active) return '#0e1230';
+      if (show && idx <= maturity) return '#4a4f6e';
+      return '#8a8fa8';
+    }
+
+    function applyState(root) {
+      var active = parseInt(root.dataset.active, 10);
+      var maturity = parseInt(root.dataset.maturity, 10);
+      var show = root.dataset.showMaturity === 'true';
+
+      // Rings
+      root.querySelectorAll('[data-ring-idx]').forEach(function (path) {
+        var idx = parseInt(path.dataset.ringIdx, 10);
+        var sev = path.dataset.sevColor;
+        var isActive = idx === active;
+        var isCovered = show && idx <= maturity;
+        path.setAttribute('fill', ringFill(idx, active, maturity, sev, show));
+        path.setAttribute('stroke', ringStroke(idx, active, maturity, sev, show));
+        path.setAttribute('stroke-width', isActive ? '2.2' : '1');
+        path.setAttribute('stroke-dasharray', !isCovered && show ? '4 5' : '0');
+        path.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+
+      // Label arc colors
+      root.querySelectorAll('[data-label-idx]').forEach(function (text) {
+        var idx = parseInt(text.dataset.labelIdx, 10);
+        text.setAttribute('fill', labelFill(idx, active, maturity, show));
+      });
+
+      // Center label (always represents phase 0)
+      var center = root.querySelector('[data-center-label]');
+      if (center) center.setAttribute('fill', labelFill(0, active, maturity, show));
+
+      // Maturity pin
+      if (show) {
+        var pinR = RING_RADII[maturity];
+        var x = RING_CENTER + pinR * Math.cos(PIN_ANGLE);
+        var y = RING_CENTER + pinR * Math.sin(PIN_ANGLE);
+        var x2 = RING_CENTER + (pinR + 26) * Math.cos(PIN_ANGLE);
+        var y2 = RING_CENTER + (pinR + 26) * Math.sin(PIN_ANGLE);
+        var line = root.querySelector('[data-pin-line]');
+        if (line) {
+          line.setAttribute('x1', x);
+          line.setAttribute('y1', y);
+          line.setAttribute('x2', x2);
+          line.setAttribute('y2', y2);
+        }
+        var outer = root.querySelector('[data-pin-outer]');
+        if (outer) {
+          outer.setAttribute('cx', x);
+          outer.setAttribute('cy', y);
+        }
+        var inner = root.querySelector('[data-pin-inner]');
+        if (inner) {
+          inner.setAttribute('cx', x);
+          inner.setAttribute('cy', y);
+        }
+        var label = root.querySelector('[data-pin-label]');
+        if (label) label.setAttribute('transform', 'translate(' + (x2 + 6) + ', ' + (y2 - 12) + ')');
+      }
+
+      // Detail panels — covered state per panel
+      root.querySelectorAll('[data-panel-idx]').forEach(function (panel) {
+        var idx = parseInt(panel.dataset.panelIdx, 10);
+        panel.dataset.covered = show && idx <= maturity ? 'true' : 'false';
+        var covText = panel.querySelector('[data-covered-text]');
+        if (covText) covText.textContent = idx <= maturity ? '● Covered' : '○ Gap';
+      });
+
+      // Strip buttons
+      root.querySelectorAll('[data-strip-idx]').forEach(function (btn) {
+        var idx = parseInt(btn.dataset.stripIdx, 10);
+        btn.classList.toggle('is-active', idx === active);
+        btn.classList.toggle('is-covered', show && idx <= maturity);
+        btn.classList.toggle('is-maturity', show && idx === maturity);
+        btn.setAttribute('aria-pressed', idx === active ? 'true' : 'false');
+      });
+
+      // Maturity note
+      var note = root.querySelector('[data-maturity-note]');
+      if (note && show && PHASES[maturity]) note.textContent = PHASES[maturity].maturityNote;
+    }
+
+    function init() {
+      var roots = document.querySelectorAll('[data-phases-section]');
+      roots.forEach(function (root) {
+        if (root.dataset.bound === 'true') return;
+        root.dataset.bound = 'true';
+
+        function setActive(idx, alsoSetMaturity) {
+          root.dataset.active = String(idx);
+          if (alsoSetMaturity && root.dataset.showMaturity === 'true') {
+            root.dataset.maturity = String(idx);
+          }
+          applyState(root);
+        }
+
+        // Ring clicks
+        root.querySelectorAll('[data-ring-idx]').forEach(function (path) {
+          path.addEventListener('click', function () {
+            setActive(parseInt(path.dataset.ringIdx, 10), false);
+          });
+          path.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setActive(parseInt(path.dataset.ringIdx, 10), false);
+            }
+          });
+        });
+
+        // Strip button clicks (also moves the maturity pin, matching the React version)
+        root.querySelectorAll('[data-strip-idx]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            setActive(parseInt(btn.dataset.stripIdx, 10), true);
+          });
+        });
+
+        applyState(root);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init, { once: true });
+    } else {
+      init();
+    }
+    document.addEventListener('astro:page-load', init);
+  })();
+</script>
+
+<style>
+  .phases {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 88px 24px 96px;
+    color: #0e1230;
+  }
+  .phases__head { max-width: 820px; margin-bottom: 48px; }
+  .phases__eyebrow {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    color: var(--color-brand);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .phases__title {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin: 0 0 18px;
+    text-wrap: balance;
+    color: #0e1230;
+  }
+  .phases__title-soft { color: #4a4f6e; }
+  .phases__lede {
+    font-size: 17px;
+    line-height: 1.55;
+    color: #4a4f6e;
+    margin: 0;
+    text-wrap: pretty;
+    max-width: 760px;
+  }
+
+  .phases__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .phases__grid { grid-template-columns: 540px 1fr; gap: 40px; }
+  }
+
+  .phases__chart-wrap { display: flex; justify-content: center; }
+  .phases__chart {
+    width: 100%;
+    max-width: 540px;
+    height: auto;
+    overflow: visible;
+    display: block;
+  }
+  .phases__chart [data-ring-idx] {
+    cursor: pointer;
+    transition: fill 220ms ease, stroke 220ms ease, stroke-width 220ms ease;
+  }
+  .phases__chart [data-ring-idx]:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+
+  /* Detail panels — show only the active one */
+  .phases__panels { position: relative; }
+  .phases .panel {
+    background: #fff;
+    border: 1px solid #e5e7f0;
+    border-radius: 16px;
+    padding: 28px 28px 26px;
+    min-height: 540px;
+    box-shadow: 0 1px 0 rgba(14, 18, 48, 0.02), 0 18px 40px -28px rgba(14, 18, 48, 0.18);
+    display: none;
+    flex-direction: column;
+  }
+  .phases[data-active="0"] .panel[data-panel-idx="0"],
+  .phases[data-active="1"] .panel[data-panel-idx="1"],
+  .phases[data-active="2"] .panel[data-panel-idx="2"],
+  .phases[data-active="3"] .panel[data-panel-idx="3"],
+  .phases[data-active="4"] .panel[data-panel-idx="4"] {
+    display: flex;
+  }
+  .panel__meta { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .panel__phase-num {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.22em; color: #8a8fa8; font-weight: 600;
+  }
+  .panel__tag {
+    display: inline-block; padding: 3px 9px; border-radius: 999px;
+    background: #eef1fc; color: var(--color-brand);
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .panel__cov-state {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+    color: #c43253;
+  }
+  .panel[data-covered="true"] .panel__cov-state { color: #1e8e5a; }
+  .panel__name {
+    font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;
+    color: #0e1230; margin: 4px 0 14px;
+  }
+  .panel__promise { font-size: 15px; line-height: 1.55; color: #4a4f6e; margin: 0 0 20px; text-wrap: pretty; }
+  .panel__sev-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .sev-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--sev); background: color-mix(in srgb, var(--sev) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--sev) 20%, transparent);
+  }
+  .sev-badge__dot { width: 6px; height: 6px; border-radius: 3px; background: var(--sev); display: inline-block; }
+  .panel__count {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 11px; color: #8a8fa8; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .panel__controls-wrap { border-top: 1px dashed #e5e7f0; padding-top: 16px; margin-top: 4px; flex: 1; }
+  .panel__controls-label {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.2em; color: #8a8fa8;
+    text-transform: uppercase; margin-bottom: 12px; font-weight: 600;
+  }
+  .panel__controls { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .panel__controls li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 14px; color: #0e1230; line-height: 1.45;
+  }
+  .panel__controls svg { margin-top: 3px; flex-shrink: 0; }
+
+  /* Strip */
+  .phases__strip {
+    margin-top: 28px; background: #fff; border: 1px solid #e5e7f0; border-radius: 14px;
+    padding: 18px 22px 16px;
+  }
+  .strip__lede { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .strip__lede-label {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.22em; color: #8a8fa8;
+    font-weight: 600; text-transform: uppercase;
+  }
+  .strip__lede-text { font-size: 13.5px; color: #4a4f6e; text-wrap: pretty; }
+  .strip__buttons { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  @media (max-width: 640px) {
+    .strip__buttons { grid-template-columns: repeat(2, 1fr); }
+  }
+  .strip__btn {
+    appearance: none; cursor: pointer; padding: 12px 14px; border-radius: 10px;
+    border: 1px dashed #c9d2f3; background: #f5f7fd; text-align: left;
+    transition: border 200ms ease, background 200ms ease;
+    font: inherit; color: inherit;
+  }
+  .strip__btn.is-covered { border: 1px solid #7d92ec; background: #eef1fc; }
+  .strip__btn.is-active {
+    border: 1.5px solid var(--strip-active, var(--color-brand));
+    background: color-mix(in srgb, var(--strip-active, var(--color-brand)) 6%, white);
+  }
+  .strip__btn[data-sev-color="#ff5470"] { --strip-active: #ff5470; }
+  .strip__btn[data-sev-color="#4d66e0"] { --strip-active: #4d66e0; }
+  .strip__btn[data-sev-color="#7a7fe0"] { --strip-active: #7a7fe0; }
+  .strip__btn:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+  .strip__btn-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; min-height: 18px; }
+  .strip__btn-num {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.18em; color: #8a8fa8; font-weight: 600;
+  }
+  .strip__btn.is-covered .strip__btn-num { color: var(--color-brand); }
+  .strip__btn-you {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 8.5px; letter-spacing: 0.18em; color: #fff; background: #0e1230;
+    padding: 2px 6px; border-radius: 4px; font-weight: 600;
+    visibility: hidden;
+  }
+  .strip__btn.is-maturity .strip__btn-you { visibility: visible; }
+  .strip__btn-tag { font-size: 13px; font-weight: 600; color: #0e1230; line-height: 1.25; margin-bottom: 2px; }
+  .strip__btn-count {
+    font-size: 11px; color: #8a8fa8;
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  /* Frameworks */
+  .phases__frameworks {
+    margin-top: 22px; display: flex; align-items: center; gap: 14px;
+    flex-wrap: wrap; padding-top: 18px; border-top: 1px dashed #e5e7f0;
+  }
+  .frameworks__label {
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 10.5px; letter-spacing: 0.22em; color: #8a8fa8;
+    font-weight: 600; text-transform: uppercase;
+  }
+  .frameworks__chip {
+    padding: 5px 11px; border-radius: 999px; background: #fff;
+    border: 1px solid #e5e7f0; color: #0e1230;
+    font-family: ui-monospace, 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .phases__chart [data-ring-idx],
+    .phases__chart [data-label-idx],
+    .phases__chart [data-center-label],
+    .strip__btn { transition: none; }
+  }
+</style>
