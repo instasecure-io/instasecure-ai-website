@@ -50,22 +50,25 @@ const testimonials = [
   },
 ];
 
+// Numbers + severity colors mirror the converging-vectors illustration:
+// 01 attackers automated (red), 02 defenders drowned (orange),
+// 03 detection lost economics (purple).
 const threats = [
   {
-    icon: 'lucide:bot',
-    iconColor: 'brand' as const,
+    num: '01',
+    color: '#ff5470',
     title: 'Attackers automated.',
     description: 'Frontier models enumerate IAM paths, trust chains, and misconfigurations in minutes. The cloud attack surface moved from payload to policy — and policy is where AI-assisted attackers now live.',
   },
   {
-    icon: 'lucide:key-round',
-    iconColor: 'accent' as const,
+    num: '02',
+    color: '#f59f3c',
     title: 'Defenders drowned.',
     description: 'Non-human identities — service roles, pipelines, third-parties, AI agents — already outnumber humans 20–50 to 1. Every new agent is a new credential. SOC alert volume rises faster than headcount ever can.',
   },
   {
-    icon: 'lucide:clock-alert',
-    iconColor: 'brand' as const,
+    num: '03',
+    color: '#b95ad8',
     title: "Detection lost its economics.",
     description: 'Finding threats faster than attackers move is a losing race against AI-accelerated adversaries. Mean-time-to-detect becomes meaningless when mean-time-to-compromise collapses to minutes.',
   },
@@ -123,15 +126,78 @@ const gatesVsGuardrails = {
 
   <TuesdayAttackScene />
 
-  <FeatureGrid
-    eyebrow="The shift"
-    title="The attack economy flipped. The defense stack didn't."
-    subtitle="Three things changed in 24 months. Most security programs were built for the world that existed before them."
-    features={threats}
-    columns={3}
-  >
-    <TheShiftIllustration />
-  </FeatureGrid>
+  <section class="mx-auto max-w-7xl px-6 py-20">
+    <div class="mb-14">
+      <SectionHeader
+        eyebrow="The shift"
+        title="The attack economy flipped. The defense stack didn't."
+        subtitle="Three things changed in 24 months. Most security programs were built for the world that existed before them."
+      />
+    </div>
+    <div class="mb-14">
+      <TheShiftIllustration />
+    </div>
+    <div class="grid gap-6 md:gap-7 md:grid-cols-3">
+      {threats.map((t) => (
+        <article class="threat-card" style={`--threat: ${t.color};`}>
+          <div class="threat-card__num">{t.num}</div>
+          <h3 class="threat-card__title">{t.title}</h3>
+          <p class="threat-card__body">{t.description}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <style>
+    /* Numbered threat cards — top accent in the matching vector color
+       from TheShiftIllustration above (red/orange/purple) ties the
+       narrative together. Big mono number reads as the visual anchor;
+       title + body follow the site's standard h3 / paragraph rhythm. */
+    .threat-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 1rem;
+      padding: 1.875rem 1.875rem 2rem;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 18px 40px -28px rgba(29, 47, 113, 0.20);
+      overflow: hidden;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+    }
+    .threat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 22px 50px -28px rgba(29, 47, 113, 0.28);
+    }
+    .threat-card::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 4px;
+      background: var(--threat);
+    }
+    .threat-card__num {
+      font-family: ui-monospace, 'JetBrains Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--threat);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin: 0 0 1.125rem;
+    }
+    .threat-card__title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      margin: 0 0 0.625rem;
+    }
+    .threat-card__body {
+      font-size: 0.9375rem;
+      color: rgb(51 65 85);
+      line-height: 1.6;
+      margin: 0;
+    }
+  </style>
 
   <div class="bg-slate-50">
     <VersusBlock
