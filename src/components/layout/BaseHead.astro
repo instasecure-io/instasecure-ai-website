@@ -15,7 +15,7 @@ interface Props {
   noindex?: boolean;
   articleMeta?: ArticleMeta;
 }
-const { title, description, image = '/og-default.png', canonical, noindex = false, articleMeta } = Astro.props;
+const { title, description, image = '/og-default-v2.png', canonical, noindex = false, articleMeta } = Astro.props;
 const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
 const imageURL = new URL(image, Astro.site).toString();
 ---
