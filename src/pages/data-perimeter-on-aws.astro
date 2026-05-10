@@ -116,23 +116,25 @@ const features = [
   </div>
 
   <section class="mx-auto max-w-5xl px-6 py-20">
-    <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">Keep Reading</div>
-    <h2 class="text-2xl md:text-3xl font-bold text-[var(--color-text)] tracking-tight mb-8">Related guides on AWS preventive security</h2>
-    <div class="grid md:grid-cols-3 gap-6">
+    <SectionHeader
+      eyebrow="Keep reading"
+      title="Related guides on AWS preventive security"
+    />
+    <div class="grid md:grid-cols-3 gap-6 mt-14">
       <a href="/learn/aws-organizational-policies" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
         <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Interactive simulator</div>
-        <div class="font-bold text-lg text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">AWS Service Control Policies (SCPs) and Resource Control Policies (RCPs) — try them live</div>
-        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Click through six trust scenarios and watch which gate blocks each one — SCPs, RCPs, permission boundaries, and the AWS evaluation logic that ties them together.</p>
+        <h3 class="text-lg font-bold text-[var(--color-text)] leading-snug tracking-tight group-hover:text-[var(--color-brand)] transition">AWS Service Control Policies (SCPs) and Resource Control Policies (RCPs) — try them live</h3>
+        <p class="mt-3 text-[15px] text-slate-700 leading-relaxed">Click through six trust scenarios and watch which gate blocks each one — SCPs, RCPs, permission boundaries, and the AWS evaluation logic that ties them together.</p>
       </a>
       <a href="/credential-compromise" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
         <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Use case</div>
-        <div class="font-bold text-lg text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">How preventive controls block stolen AWS credentials</div>
-        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Why detection-based defense loses against valid stolen credentials — and how the data perimeter denies the action at the AWS control plane.</p>
+        <h3 class="text-lg font-bold text-[var(--color-text)] leading-snug tracking-tight group-hover:text-[var(--color-brand)] transition">How preventive controls block stolen AWS credentials</h3>
+        <p class="mt-3 text-[15px] text-slate-700 leading-relaxed">Why detection-based defense loses against valid stolen credentials — and how the data perimeter denies the action at the AWS control plane.</p>
       </a>
       <a href="/learn/cloud-architecture-gaps" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
         <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Field guide</div>
-        <div class="font-bold text-lg text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">Cloud hardening against AI-driven attacks</div>
-        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Tenancy, perimeter, and IAM blast radius — the three architectural gaps that AI-accelerated reconnaissance exploits, and the AWS-native primitives that close them.</p>
+        <h3 class="text-lg font-bold text-[var(--color-text)] leading-snug tracking-tight group-hover:text-[var(--color-brand)] transition">Cloud hardening against AI-driven attacks</h3>
+        <p class="mt-3 text-[15px] text-slate-700 leading-relaxed">Tenancy, perimeter, and IAM blast radius — the three architectural gaps that AI-accelerated reconnaissance exploits, and the AWS-native primitives that close them.</p>
       </a>
     </div>
   </section>
