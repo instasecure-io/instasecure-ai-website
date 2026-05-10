@@ -277,8 +277,17 @@ const phaseInitial = PHASES.map((p, idx) => {
     </div>
 
     <div class="phases__panels">
-      {phaseInitial.map(({ p: phase, idx, isCovered }) => (
-        <div class="panel" data-panel-idx={idx} data-covered={isCovered ? 'true' : 'false'}>
+      {phaseInitial.map(({ p: phase, idx, isActive, isCovered }) => (
+        <div
+          class="panel"
+          data-panel-idx={idx}
+          data-covered={isCovered ? 'true' : 'false'}
+          id={`phase-panel-${idx}`}
+          role="tabpanel"
+          aria-labelledby={`phase-tab-${idx}`}
+          tabindex="0"
+          hidden={!isActive}
+        >
           <div class="panel__meta">
             <span class="panel__phase-num">PHASE {phase.n}</span>
             <span class="panel__tag">{phase.tag}</span>
@@ -321,14 +330,18 @@ const phaseInitial = PHASES.map((p, idx) => {
         <span class="strip__lede-text" data-maturity-note>{PHASES[defaultMaturity].maturityNote}</span>
       </div>
     )}
-    <div class="strip__buttons">
+    <div class="strip__buttons" role="tablist" aria-label="Guardrail phases">
       {phaseInitial.map(({ p, idx, isActive, stripCls }) => (
         <button
           type="button"
           class={stripCls}
           data-strip-idx={idx}
           data-sev-color={p.sevColor}
-          aria-pressed={isActive ? 'true' : 'false'}
+          id={`phase-tab-${idx}`}
+          role="tab"
+          aria-controls={`phase-panel-${idx}`}
+          aria-selected={isActive ? 'true' : 'false'}
+          tabindex={isActive ? '0' : '-1'}
           aria-label={`Phase ${p.n} ${p.name}, ${p.count} controls`}
         >
           <div class="strip__btn-top">
@@ -435,21 +448,27 @@ const phaseInitial = PHASES.map((p, idx) => {
         if (label) label.setAttribute('transform', 'translate(' + (x2 + 6) + ', ' + (y2 - 12) + ')');
       }
 
-      // Detail panels — covered state per panel
+      // Detail panels — drive visibility via the [hidden] attribute so
+      // the ARIA tab/tabpanel state and the rendered DOM stay in sync.
       root.querySelectorAll('[data-panel-idx]').forEach(function (panel) {
         var idx = parseInt(panel.dataset.panelIdx, 10);
         panel.dataset.covered = show && idx <= maturity ? 'true' : 'false';
+        if (idx === active) panel.removeAttribute('hidden');
+        else panel.setAttribute('hidden', '');
         var covText = panel.querySelector('[data-covered-text]');
         if (covText) covText.textContent = idx <= maturity ? '● Covered' : '○ Gap';
       });
 
-      // Strip buttons
+      // Strip buttons (role=tab) — APG: only the active tab is in tab
+      // order; others are reachable via arrow keys (handled below).
       root.querySelectorAll('[data-strip-idx]').forEach(function (btn) {
         var idx = parseInt(btn.dataset.stripIdx, 10);
-        btn.classList.toggle('is-active', idx === active);
+        var isActive = idx === active;
+        btn.classList.toggle('is-active', isActive);
         btn.classList.toggle('is-covered', show && idx <= maturity);
         btn.classList.toggle('is-maturity', show && idx === maturity);
-        btn.setAttribute('aria-pressed', idx === active ? 'true' : 'false');
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        btn.setAttribute('tabindex', isActive ? '0' : '-1');
       });
 
       // Maturity note
@@ -480,11 +499,31 @@ const phaseInitial = PHASES.map((p, idx) => {
         });
 
         // Strip button clicks (also moves the maturity pin, matching the React version)
-        root.querySelectorAll('[data-strip-idx]').forEach(function (btn) {
+        var stripBtns = root.querySelectorAll('[data-strip-idx]');
+        stripBtns.forEach(function (btn) {
           btn.addEventListener('click', function () {
             setActive(parseInt(btn.dataset.stripIdx, 10), true);
           });
         });
+
+        // APG tab pattern — Left/Right and Home/End move focus + activate
+        // the next tab. Vertical arrows are ignored (this is a horizontal tablist).
+        var tablist = root.querySelector('[role="tablist"]');
+        if (tablist) {
+          tablist.addEventListener('keydown', function (e) {
+            var keys = { ArrowLeft: -1, ArrowRight: 1, Home: 'first', End: 'last' };
+            if (!(e.key in keys)) return;
+            e.preventDefault();
+            var current = parseInt(root.dataset.active, 10);
+            var next;
+            if (keys[e.key] === 'first') next = 0;
+            else if (keys[e.key] === 'last') next = stripBtns.length - 1;
+            else next = (current + keys[e.key] + stripBtns.length) % stripBtns.length;
+            setActive(next, true);
+            var nextBtn = root.querySelector('[data-strip-idx="' + next + '"]');
+            if (nextBtn) nextBtn.focus();
+          });
+        }
 
         applyState(root);
       });
@@ -538,7 +577,8 @@ const phaseInitial = PHASES.map((p, idx) => {
      no visible focus state. */
   .phases__chart [data-ring-idx]:focus { outline: none; }
 
-  /* Detail panels — show only the active one */
+  /* Detail panels — visibility driven by the [hidden] attribute (so the
+     ARIA tab/tabpanel pattern stays in sync with what's in the DOM). */
   .phases__panels { position: relative; }
   .phases .panel {
     background: #fff;
@@ -547,16 +587,10 @@ const phaseInitial = PHASES.map((p, idx) => {
     padding: 1.75rem 1.75rem 1.625rem;
     min-height: 540px;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 18px 40px -28px rgba(29, 47, 113, 0.18);
-    display: none;
     flex-direction: column;
   }
-  .phases[data-active="0"] .panel[data-panel-idx="0"],
-  .phases[data-active="1"] .panel[data-panel-idx="1"],
-  .phases[data-active="2"] .panel[data-panel-idx="2"],
-  .phases[data-active="3"] .panel[data-panel-idx="3"],
-  .phases[data-active="4"] .panel[data-panel-idx="4"] {
-    display: flex;
-  }
+  .phases .panel:not([hidden]) { display: flex; }
+  .phases .panel:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
   .panel__meta { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.375rem; flex-wrap: wrap; }
   .panel__phase-num {
     font-family: ui-monospace, 'SF Mono', Menlo, monospace;
