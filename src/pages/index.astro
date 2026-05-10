@@ -6,6 +6,7 @@ import FeatureGrid from '@/components/sections/FeatureGrid.astro';
 import HowItWorksAnimation from '@/components/sections/HowItWorksAnimation.astro';
 import CoexistsCalendar from '@/components/sections/CoexistsCalendar.astro';
 import EconomicsChart from '@/components/sections/EconomicsChart.astro';
+import TheShiftIllustration from '@/components/sections/TheShiftIllustration.astro';
 import VersusBlock from '@/components/sections/VersusBlock.astro';
 import PhasesSection from '@/components/sections/PhasesSection.astro';
 import TestimonialRow from '@/components/sections/TestimonialRow.astro';
@@ -128,7 +129,9 @@ const gatesVsGuardrails = {
     subtitle="Three things changed in 24 months. Most security programs were built for the world that existed before them."
     features={threats}
     columns={3}
-  />
+  >
+    <TheShiftIllustration />
+  </FeatureGrid>
 
   <div class="bg-slate-50">
     <VersusBlock
