@@ -65,7 +65,10 @@ const breadcrumbSchema = {
 };
 ---
 <BaseLayout {title} {description}>
-  <StructuredData slot="head" data={breadcrumbSchema} />
+  <Fragment slot="head">
+    <StructuredData data={breadcrumbSchema} />
+    <slot name="head" />
+  </Fragment>
   <Breadcrumbs crumbs={crumbs} />
 
   <Hero
