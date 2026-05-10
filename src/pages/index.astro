@@ -5,6 +5,7 @@ import Hero from '@/components/sections/Hero.astro';
 import FeatureGrid from '@/components/sections/FeatureGrid.astro';
 import HowItWorksAnimation from '@/components/sections/HowItWorksAnimation.astro';
 import CoexistsCalendar from '@/components/sections/CoexistsCalendar.astro';
+import EconomicsChart from '@/components/sections/EconomicsChart.astro';
 import VersusBlock from '@/components/sections/VersusBlock.astro';
 import PhasesSection from '@/components/sections/PhasesSection.astro';
 import TestimonialRow from '@/components/sections/TestimonialRow.astro';
@@ -102,22 +103,6 @@ const gatesVsGuardrails = {
   },
 };
 
-const economicsBefore = {
-  label: 'CSPM + SOC',
-  bullets: [
-    'Linear headcount growth to scale detection — every new alert source needs analysts',
-    'Sub-linear coverage — tomorrow\'s attack isn\'t in yesterday\'s rules',
-    'Attacker-tempo dependent — loses to AI-speed adversaries by design',
-  ],
-};
-const economicsAfter = {
-  label: 'InstaSecure guardrails',
-  bullets: [
-    'Fixed-cost boundary — one enforcement layer, organization-wide, forever',
-    'Deterministic coverage — impossibility is impossibility at any attacker speed',
-    'Attacker-tempo independent — prevention doesn\'t race, it pre-commits',
-  ],
-};
 ---
 <BaseLayout
   title="Preventive AWS Cloud Security Controls | InstaSecure"
@@ -188,12 +173,16 @@ const economicsAfter = {
   </section>
 
   <div class="bg-slate-50">
-    <VersusBlock
-      eyebrow="The economics"
-      title="Prevention scales. Detection doesn't."
-      before={economicsBefore}
-      after={economicsAfter}
-    />
+    <section class="mx-auto max-w-7xl px-6 py-20">
+      <SectionHeader
+        eyebrow="The economics"
+        title="Prevention scales. Detection doesn't."
+        subtitle="Defenders got AI too. It didn't close the gap — it let both sides scale, and attackers were never going to lose a speed race against triage. Prevention doesn't race. It pre-commits."
+      />
+      <div class="mt-14">
+        <EconomicsChart />
+      </div>
+    </section>
   </div>
 
   <TestimonialRow
