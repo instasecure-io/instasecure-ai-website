@@ -158,36 +158,36 @@
 
   <div class="econ__bullets">
     <div class="econ__col">
-      <h4 class="econ__col-label">CSPM + SOC · even AI-augmented</h4>
-      <ul>
+      <h4 class="econ__col-title">CSPM + SOC · even AI-augmented</h4>
+      <ul class="econ__list">
         <li>
-          <span class="econ__b-head">Triage-bound</span>
-          <span class="econ__b-body">AI helps you review findings faster, not retire categories. Same volume, faster spin — the treadmill just runs at a higher RPM.</span>
+          <h5 class="econ__item-name">Triage-bound</h5>
+          <p class="econ__item-body">AI helps you review findings faster, not retire categories. Same volume, faster spin — the treadmill just runs at a higher RPM.</p>
         </li>
         <li>
-          <span class="econ__b-head">Sub-linear coverage</span>
-          <span class="econ__b-body">Every novel attack path becomes a rule <em>after</em> the first incident. Adversarial AI generates novel paths faster than any catalog can grow.</span>
+          <h5 class="econ__item-name">Sub-linear coverage</h5>
+          <p class="econ__item-body">Every novel attack path becomes a rule <em>after</em> the first incident. Adversarial AI generates novel paths faster than any catalog can grow.</p>
         </li>
         <li>
-          <span class="econ__b-head">A race you can't win</span>
-          <span class="econ__b-body">Detection latency vs. exploit-at-machine-speed isn't a fair contest. The exposure window widens with every model release on the wrong side.</span>
+          <h5 class="econ__item-name">A race you can't win</h5>
+          <p class="econ__item-body">Detection latency vs. exploit-at-machine-speed isn't a fair contest. The exposure window widens with every model release on the wrong side.</p>
         </li>
       </ul>
     </div>
     <div class="econ__col econ__col--us">
-      <h4 class="econ__col-label">InstaSecure guardrails</h4>
-      <ul>
+      <h4 class="econ__col-title">InstaSecure guardrails</h4>
+      <ul class="econ__list">
         <li>
-          <span class="econ__b-head">Category retirement</span>
-          <span class="econ__b-body">One guardrail eliminates a class of finding org-wide, forever. Not a faster fix — a structurally different fix.</span>
+          <h5 class="econ__item-name">Category retirement</h5>
+          <p class="econ__item-body">One guardrail eliminates a class of finding org-wide, forever. Not a faster fix — a structurally different fix.</p>
         </li>
         <li>
-          <span class="econ__b-head">Deterministic coverage</span>
-          <span class="econ__b-body">Impossibility doesn't degrade with attacker speed. A retired category stays retired against tomorrow's tools, too.</span>
+          <h5 class="econ__item-name">Deterministic coverage</h5>
+          <p class="econ__item-body">Impossibility doesn't degrade with attacker speed. A retired category stays retired against tomorrow's tools, too.</p>
         </li>
         <li>
-          <span class="econ__b-head">Pre-commits, doesn't react</span>
-          <span class="econ__b-body">The policy plane decides before the action runs. Tempo-independent by construction — there's nothing to outrun.</span>
+          <h5 class="econ__item-name">Pre-commits, doesn't react</h5>
+          <p class="econ__item-body">The policy plane decides before the action runs. Tempo-independent by construction — there's nothing to outrun.</p>
         </li>
       </ul>
     </div>
@@ -269,52 +269,43 @@
   .econ__col--us {
     background: linear-gradient(180deg, rgba(77, 102, 224, 0.04), rgba(77, 102, 224, 0));
   }
-  .econ__col-label {
-    margin: 0 0 1rem;
-    font-size: 0.6875rem;
-    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--econ-faint);
-    font-weight: 600;
+  /* Column title: regular case, site-convention h4 sizing — drops the
+     small mono uppercase eyebrow look that didn't match the rest of
+     the page's "text below an image" pattern (FeatureGrid / FeatureRow
+     style: bold heading + paragraph, no decorative markers). */
+  .econ__col-title {
+    margin: 0 0 1.25rem;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--econ-ink);
   }
-  .econ__col--us .econ__col-label { color: var(--econ-accent); }
-  .econ__col ul {
+  .econ__col--us .econ__col-title { color: var(--econ-accent); }
+
+  .econ__list {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 1.125rem;
+    gap: 1.25rem;
   }
-  .econ__col li {
+  .econ__list > li { margin: 0; padding: 0; }
+
+  .econ__item-name {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--econ-ink);
+    letter-spacing: -0.005em;
+    margin: 0 0 0.25rem;
+    line-height: 1.4;
+  }
+  .econ__item-body {
     font-size: 0.875rem;
     line-height: 1.55;
     color: var(--econ-muted);
-    position: relative;
+    margin: 0;
   }
-  .econ__b-head {
-    display: block;
-    font-size: 0.90625rem;
-    color: var(--econ-ink);
-    font-weight: 700;
-    letter-spacing: -0.005em;
-    margin-bottom: 0.25rem;
-    padding-left: 1.125rem;
-    position: relative;
-  }
-  .econ__b-head::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 9px;
-    width: 10px;
-    height: 1.5px;
-    background: var(--econ-hot);
-    border-radius: 1px;
-  }
-  .econ__col--us .econ__b-head::before { background: var(--econ-accent); }
-  .econ__b-body { padding-left: 1.125rem; display: block; }
 
   @media (max-width: 900px) {
     .econ { padding: 1.25rem; }
