@@ -1,0 +1,360 @@
+---
+// 8-week CSPM-findings calendar for the "Coexists with your stack"
+// section. Pure static HTML + scoped CSS — no JS. Only the diagram
+// is included from the source component; the section header (eyebrow
+// + h2 + lede) lives on the page.
+//
+// Site-aligned typography: DM Sans inherited from body, severity
+// colors kept as literal hex (graph-signaling content, not chrome),
+// border + shadow tokens harmonized with the site card system.
+---
+<div class="cox">
+  <div class="cox__head">
+    <div class="cox__head-left">
+      <div class="cox__kicker">Last 8 weeks · your CSPM, with InstaSecure installed</div>
+      <h3 class="cox__h3">Same CSPM. <span class="cox__accent">Three categories quietly retired.</span></h3>
+    </div>
+    <div class="cox__head-right">
+      <div class="cox__head-label">Findings stopped at source</div>
+      <div class="cox__head-num">−126</div>
+      <div class="cox__head-sub">228 of 354</div>
+    </div>
+  </div>
+
+  <div class="cox__cal">
+    <div></div>
+    <div class="cox__h">W1</div>
+    <div class="cox__h">W2</div>
+    <div class="cox__h">W3</div>
+    <div class="cox__h">W4</div>
+    <div class="cox__h">W5</div>
+    <div class="cox__h">W6</div>
+    <div class="cox__h">W7</div>
+    <div class="cox__h">W8</div>
+    <div></div>
+
+    <div class="cox__row-label"><span class="cox__sw" data-c="low"></span>Public S3 bucket</div>
+    <div class="cox__cell" data-c="low">12</div>
+    <div class="cox__cell" data-c="low">9</div>
+    <div class="cox__cell cox__cell--guardrail" data-c="low">14<span class="cox__chip">+ GUARDRAIL</span></div>
+    <div class="cox__cell cox__cell--ghost">11</div>
+    <div class="cox__cell cox__cell--ghost">13</div>
+    <div class="cox__cell cox__cell--ghost">10</div>
+    <div class="cox__cell cox__cell--ghost">12</div>
+    <div class="cox__cell cox__cell--ghost">9</div>
+    <div class="cox__delta"><span class="cox__saved">−55</span><span class="cox__of">of 90</span></div>
+
+    <div class="cox__row-label"><span class="cox__sw" data-c="mid"></span>Overly-permissive IAM</div>
+    <div class="cox__cell" data-c="mid">8</div>
+    <div class="cox__cell" data-c="mid">11</div>
+    <div class="cox__cell" data-c="mid">7</div>
+    <div class="cox__cell" data-c="mid">9</div>
+    <div class="cox__cell" data-c="mid">10</div>
+    <div class="cox__cell" data-c="mid">8</div>
+    <div class="cox__cell" data-c="mid">11</div>
+    <div class="cox__cell" data-c="mid">9</div>
+    <div class="cox__delta"><span class="cox__ongoing">73 ongoing</span></div>
+
+    <div class="cox__row-label"><span class="cox__sw" data-c="hot"></span>CloudTrail disabled</div>
+    <div class="cox__cell" data-c="hot">12</div>
+    <div class="cox__cell" data-c="hot">14</div>
+    <div class="cox__cell" data-c="hot">11</div>
+    <div class="cox__cell cox__cell--guardrail" data-c="hot">13<span class="cox__chip">+ GUARDRAIL</span></div>
+    <div class="cox__cell cox__cell--ghost">15</div>
+    <div class="cox__cell cox__cell--ghost">12</div>
+    <div class="cox__cell cox__cell--ghost">14</div>
+    <div class="cox__cell cox__cell--ghost">11</div>
+    <div class="cox__delta"><span class="cox__saved">−52</span><span class="cox__of">of 102</span></div>
+
+    <div class="cox__row-label"><span class="cox__sw" data-c="high"></span>Unencrypted RDS</div>
+    <div class="cox__cell" data-c="high">4</div>
+    <div class="cox__cell" data-c="high">5</div>
+    <div class="cox__cell" data-c="high">3</div>
+    <div class="cox__cell" data-c="high">4</div>
+    <div class="cox__cell" data-c="high">6</div>
+    <div class="cox__cell" data-c="high">5</div>
+    <div class="cox__cell" data-c="high">4</div>
+    <div class="cox__cell" data-c="high">5</div>
+    <div class="cox__delta"><span class="cox__ongoing">36 ongoing</span></div>
+
+    <div class="cox__row-label"><span class="cox__sw" data-c="teal"></span>IMDSv1 enabled</div>
+    <div class="cox__cell" data-c="teal">7</div>
+    <div class="cox__cell" data-c="teal">5</div>
+    <div class="cox__cell" data-c="teal">6</div>
+    <div class="cox__cell" data-c="teal">9</div>
+    <div class="cox__cell cox__cell--guardrail" data-c="teal">7<span class="cox__chip">+ GUARDRAIL</span></div>
+    <div class="cox__cell cox__cell--ghost">8</div>
+    <div class="cox__cell cox__cell--ghost">6</div>
+    <div class="cox__cell cox__cell--ghost">5</div>
+    <div class="cox__delta"><span class="cox__saved">−19</span><span class="cox__of">of 53</span></div>
+  </div>
+
+  <div class="cox__foot">
+    <div class="cox__pill">3 categories retired · conditions no longer exist</div>
+    <div class="cox__badges">
+      <span class="cox__badge"><span class="cox__dot"></span>CSPM connected</span>
+      <span class="cox__badge cox__badge--us">+ InstaSecure SCP</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cox {
+    /* Site-aligned tokens; severity colors stay literal because they're
+       graph-signaling content, not chrome. */
+    --cox-ink: var(--color-text);
+    --cox-muted: rgb(51 65 85); /* slate-700 */
+    --cox-faint: rgb(100 116 139); /* slate-500 */
+    --cox-line: rgba(0, 0, 0, 0.05);
+    --cox-line-strong: rgba(0, 0, 0, 0.08);
+    --cox-accent: var(--color-brand);
+    --cox-accent-bg: rgba(77, 102, 224, 0.08);
+    --cox-hot: #ff5470;
+    --cox-high: #e25a86;
+    --cox-mid: #a16fc4;
+    --cox-low: #7d92ec;
+    --cox-teal: #2fa6a6;
+    --cox-ok: #2db389;
+
+    background: #ffffff;
+    border: 1px solid var(--cox-line);
+    border-radius: 1rem; /* rounded-2xl */
+    padding: 1.625rem 1.75rem 1.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 18px 40px -28px rgba(29, 47, 113, 0.18);
+    color: var(--cox-ink);
+    overflow: hidden;
+  }
+
+  .cox__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1.375rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .cox__head-left { min-width: 0; }
+  .cox__kicker {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    color: var(--cox-faint);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  .cox__h3 {
+    font-size: 1.375rem;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--cox-ink);
+  }
+  .cox__accent { color: var(--cox-accent); }
+  .cox__head-right {
+    text-align: right;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    color: var(--cox-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+  }
+  .cox__head-label { color: var(--cox-muted); }
+  .cox__head-num {
+    font-family: inherit;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--cox-ok);
+    line-height: 1;
+    margin-top: 0.25rem;
+  }
+  .cox__head-sub {
+    margin-top: 0.25rem;
+    font-size: 0.71875rem;
+    color: var(--cox-faint);
+    letter-spacing: 0.04em;
+  }
+
+  /* Calendar grid */
+  .cox__cal {
+    display: grid;
+    grid-template-columns: 220px repeat(8, 1fr) 132px;
+    column-gap: 6px;
+    row-gap: 8px;
+    align-items: center;
+  }
+  .cox__h {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.65625rem;
+    letter-spacing: 0.18em;
+    color: var(--cox-faint);
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 600;
+  }
+  .cox__row-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.84375rem;
+    color: var(--cox-ink);
+    font-weight: 500;
+  }
+  .cox__sw {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .cox__sw[data-c="low"]  { background: var(--cox-low); }
+  .cox__sw[data-c="mid"]  { background: var(--cox-mid); }
+  .cox__sw[data-c="hot"]  { background: var(--cox-hot); }
+  .cox__sw[data-c="high"] { background: var(--cox-high); }
+  .cox__sw[data-c="teal"] { background: var(--cox-teal); }
+
+  .cox__cell {
+    height: 30px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #ffffff;
+    position: relative;
+  }
+  .cox__cell[data-c="low"]  { background: var(--cox-low); }
+  .cox__cell[data-c="mid"]  { background: var(--cox-mid); }
+  .cox__cell[data-c="hot"]  { background: var(--cox-hot); }
+  .cox__cell[data-c="high"] { background: var(--cox-high); }
+  .cox__cell[data-c="teal"] { background: var(--cox-teal); }
+
+  .cox__cell--guardrail::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 7px;
+    border: 1.5px solid var(--cox-accent);
+    pointer-events: none;
+  }
+  .cox__chip {
+    position: absolute;
+    top: -10px;
+    right: 6px;
+    background: var(--cox-accent);
+    color: #fff;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.59375rem;
+    letter-spacing: 0.16em;
+    padding: 4px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px -4px rgba(77, 102, 224, 0.55);
+    font-weight: 600;
+  }
+
+  .cox__cell--ghost {
+    background: transparent;
+    border: 1px dashed var(--cox-line-strong);
+    color: var(--cox-faint);
+    opacity: 0.75;
+    font-weight: 400;
+    font-style: italic;
+  }
+  .cox__cell--ghost::before { content: '('; margin-right: 1px; }
+  .cox__cell--ghost::after  { content: ')'; margin-left: 1px; }
+
+  /* Row delta */
+  .cox__delta {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .cox__saved {
+    color: var(--cox-ok);
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: -0.01em;
+  }
+  .cox__of, .cox__ongoing {
+    color: var(--cox-faint);
+    font-size: 0.6875rem;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.04em;
+  }
+
+  /* Foot */
+  .cox__foot {
+    margin-top: 1.125rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--cox-line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .cox__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--cox-accent-bg);
+    color: var(--cox-accent);
+    border-radius: 999px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    padding: 6px 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .cox__badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cox__badge {
+    border: 1px solid var(--cox-line);
+    background: #ffffff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.71875rem;
+    color: var(--cox-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cox__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--cox-ok);
+    box-shadow: 0 0 0 3px rgba(45, 179, 137, 0.18);
+  }
+  .cox__badge--us {
+    border-color: color-mix(in srgb, var(--cox-accent) 35%, transparent);
+    color: var(--cox-accent);
+    background: var(--cox-accent-bg);
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .cox { padding: 1.25rem 1.25rem 1rem; }
+    .cox__h3 { font-size: 1.125rem; }
+    .cox__head { gap: 1rem; }
+    .cox__head-num { font-size: 1.5rem; }
+    .cox__cal {
+      grid-template-columns: 140px repeat(8, 1fr) 80px;
+      column-gap: 4px;
+    }
+    .cox__row-label { font-size: 0.75rem; }
+    .cox__cell { height: 26px; font-size: 0.6875rem; border-radius: 4px; }
+    .cox__chip { font-size: 0.5625rem; padding: 3px 6px; letter-spacing: 0.12em; }
+    .cox__saved { font-size: 1rem; }
+  }
+
+  @media (max-width: 640px) {
+    .cox__cal { grid-template-columns: 110px repeat(8, 1fr) 70px; }
+    .cox__row-label { font-size: 0.6875rem; gap: 6px; }
+    .cox__cell { height: 22px; font-size: 0.625rem; }
+  }
+</style>
