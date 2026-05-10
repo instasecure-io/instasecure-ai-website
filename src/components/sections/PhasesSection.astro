@@ -33,7 +33,7 @@ const PHASES = [
     controls: [
       'Deny non-approved AWS regions',
       'Deny non-approved AWS services',
-      'Deny default VPC / public Lambda URLs',
+      'Deny default VPC and subnet creation',
       'Enforce S3 public-access block',
     ],
     count: 11,
@@ -45,9 +45,9 @@ const PHASES = [
     tag: 'Hygiene',
     severity: 'Strongly recommended',
     sevColor: '#7a7fe0',
-    promise: 'Industry best practices stop being aspirational. Tags, encryption, IMDSv2, no root, no new IAM users.',
+    promise: 'Industry best practices stop being aspirational. Encryption everywhere, IMDSv2, no root, no new long-lived credentials.',
     controls: [
-      'Require owner tags on EC2, RDS',
+      'Block S3 unencrypted object uploads',
       'Enforce EBS encryption, IMDSv2',
       'Prevent root-user activity outside assume-root',
       'Block new long-lived IAM users & keys',
@@ -64,7 +64,7 @@ const PHASES = [
     promise: 'Eliminate the escalation paths and exfil routes attackers use — privilege escalation, destructive actions, backdoors.',
     controls: [
       'Prevent IAM privilege escalation',
-      'Prevent credential leakage via API responses',
+      'Enforce 30-day waiting period on KMS key deletion',
       'Limit high-impact destructive actions',
       'Block backdoor resource-policy modifications',
     ],
