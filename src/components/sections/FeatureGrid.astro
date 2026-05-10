@@ -31,6 +31,11 @@ const cardClass = variant === 'cards'
       <SectionHeader eyebrow={eyebrow} title={title!} subtitle={subtitle} />
     </div>
   )}
+  {Astro.slots.has('default') && (
+    <div class="mb-14">
+      <slot />
+    </div>
+  )}
   <div class={`grid gap-6 md:gap-8 ${gridClass}`}>
     {features.map(f => (
       <div class={cardClass}>
