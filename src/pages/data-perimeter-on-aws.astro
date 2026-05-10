@@ -3,6 +3,46 @@ import UseCaseLayout from '@/layouts/UseCaseLayout.astro';
 import FeatureGrid from '@/components/sections/FeatureGrid.astro';
 import SectionHeader from '@/components/sections/SectionHeader.astro';
 import IconBadge from '@/components/ui/IconBadge.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is an AWS Data Perimeter?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'An AWS Data Perimeter is a set of preventive cloud security controls — service control policies (SCPs), resource control policies (RCPs), and VPC endpoint policies — that ensure only trusted identities access trusted resources from expected networks.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What are the three pillars of an AWS Data Perimeter?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Trusted Identities — only identities your organization recognizes; Trusted Resources — privileged actions can only target approved AWS resources; and Expected Networks — access must come from networks your organization has blessed (corporate VPCs, Identity Center endpoints, known CI/CD runners).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does the AWS Data Perimeter stop credential theft?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Stolen credentials used from rogue networks or against unapproved resources are denied at the AWS control plane — regardless of valid authentication. The perimeter works on any attack, not just known CVEs.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why is least privilege not enough on its own?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Least Privilege and Zero-Trust Microsegmentation only narrow the scope of access — they reduce blast radius but do not remove the attacker with valid stolen credentials. One-off fixes to misconfigurations are labor-intensive and reactive. These approaches cover less than 5% of the attack surface.',
+      },
+    },
+  ],
+};
 
 const whatDoesntWork = [
   'Least Privilege & Zero-Trust Microsegmentation only narrows the scope of access — they reduce blast radius but do not remove the attacker with valid stolen credentials',
@@ -25,12 +65,13 @@ const features = [
 ];
 ---
 <UseCaseLayout
-  title="AWS Data Perimeter — Definition, 3 Pillars & Implementation | InstaSecure"
-  description="What is an AWS data perimeter? It's a set of preventive cloud security controls — service control policies (SCPs), resource control policies (RCPs), and VPC endpoint policies — that ensure only trusted identities access trusted resources from expected networks. InstaSecure delivers it as a deployable guardrail set."
+  title="AWS Data Perimeter — Definition & 3 Pillars"
+  description="An AWS Data Perimeter is a set of preventive cloud security controls — SCPs, RCPs, and VPC endpoint policies — ensuring only trusted identities access trusted resources."
   eyebrow="Solution · AWS Data Perimeter · Cloud Perimeter"
   heroTitle="What Is an AWS Data Perimeter?"
   heroDescription="An AWS data perimeter is a set of preventive controls that ensures only trusted identities access trusted resources from expected networks. InstaSecure delivers it as a deployable guardrail set — the closed perimeter that blocks stolen credentials and zero-day exploits, even when attackers have valid keys."
 >
+  <StructuredData slot="head" data={faqSchema} />
   <section class="mx-auto max-w-5xl px-6 py-20">
     <SectionHeader
       eyebrow="The Problem"
@@ -73,4 +114,26 @@ const features = [
       columns={3}
     />
   </div>
+
+  <section class="mx-auto max-w-5xl px-6 py-20">
+    <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">Keep Reading</div>
+    <h2 class="text-2xl md:text-3xl font-bold text-[var(--color-text)] tracking-tight mb-8">Related guides on AWS preventive security</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <a href="/learn/aws-organizational-policies" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Interactive simulator</div>
+        <div class="font-bold text-lg text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">AWS Service Control Policies (SCPs) and Resource Control Policies (RCPs) — try them live</div>
+        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Click through six trust scenarios and watch which gate blocks each one — SCPs, RCPs, permission boundaries, and the AWS evaluation logic that ties them together.</p>
+      </a>
+      <a href="/credential-compromise" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Use case</div>
+        <div class="font-bold text-lg text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">How preventive controls block stolen AWS credentials</div>
+        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Why detection-based defense loses against valid stolen credentials — and how the data perimeter denies the action at the AWS control plane.</p>
+      </a>
+      <a href="/learn/cloud-architecture-gaps" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Field guide</div>
+        <div class="font-bold text-lg text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">Cloud hardening against AI-driven attacks</div>
+        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Tenancy, perimeter, and IAM blast radius — the three architectural gaps that AI-accelerated reconnaissance exploits, and the AWS-native primitives that close them.</p>
+      </a>
+    </div>
+  </section>
 </UseCaseLayout>

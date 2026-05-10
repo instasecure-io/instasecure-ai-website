@@ -36,21 +36,21 @@ const products = [
     name: 'InstaAccess',
     tagline: 'Cloud Configuration Hardening & Automated Remediation',
     description: 'Protect non-human identities — service roles, automation agents, third-party integrations. InstaAccess automates the hardening of cloud configurations, prevents untrusted access, and remediates exposure risks in minutes — without disrupting workloads.',
-    primaryCta: { label: 'Learn more about InstaAccess', href: '/instaaccess' },
-    secondaryCta: { label: 'View InstaAccess Use Cases', href: '/instaaccess-use-cases' },
+    primaryCta: { label: 'Explore non-human identity security on AWS', href: '/instaaccess' },
+    secondaryCta: { label: 'See InstaAccess use cases', href: '/instaaccess-use-cases' },
   },
   {
     name: 'InstaWorkforce',
     tagline: 'Secure Human Access to the Cloud',
     description: 'Ensure least-privilege, just-in-time, and policy-aligned access for your workforce across cloud environments. InstaWorkforce enforces identity-based segmentation, detects privilege creep, and helps eliminate excessive access risks for employees, contractors, and partners.',
-    primaryCta: { label: 'Learn more about InstaWorkforce', href: '/instaworkforce' },
-    secondaryCta: { label: 'View InstaWorkforce Use Cases', href: '/instaworkforce-use-cases' },
+    primaryCta: { label: 'Explore AWS workforce IAM controls', href: '/instaworkforce' },
+    secondaryCta: { label: 'See InstaWorkforce use cases', href: '/instaworkforce-use-cases' },
   },
 ];
 ---
 <BaseLayout
-  title="How Preventive AWS Cloud Security Controls Work | InstaSecure"
-  description="How InstaSecure delivers preventive cloud security controls on AWS — service control policies (SCPs), resource control policies (RCPs), and data-perimeter guardrails applied at organizational entry points so every account, role, and resource is protected by default."
+  title="How Preventive AWS Cloud Security Controls Work"
+  description="Preventive AWS cloud security controls — SCPs, RCPs, and data-perimeter guardrails — applied at organizational entry points, so every account, role, and resource is protected by default."
 >
   <Hero
     eyebrow="How It Works"
@@ -88,7 +88,11 @@ const products = [
     </div>
     <img
       src={platformDiagram.src}
-      alt="InstaSecure platform architecture: data ingestion from security ecosystem → core engine (graph, risk, policy) → user interface workflows → AWS policies + Jira/Slack integrations"
+      alt="InstaSecure platform architecture: data ingestion from security ecosystem → core engine (graph, risk, policy) → user interface workflows → AWS policies (SCPs, RCPs, permission boundaries) + Jira/Slack integrations"
+      width={platformDiagram.width}
+      height={platformDiagram.height}
+      loading="lazy"
+      decoding="async"
       class="w-full max-w-5xl mx-auto"
     />
   </section>

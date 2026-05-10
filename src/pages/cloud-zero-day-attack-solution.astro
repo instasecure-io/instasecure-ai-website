@@ -19,8 +19,8 @@ const protectionPoints = [
 ];
 ---
 <UseCaseLayout
-  title="AI-Driven Cloud Attacks & Zero-Day Defense on AWS | InstaSecure"
-  description="AI-accelerated zero-day exploitation outpaces patching. InstaSecure's preventive security controls — AWS service control policies, resource control policies, and data perimeters — close trust boundaries before exploits land, even on unknown vulnerabilities."
+  title="AI-Driven Cloud Attacks & Zero-Day Defense | InstaSecure"
+  description="AI-accelerated zero-day exploitation outpaces patching. Preventive AWS cloud security controls — SCPs, RCPs, data perimeters — close trust boundaries before exploits land."
   eyebrow="Solution · AI-Driven Cloud Attacks · Zero-Day"
   heroTitle="Zero-Day Attacks Just Got an AI Co-Pilot."
   heroDescription="AI agents now weaponize disclosed CVEs in hours, not days. Detection-based defense loses the race. Preventive cloud security controls — applied at the AWS control plane before the exploit lands — block the path even when the vulnerability is unknown."
@@ -55,7 +55,7 @@ const protectionPoints = [
         title="Zero-day breaches are expensive"
         subtitle="Unknown, zero-day vulnerabilities account for 11% of breaches at the highest average cost per incident — roughly 7% more costly than known-unpatched issues."
       />
-      <img src={zeroDayChart.src} alt="Bar chart: known unpatched vulnerability costs $4.17M (6% of breaches); unknown zero-day vulnerability costs $4.45M (11% of breaches)." class="mt-12 w-full max-w-3xl mx-auto" />
+      <img src={zeroDayChart.src} alt="Bar chart: known unpatched vulnerability costs $4.17M (6% of breaches); unknown zero-day vulnerability costs $4.45M (11% of breaches)." width={zeroDayChart.width} height={zeroDayChart.height} loading="lazy" decoding="async" class="mt-12 w-full max-w-3xl mx-auto" />
     </section>
   </div>
 
@@ -65,7 +65,7 @@ const protectionPoints = [
       title="Prevent the attack, despite unknown vulnerabilities"
       subtitle="InstaSecure's Preventive Cloud Controls work on any attack path — not just the ones we know about. By enforcing trust boundaries at the control plane, even unknown vulnerabilities have nowhere to pivot to."
     />
-    <img src={zeroDayDiagram.src} alt="Multi-layer cloud security diagram: accounts isolated from the internet, with protect measures blocking attackers from reaching cloud workloads." class="mt-12 w-full max-w-4xl mx-auto" />
+    <img src={zeroDayDiagram.src} alt="Multi-layer cloud security diagram: AWS accounts isolated from the internet with preventive controls blocking attackers from reaching cloud workloads." width={zeroDayDiagram.width} height={zeroDayDiagram.height} loading="lazy" decoding="async" class="mt-12 w-full max-w-4xl mx-auto" />
   </section>
 
   <div class="bg-slate-50">

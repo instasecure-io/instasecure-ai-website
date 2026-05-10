@@ -51,8 +51,8 @@ const challenges = [
 ];
 ---
 <BaseLayout
-  title="InstaWorkforce — AWS Human Access Security & IAM Controls | InstaSecure"
-  description="Secure human access to AWS with InstaWorkforce. Agentless engine connects your IdP, AWS Identity Center, and AWS accounts to compute true permissions — and applies preventive AWS security controls (SCPs, permission boundaries, data perimeters) to enforce least privilege."
+  title="InstaWorkforce — AWS Human Access & IAM Controls"
+  description="Secure human access to AWS. Agentless engine connects IdP, AWS Identity Center, and accounts to compute true permissions — and applies preventive controls (SCPs, boundaries, data perimeters) to enforce least privilege."
 >
   <StructuredData slot="head" data={{
     '@context': 'https://schema.org',
@@ -97,7 +97,7 @@ const challenges = [
           subtitle="At the core of InstaWorkforce is the Access Authorization Graph. The agentless engine connects your IdP, AWS Identity Center, and AWS accounts to map every potential access path — then calculates the net residual access, the true end-to-end permissions for every user and group."
         />
       </div>
-      <img src={howItWorks.src} alt="Three icons labeled 'IdP', 'AWS Identity Center', and 'AWS Account' all connecting to a central 'Access Authorization Graph Engine'." class="w-full max-w-4xl mx-auto" />
+      <img src={howItWorks.src} alt="Three icons labeled 'IdP', 'AWS Identity Center', and 'AWS Account' all connecting to a central 'Access Authorization Graph Engine'." width={howItWorks.width} height={howItWorks.height} loading="lazy" decoding="async" class="w-full max-w-4xl mx-auto" />
     </section>
   </div>
 
@@ -123,7 +123,7 @@ const challenges = [
       'Track identity activities and detect anomalies with real-time monitoring',
       'Historical trend analysis to surface drift and long-tail access',
     ]}
-    image={{ src: ft01.src, alt: 'Flowchart showing user identity flowing through group membership into effective access.' }}
+    image={{ src: ft01.src, alt: 'Flowchart showing user identity flowing through group membership into effective access.', width: ft01.width, height: ft01.height }}
     imagePosition="right"
   />
   <FeatureRow
@@ -134,7 +134,7 @@ const challenges = [
       'Accurately assess actual permission usage and detect dormant or excessive access',
       'Integrate with AWS Identity Center and existing workflows (Terraform, CI/CD, Jira, GitHub)',
     ]}
-    image={{ src: ft02.src, alt: 'Central user node connected to multiple resource nodes via dashed access lines.' }}
+    image={{ src: ft02.src, alt: 'Central user node connected to multiple resource nodes via dashed access lines.', width: ft02.width, height: ft02.height }}
     imagePosition="left"
   />
   <FeatureRow
@@ -145,7 +145,7 @@ const challenges = [
       'Identify and stop unauthorized privilege escalation across cloud accounts — for human and non-human identities alike',
       'Continuously scan identity provider vulnerabilities to protect cloud identities',
     ]}
-    image={{ src: ft03.src, alt: 'Colorful pie chart showing risk distribution across five categories.' }}
+    image={{ src: ft03.src, alt: 'Colorful pie chart showing risk distribution across five categories.', width: ft03.width, height: ft03.height }}
     imagePosition="right"
   />
   <FeatureRow
@@ -156,7 +156,7 @@ const challenges = [
       'Intelligent risk scoring with visual insights into active vs. inactive accounts',
       'Identify idle and dormant access, third-party exposure, and toxic permission patterns proactively',
     ]}
-    image={{ src: ft04.src, alt: 'Arrow-shaped infographic showing risk levels for database access — high, medium, low.' }}
+    image={{ src: ft04.src, alt: 'Arrow-shaped infographic showing risk levels for database access — high, medium, low.', width: ft04.width, height: ft04.height }}
     imagePosition="left"
   />
   <FeatureRow
@@ -167,7 +167,7 @@ const challenges = [
       'Dynamically adjust access based on business needs, data classifications, and account types',
       'Integrate with existing workflows — Terraform, CI/CD pipelines, Jira, GitHub',
     ]}
-    image={{ src: ft05.src, alt: 'Form / questionnaire illustration depicting access review workflows.' }}
+    image={{ src: ft05.src, alt: 'Form / questionnaire illustration depicting access review workflows.', width: ft05.width, height: ft05.height }}
     imagePosition="right"
   />
   <FeatureRow
@@ -178,7 +178,7 @@ const challenges = [
       'Guard against credential exposure, sensitive permission abuse, and unauthorized resource changes',
       'Minimize lateral movement and enforce strict account boundaries across your cloud',
     ]}
-    image={{ src: ft06.src, alt: 'Line graph showing identity-risk trending downward over time.' }}
+    image={{ src: ft06.src, alt: 'Line graph showing identity-risk trending downward over time.', width: ft06.width, height: ft06.height }}
     imagePosition="left"
   />
   <FeatureRow
@@ -189,7 +189,7 @@ const challenges = [
       'Generate compliance documentation with one-click reports',
       'Visualize compliance posture and apply new policies through flexible opt-in integration',
     ]}
-    image={{ src: ft07.src, alt: 'Checkmark inside a circle — compliance confirmation graphic.' }}
+    image={{ src: ft07.src, alt: 'Checkmark inside a circle — compliance confirmation graphic.', width: ft07.width, height: ft07.height }}
     imagePosition="right"
   />
 

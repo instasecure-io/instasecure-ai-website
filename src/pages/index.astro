@@ -190,8 +190,8 @@ const economicsAfter = {
 };
 ---
 <BaseLayout
-  title="InstaSecure — Preventive AWS Cloud Security Controls (SCPs, RCPs, Data Perimeters)"
-  description="Preventive AWS cloud security controls — service control policies (SCPs), resource control policies (RCPs), and data perimeters — that block credential compromise and AI-driven attacks before they happen. Organization-wide. Zero code. Minutes to enforced."
+  title="Preventive AWS Cloud Security Controls | InstaSecure"
+  description="Preventive AWS cloud security controls — SCPs, RCPs, and data perimeters block credential compromise and AI-driven attacks before they happen. Org-wide. Zero code."
 >
   <Hero
     eyebrow="Agentic Cloud Security · Preventive Guardrails"
@@ -248,6 +248,36 @@ const economicsAfter = {
       <p class="mt-6 text-lg text-slate-700 leading-relaxed">
         You don't have to rip and replace. Install a guardrail, watch the class of finding stop recurring. Alert fatigue stops — not because you muted the alerts, but because the conditions that create them no longer exist.
       </p>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-6 py-20">
+    <div class="max-w-3xl mb-12">
+      <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-4">Deep dives</div>
+      <h2 class="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-[var(--color-text)]">The techniques behind preventive cloud security</h2>
+      <p class="mt-4 text-lg text-slate-700 leading-relaxed">Field guides and use-case briefs on the AWS-native primitives that make whole classes of attack structurally impossible.</p>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <a href="/data-perimeter-on-aws" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Solution</div>
+        <div class="font-bold text-[17px] text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">AWS Data Perimeter — definition and 3 pillars</div>
+        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Trusted identities, trusted resources, expected networks — the closed perimeter against stolen credentials.</p>
+      </a>
+      <a href="/credential-compromise" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Use case</div>
+        <div class="font-bold text-[17px] text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">Credential compromise on AWS — and how to stop it</div>
+        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Why valid stolen credentials defeat detection — and how preventive controls deny the action at the control plane.</p>
+      </a>
+      <a href="/learn/aws-organizational-policies" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Interactive simulator</div>
+        <div class="font-bold text-[17px] text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">SCPs and RCPs — try the AWS organizational policy gates</div>
+        <p class="mt-3 text-sm text-slate-600 leading-relaxed">Click through six trust scenarios and watch which gate blocks each one — with a tabbed deep-dive on AWS evaluation logic.</p>
+      </a>
+      <a href="/cloud-zero-day-attack-solution" class="group block p-6 rounded-2xl border border-black/5 bg-white hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="text-xs uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">Use case</div>
+        <div class="font-bold text-[17px] text-[var(--color-text)] leading-tight group-hover:text-[var(--color-brand)] transition">AI-driven zero-day attacks — preventive defense</div>
+        <p class="mt-3 text-sm text-slate-600 leading-relaxed">AI agents weaponize CVEs in hours. Preventive controls don't depend on knowing the vulnerability — they close the path.</p>
+      </a>
     </div>
   </section>
 

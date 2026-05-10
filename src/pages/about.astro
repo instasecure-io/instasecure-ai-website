@@ -44,8 +44,8 @@ function initials(name: string) {
 }
 ---
 <BaseLayout
-  title="About | InstaSecure"
-  description="Crafting a breakthrough in cloud security. Meet the team and advisory board behind InstaSecure — veterans from AWS, Netflix, JPMorgan, Meta, and more."
+  title="About InstaSecure — Preventive AWS Cloud Security"
+  description="Meet the team and advisory board building InstaSecure — veterans from AWS, Netflix, JPMorgan, Meta, and fwd:cloudsec, building preventive AWS cloud security controls."
 >
   <Hero
     eyebrow="About"
@@ -95,6 +95,10 @@ function initials(name: string) {
     <img
       src={teamExpertiseLogos.src}
       alt="Logos of companies where our team has previously worked: Twitter, Splunk, Uber, Illumio, Juniper Networks, Meta, and Cisco"
+      width={teamExpertiseLogos.width}
+      height={teamExpertiseLogos.height}
+      loading="lazy"
+      decoding="async"
       class="mt-12 max-w-4xl w-full mx-auto"
     />
   </section>
@@ -105,7 +109,7 @@ function initials(name: string) {
       <p class="mt-5 max-w-3xl mx-auto text-lg md:text-xl text-slate-700 leading-relaxed">
         Featured at fwd:cloudsec and AWS re:Inforce cloud security conferences, InstaSecure was recognized as the only solution offering a full Data Perimeter on AWS.
       </p>
-      <img src={industryRecognition.src} alt="Industry recognition logo" class="mt-10 max-w-xs w-full mx-auto" />
+      <img src={industryRecognition.src} alt="Industry recognition badge — InstaSecure named best-in-class for AWS Data Perimeter" width={industryRecognition.width} height={industryRecognition.height} loading="lazy" decoding="async" class="mt-10 max-w-xs w-full mx-auto" />
     </section>
   </div>
 
@@ -113,7 +117,11 @@ function initials(name: string) {
     <SectionHeader eyebrow="Our Investors" title="Backed by visionaries. Built by experts." />
     <img
       src={investorsLogo.src}
-      alt="Logos of our investors: AVISO Ventures and Correction Capital"
+      alt="Logos of InstaSecure investors: AVISO Ventures and Correction Capital"
+      width={investorsLogo.width}
+      height={investorsLogo.height}
+      loading="lazy"
+      decoding="async"
       class="mt-12 max-w-3xl w-full mx-auto"
     />
   </section>

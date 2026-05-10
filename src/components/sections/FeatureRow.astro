@@ -4,7 +4,8 @@ interface Props {
   title: string;
   description?: string;
   bullets?: string[];
-  image: { src: string; alt: string };
+  /** Image is required. width/height are optional for callers that have raw URLs but recommended (prevents CLS on the 7 capability rows per product page). */
+  image: { src: string; alt: string; width?: number; height?: number };
   imagePosition?: 'left' | 'right';
 }
 const { eyebrow, title, description, bullets, image, imagePosition = 'right' } = Astro.props;
@@ -12,11 +13,11 @@ const { eyebrow, title, description, bullets, image, imagePosition = 'right' } =
 <section class="py-14">
   <div class="mx-auto max-w-7xl px-6 grid md:grid-cols-2 gap-12 items-center">
     {imagePosition === 'left' && (
-      <img src={image.src} alt={image.alt} class="w-full rounded-2xl shadow-lg" loading="lazy" />
+      <img src={image.src} alt={image.alt} width={image.width} height={image.height} class="w-full rounded-2xl shadow-lg" loading="lazy" decoding="async" />
     )}
     <div>
       {eyebrow && <div class="text-sm uppercase tracking-[0.15em] font-bold text-[var(--color-brand)] mb-3">{eyebrow}</div>}
-      <h3 class="text-2xl md:text-3xl font-bold text-[var(--color-text)] tracking-tight leading-tight">{title}</h3>
+      <h2 class="text-2xl md:text-3xl font-bold text-[var(--color-text)] tracking-tight leading-tight">{title}</h2>
       {description && <p class="mt-4 text-[17px] text-slate-700 leading-relaxed">{description}</p>}
       {bullets && (
         <ul class="mt-5 space-y-3">
@@ -30,7 +31,7 @@ const { eyebrow, title, description, bullets, image, imagePosition = 'right' } =
       )}
     </div>
     {imagePosition === 'right' && (
-      <img src={image.src} alt={image.alt} class="w-full rounded-2xl shadow-lg" loading="lazy" />
+      <img src={image.src} alt={image.alt} width={image.width} height={image.height} class="w-full rounded-2xl shadow-lg" loading="lazy" decoding="async" />
     )}
   </div>
 </section>

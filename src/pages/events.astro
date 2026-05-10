@@ -32,8 +32,8 @@ const upcomingEvents = [
 ];
 ---
 <BaseLayout
-  title="Events | InstaSecure"
-  description="Meet InstaSecure at RSA Conference, Black Hat, DEF CON, fwd:cloudsec, and other cloud-security industry events. Book time with our team live on-site."
+  title="Events — Meet InstaSecure at RSAC, Black Hat, DEF CON"
+  description="Meet InstaSecure at RSA Conference, Black Hat, DEF CON, fwd:cloudsec, and other cloud-security events. Book time with our team live on-site."
 >
   <Hero
     eyebrow="Events"
@@ -52,7 +52,7 @@ const upcomingEvents = [
       {upcomingEvents.map(ev => (
         <article class="p-8 rounded-2xl bg-white border border-black/5 shadow-sm hover:shadow-md transition flex flex-col">
           {ev.image && (
-            <img src={ev.image.src} alt={ev.image.alt} class="w-full rounded-xl mb-6 bg-slate-50 object-contain" style="max-height: 200px;" />
+            <img src={ev.image.src} alt={ev.image.alt} width="800" height="450" loading="lazy" decoding="async" class="w-full rounded-xl mb-6 bg-slate-50 object-contain" style="max-height: 200px;" />
           )}
           <h2 class="text-2xl font-bold text-[var(--color-text)] leading-tight tracking-tight">{ev.title}</h2>
           <div class="mt-4 space-y-2 text-[15px] text-slate-700">
