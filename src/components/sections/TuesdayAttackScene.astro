@@ -390,14 +390,19 @@
     padding: 20px;
     position: relative;
     transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    /* Promote to its own compositor layer so the box-shadow change in
+       active states doesn't repaint the whole section on every frame. */
+    will-change: border-color, box-shadow;
   }
+  /* Lighter blur radius (12px instead of 30px) so the GPU repaint is
+     cheaper on mobile while keeping the glow effect. */
   .is-account.is-compromised {
     border-color: var(--is-accent-red);
-    box-shadow: 0 0 0 1px var(--is-accent-red), 0 0 30px rgba(255, 84, 112, 0.2);
+    box-shadow: 0 0 0 1px var(--is-accent-red), 0 0 12px rgba(255, 84, 112, 0.35);
   }
   .is-account.is-defended {
     border-color: var(--is-accent-green);
-    box-shadow: 0 0 0 1px var(--is-accent-green), 0 0 30px rgba(45, 212, 168, 0.15);
+    box-shadow: 0 0 0 1px var(--is-accent-green), 0 0 12px rgba(45, 212, 168, 0.3);
   }
 
   .is-account__header {
@@ -466,7 +471,9 @@
   .is-asset.is-active {
     background: rgba(255, 84, 112, 0.1);
     color: white;
-    transform: translateX(4px);
+    /* Removed translateX(4px) — the 4px jolt registered as jitter on
+       mobile when several assets toggled in quick succession. The color
+       change is enough visual signal that the asset is active. */
   }
   .is-asset.is-blocked {
     background: rgba(45, 212, 168, 0.08);
@@ -520,6 +527,8 @@
     opacity: 0;
     transform: translateY(-4px);
     transition: opacity 0.4s ease, transform 0.4s ease, left 1s cubic-bezier(0.65, 0, 0.35, 1);
+    /* Compositor layer so the left-axis travel doesn't repaint nearby cards. */
+    will-change: opacity, transform, left;
   }
   .is-attacker.is-visible {
     opacity: 1;
