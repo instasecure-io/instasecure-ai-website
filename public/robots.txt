@@ -1,50 +1,65 @@
 # InstaSecure robots.txt
-# General search crawlers — allow everything
+# General search crawlers — allow everything except /private/
 User-agent: *
+Disallow: /private/
 Allow: /
 
 # AI / LLM crawlers — explicit allow (InstaSecure benefits from AI citations
-# as a preventive-cloud-security vendor).
+# as a preventive-cloud-security vendor). /private/ stays off-limits.
 User-agent: GPTBot
+Disallow: /private/
 Allow: /
 
 User-agent: OAI-SearchBot
+Disallow: /private/
 Allow: /
 
 User-agent: ChatGPT-User
+Disallow: /private/
 Allow: /
 
 User-agent: PerplexityBot
+Disallow: /private/
 Allow: /
 
 User-agent: Perplexity-User
+Disallow: /private/
 Allow: /
 
 User-agent: ClaudeBot
+Disallow: /private/
 Allow: /
 
 User-agent: Claude-Web
+Disallow: /private/
 Allow: /
 
 User-agent: Google-Extended
+Disallow: /private/
 Allow: /
 
 User-agent: Applebot-Extended
+Disallow: /private/
 Allow: /
 
 User-agent: CCBot
+Disallow: /private/
 Allow: /
 
 User-agent: Meta-ExternalAgent
+Disallow: /private/
 Allow: /
 
 User-agent: Bytespider
+Disallow: /private/
 Allow: /
 
 User-agent: DuckAssistBot
+Disallow: /private/
 Allow: /
 
 User-agent: cohere-ai
+Disallow: /private/
 Allow: /
 
 Sitemap: https://instasecure.ai/sitemap-index.xml

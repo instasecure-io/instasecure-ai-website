@@ -7,5 +7,8 @@ dist/
 .DS_Store
 playwright-report/
 test-results/
+# Claude Code — local config + project memory (kept out of the public repo)
 .claude/
+CLAUDE.md
+
 private/
