@@ -1,0 +1,60 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  audience?: string;   // free-form, rendered into the watermark when set
+  preparedBy?: string;
+}
+
+const {
+  title,
+  description = 'Internal gated content.',
+  audience,
+  preparedBy = 'InstaSecure',
+} = Astro.props;
+---
+<BaseLayout
+  title={title}
+  description={description}
+  noindex={true}
+>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <meta name="googlebot" content="noindex, nofollow, noarchive" />
+    <meta name="bingbot" content="noindex, nofollow, noarchive" />
+    <meta name="GPTBot" content="noindex" />
+    <meta name="ClaudeBot" content="noindex" />
+    <meta name="PerplexityBot" content="noindex" />
+    <meta name="referrer" content="no-referrer" />
+  </Fragment>
+
+  <div class="private-watermark" aria-hidden="true">
+    <span>Private · {preparedBy}{audience ? ` · ${audience}` : ''} · Do not distribute</span>
+  </div>
+
+  <slot />
+
+  <style>
+    .private-watermark {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      background: linear-gradient(90deg, rgba(29, 47, 113, 0.96), rgba(77, 102, 224, 0.96));
+      color: #fff;
+      padding: 6px 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      backdrop-filter: saturate(140%);
+      -webkit-backdrop-filter: saturate(140%);
+    }
+    .private-watermark span {
+      opacity: 0.95;
+    }
+  </style>
+</BaseLayout>

@@ -36,6 +36,14 @@
       ]
     },
     {
+      "source": "/private/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive, nosnippet, noai, noimageai" },
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, private" },
+        { "key": "Pragma", "value": "no-cache" }
+      ]
+    },
+    {
       "source": "/(.*)\\.(woff2|woff|ttf|otf)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" }
