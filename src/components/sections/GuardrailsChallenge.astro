@@ -1,0 +1,50 @@
+---
+// src/components/sections/GuardrailsChallenge.astro
+import { CONTROLS } from '@/data/guardrails/controls';
+import { SCENARIOS } from '@/data/guardrails/scenarios';
+import { THREATS } from '@/data/guardrails/threats';
+
+const nameById = new Map(CONTROLS.map(c => [c.id, c.name]));
+const scenarios = SCENARIOS.map(s => ({
+  id: s.id, threat: s.threat, title: s.title, scenario: s.scenario, explain: s.explain, correct: s.correct,
+  options: s.options.map(id => ({ id, name: nameById.get(id) ?? id })),
+}));
+const payload = { rounds: 8, timerOn: true, threats: THREATS, scenarios };
+---
+<section class="gc-arena relative">
+  <div class="mx-auto max-w-[1080px] px-5 py-8">
+    <div data-gc-root class="min-h-[420px]"></div>
+  </div>
+  <footer class="mx-auto max-w-[1080px] px-5 grid gap-1.5 justify-items-center text-center pt-4 pb-2">
+    <span class="text-[12.5px] text-slate-400">Every one of these ships enforced, org-wide, in minutes. <a href="/contact" class="text-[var(--color-brand)] font-semibold">Book a demo</a>.</span>
+    <span class="text-[12.5px] text-slate-400">More cloud-security field guides in <a href="/learn" class="text-[var(--color-brand)] font-semibold">Learn</a>.</span>
+  </footer>
+</section>
+
+<script type="application/json" id="gc-data" set:html={JSON.stringify(payload)}></script>
+
+<script>
+  import { initGuardrailsChallenge } from '@/scripts/guardrails-challenge/controller';
+  function boot() {
+    const root = document.querySelector<HTMLElement>('[data-gc-root]');
+    const dataEl = document.getElementById('gc-data');
+    if (!root || !dataEl || root.dataset.gcBound === '1') return;
+    root.dataset.gcBound = '1';
+    const data = JSON.parse(dataEl.textContent || '{}');
+    const teardown = initGuardrailsChallenge(root, data);
+    document.addEventListener('astro:before-swap', () => teardown(), { once: true });
+  }
+  document.addEventListener('astro:page-load', boot);
+  if (document.readyState !== 'loading') boot();
+  else document.addEventListener('DOMContentLoaded', boot);
+</script>
+
+<style>
+  .gc-arena {
+    background-color: #f8f9fe;
+    background-image: radial-gradient(#dfe3f0 1px, transparent 1px);
+    background-size: 24px 24px;
+    border-top: 1px solid var(--color-border, rgba(0,0,0,0.05));
+    border-bottom: 1px solid var(--color-border, rgba(0,0,0,0.05));
+  }
+</style>

@@ -1,0 +1,24 @@
+---
+// src/pages/learn/guardrails-challenge.astro
+export const prerender = true;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import GuardrailsChallenge from '@/components/sections/GuardrailsChallenge.astro';
+---
+<BaseLayout
+  title="Guardrails Challenge — Can you pick the control that stops each attack? | InstaSecure"
+  description="A timed quiz built from the real InstaSecure control catalog: read a real cloud breach scenario, pick the one AWS preventive guardrail (SCP / RCP / data-perimeter) that stops it. Score, streaks, ranks."
+>
+  <section class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
+    <div class="mx-auto max-w-4xl px-6 pt-20 pb-14 text-center">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Guardrails Challenge</div>
+      <h1 class="font-serif text-4xl md:text-6xl font-semibold leading-[1.05] tracking-tight text-[var(--color-text)]">
+        122 guardrails. How many stand between an attacker and your cloud?
+      </h1>
+      <p class="mt-6 max-w-2xl mx-auto text-lg text-slate-700 leading-relaxed">
+        Built from the real InstaSecure control catalog — every scenario, severity, and threat mapping comes from preventive controls we enforce in production. Read the breach, pick the guardrail that stops it.
+      </p>
+    </div>
+  </section>
+
+  <GuardrailsChallenge />
+</BaseLayout>
