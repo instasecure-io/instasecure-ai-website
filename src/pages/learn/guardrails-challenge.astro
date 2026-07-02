@@ -2,6 +2,8 @@
 // src/pages/learn/guardrails-challenge.astro
 export const prerender = true;
 import BaseLayout from '@/layouts/BaseLayout.astro';
+// Aliased: this file name PascalCases to `GuardrailsChallenge`, which would
+// collide with a same-named import (astro check ts2440).
 import GuardrailsChallengeSection from '@/components/sections/GuardrailsChallenge.astro';
 ---
 <BaseLayout
