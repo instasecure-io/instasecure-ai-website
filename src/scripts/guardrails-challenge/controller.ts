@@ -77,7 +77,7 @@ export function initGuardrailsChallenge(root: HTMLElement, data: GameData): () =
   const renderPlay = () => {
     const q = state.qs[state.qi];
     const answered = state.picked !== null;
-    const threat = data.threats[q.threat];
+    const threat = data.threats[q.threat] ?? { label: q.threat, color: '#64748b' };
     const progress = ((state.qi + (answered ? 1 : 0)) / state.qs.length) * 100;
     root.innerHTML = `
       <div class="grid gap-4 max-w-[720px] mx-auto">
