@@ -1,6 +1,6 @@
 // src/scripts/guardrails-challenge/controller.ts
 import {
-  SEEDED_BOARD, seededShuffle, scoreRound, rankOf, buildRounds, mergeBoard,
+  SEEDED_BOARD, scoreRound, rankOf, buildRounds, mergeBoard,
   type BoardEntry, type PlayScenario,
 } from './game';
 
