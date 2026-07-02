@@ -21,7 +21,7 @@ const payload = { rounds: 8, timerOn: true, threats: THREATS, scenarios };
   </footer>
 </section>
 
-<script type="application/json" id="gc-data" is:inline set:html={JSON.stringify(payload)}></script>
+<script type="application/json" id="gc-data" is:inline set:html={JSON.stringify(payload).replace(/</g, '\\u003c')}></script>
 
 <script>
   import { initGuardrailsChallenge } from '@/scripts/guardrails-challenge/controller';
