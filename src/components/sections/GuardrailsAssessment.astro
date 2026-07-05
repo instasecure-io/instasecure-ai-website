@@ -1,0 +1,73 @@
+---
+// src/components/sections/GuardrailsAssessment.astro
+import { CONTROLS } from '@/data/guardrails/controls';
+import { SCENARIOS } from '@/data/guardrails/scenarios';
+import { THREATS } from '@/data/guardrails/threats';
+import { GROUPS } from '@/data/guardrails/groups';
+import { PHASES } from '@/data/guardrails/phases';
+import { CURATED_FRAMEWORKS } from '@/data/guardrails/frameworks';
+
+const curatedKeys = new Set(CURATED_FRAMEWORKS.map(f => f.key));
+const controls = CONTROLS.map(c => ({
+  id: c.id, name: c.name, sev: c.sev, tier: c.tier, impl: c.impl,
+  group: c.group, scope: c.scope, threats: c.threats,
+  fw: c.fw.filter(f => curatedKeys.has(f)),
+}));
+const scenarios = SCENARIOS.map(s => ({ id: s.id, title: s.title, threat: s.threat, correct: s.correct }));
+const aiControlIds = CONTROLS.filter(c => (c.service ?? '').includes('Bedrock') || c.id.startsWith('IS-BEDROCK')).map(c => c.id);
+const auditTamperIds = CONTROLS.filter(c => c.tags.includes('audit-tampering')).map(c => c.id);
+const formspreeId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID;
+
+const payload = {
+  controls, groups: GROUPS, phases: PHASES, threats: THREATS, scenarios,
+  frameworks: CURATED_FRAMEWORKS, aiControlIds, auditTamperIds,
+  formspreeEndpoint: formspreeId ? `https://formspree.io/f/${formspreeId}` : null,
+};
+---
+<section data-ga-arena class="ga-arena relative">
+  <div class="mx-auto max-w-[1080px] px-5 py-8">
+    <div data-ga-root class="min-h-[480px]"></div>
+  </div>
+  <footer class="ga-screen-chrome mx-auto max-w-[1080px] px-5 grid gap-1.5 justify-items-center text-center pt-4 pb-2">
+    <span class="text-[12.5px] text-slate-400">Think you know these controls? <a href="/learn/guardrails-challenge" class="text-[var(--color-brand)] font-semibold">Play the Challenge</a>.</span>
+    <span class="text-[12.5px] text-slate-400">Every one of these ships enforced, org-wide, in minutes. <a href="/contact" class="text-[var(--color-brand)] font-semibold">Book a demo</a>.</span>
+  </footer>
+</section>
+
+<script type="application/json" id="ga-data" is:inline set:html={JSON.stringify(payload).replace(/</g, '\\u003c')}></script>
+
+<script>
+  import { initGuardrailsAssessment } from '@/scripts/guardrails-assessment/controller';
+  function boot() {
+    const root = document.querySelector<HTMLElement>('[data-ga-root]');
+    const dataEl = document.getElementById('ga-data');
+    if (!root || !dataEl || root.dataset.gaBound === '1') return;
+    root.dataset.gaBound = '1';
+    const data = JSON.parse(dataEl.textContent || '{}');
+    const teardown = initGuardrailsAssessment(root, data);
+    document.addEventListener('astro:before-swap', () => teardown(), { once: true });
+  }
+  document.addEventListener('astro:page-load', boot);
+  if (document.readyState !== 'loading') boot();
+  else document.addEventListener('DOMContentLoaded', boot);
+</script>
+
+<style>
+  .ga-arena {
+    background-color: #f8f9fe;
+    background-image: radial-gradient(#dfe3f0 1px, transparent 1px);
+    background-size: 24px 24px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+</style>
+
+<style is:global>
+  @media print {
+    body > header, body > footer { display: none !important; }
+    main > *:not([data-ga-arena]) { display: none !important; }
+    [data-ga-arena] { background: #fff !important; border: 0 !important; }
+    .ga-screen-chrome { display: none !important; }
+    .ga-avoid-break { break-inside: avoid; }
+  }
+</style>
