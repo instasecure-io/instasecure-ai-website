@@ -323,7 +323,8 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
           <p class="m-0 text-[12.5px] text-slate-600">Your unchecked control weight is concentrated in ${esc((data.threats[threats[0][0]] ?? { label: threats[0][0] }).label)}. That does not predict an incident; it tells the scan where preventive coverage is thinnest.</p>`}`);
 
     const shown = missing.slice(0, 20);
-    const b6 = card(`
+    const b6 = missing.length === 0 ? card(`
+      <p class="m-0 text-[13px] leading-relaxed text-[var(--color-text)] font-medium">No critical or high-severity gaps left in your attestation. Now verify it — a scan confirms enforcement across every account, OU, and region.</p>`) : card(`
       <p class="m-0 text-[13px] leading-relaxed text-[var(--color-text)] font-medium">${orgGaps} of your open gaps are org-scope controls. Your self-attested score says what you believe is deployed; a scan should verify whether org-level guardrails are enforced across the intended AWS Organization coverage.</p>
       ${monoHead(`Top missing controls (${missing.length})`)}
       <div class="grid gap-1.5">
