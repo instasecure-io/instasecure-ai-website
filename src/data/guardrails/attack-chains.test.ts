@@ -45,4 +45,16 @@ describe('attack-chains', () => {
     for (const t of LIFECYCLE)
       for (const c of t.controls) check(c.control, c.technique, t.tactic, `lifecycle ${t.tactic}`);
   });
+
+  it('every tactic string (including null-control steps) is a valid ATT&CK v19.1 IaaS tactic', () => {
+    const VALID_TACTICS = new Set([
+      'Initial Access', 'Execution', 'Persistence', 'Privilege Escalation', 'Defense Impairment',
+      'Stealth', 'Credential Access', 'Discovery', 'Lateral Movement', 'Collection', 'Exfiltration', 'Impact',
+    ]);
+    for (const ch of CHAINS)
+      for (const s of ch.steps)
+        expect(VALID_TACTICS.has(s.tactic), `chain ${ch.id} step "${s.label}" has unknown tactic ${s.tactic}`).toBe(true);
+    for (const t of LIFECYCLE)
+      expect(VALID_TACTICS.has(t.tactic), `lifecycle bucket has unknown tactic ${t.tactic}`).toBe(true);
+  });
 });

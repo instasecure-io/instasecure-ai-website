@@ -7,9 +7,8 @@
 //   overlay: human_edits[field].human_value
 //   gate:    attack/tactics only when attack_review_status ∈ {approved, edited}
 // Usage: node scripts/generate-guardrails-controls.mjs --kb-path /path/to/control-knowledge-base
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { execSync } from 'node:child_process';
 
 const args = process.argv.slice(2);
 const kbFlag = args.indexOf('--kb-path');
@@ -69,10 +68,35 @@ if (controls.length === 0) {
   process.exit(1);
 }
 
-let shortSha = 'unknown';
-try {
-  shortSha = execSync('git rev-parse --short HEAD', { cwd: kbPath, encoding: 'utf8' }).trim();
-} catch { /* provenance is informational */ }
+function kbShortSha(kbPath) {
+  try {
+    let gitDir = join(kbPath, '.git');
+    if (!statSync(gitDir).isDirectory()) {
+      const gitdirLine = readFileSync(gitDir, 'utf8').trim();
+      if (!gitdirLine.startsWith('gitdir: ')) throw new Error('unrecognized .git file');
+      gitDir = gitdirLine.slice(8);
+    }
+    let head = readFileSync(join(gitDir, 'HEAD'), 'utf8').trim();
+    if (head.startsWith('ref: ')) {
+      const ref = head.slice(5);
+      try {
+        head = readFileSync(join(gitDir, ref), 'utf8').trim();
+      } catch {
+        const packed = readFileSync(join(gitDir, 'packed-refs'), 'utf8');
+        const line = packed.split('\n').find(l => !l.startsWith('#') && l.endsWith(' ' + ref));
+        if (!line) throw new Error(`ref ${ref} not found in packed-refs`);
+        head = line.split(' ')[0];
+      }
+    }
+    if (!/^[0-9a-f]{40}$/.test(head)) throw new Error(`unresolvable HEAD: ${head}`);
+    return head.slice(0, 7);
+  } catch (e) {
+    console.error(`error: cannot resolve KB git HEAD (${e.message}) — refusing to write without provenance`);
+    process.exit(1);
+  }
+}
+
+const shortSha = kbShortSha(kbPath);
 
 const header = `// src/data/guardrails/controls.ts
 // GENERATED from instasecure-io/control-knowledge-base @ ${shortSha} by scripts/generate-guardrails-controls.mjs — do not hand-edit.

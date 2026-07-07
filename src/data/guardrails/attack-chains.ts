@@ -3,9 +3,9 @@
 // playbooks). Actors/chains/lifecycle are shared across users; per-user open/closed status is
 // computed at render time from the attested set (see assess.ts).
 //
-// ⚠️ Interim MITRE mapping — the `technique`/`tactic` values here are the proposed mapping.
-// Swap them for the control catalog's `attack[]` field when the classification propagates.
-// This file is the single swap point.
+// Technique/tactic values are locked to the control catalog's ATT&CK v19.1 `attack[]`/`tactics[]`
+// fields (see the cross-integrity test); controls.ts is the source of truth for any control-bearing
+// entry.
 
 export type Sev = 'critical' | 'high' | 'medium' | 'low';
 
@@ -90,7 +90,7 @@ export const CHAINS: { id: string; steps: PlaybookStep[] }[] = [
       { label: 'Backdoor the identity provider', api: 'modify federation trust + register rogue MFA', technique: 'T1556', techniqueName: 'Modify Authentication Process', tactic: 'Persistence', control: 'IS-IAM-PV-6', controlName: 'Restrict modifications to identity provider trust configurations', sev: 'critical' },
       { label: 'Swap the instance role', api: 'ReplaceIamInstanceProfileAssociation', technique: 'T1098.003', techniqueName: 'Account Manipulation: Additional Cloud Roles', tactic: 'Privilege Escalation', control: null, controlName: null, sev: null },
       { label: 'Blind the sensors', api: 'DeleteTrail / StopLogging; GuardDuty DeleteDetector / DisassociateFromMasterAccount', technique: 'T1685', techniqueName: 'Disable or Modify Tools', tactic: 'Defense Impairment', control: 'IS-GUARDDUTY-PV-1', controlName: 'Deny disabling Amazon GuardDuty or modifying its configuration', sev: 'critical' },
-      { label: 'Open a serial backdoor', api: 'EnableSerialConsoleAccess + SendSerialConsoleSSHPublicKey', technique: 'T1563', techniqueName: 'Remote Service Session Hijacking', tactic: 'Defense Evasion', control: null, controlName: null, sev: null },
+      { label: 'Open a serial backdoor', api: 'EnableSerialConsoleAccess + SendSerialConsoleSSHPublicKey', technique: 'T1563', techniqueName: 'Remote Service Session Hijacking', tactic: 'Lateral Movement', control: null, controlName: null, sev: null },
       { label: 'Exfil to their own account', api: 'S3 Browser → adversary S3; RDS/DynamoDB', technique: 'T1537', techniqueName: 'Transfer Data to Cloud Account', tactic: 'Exfiltration', control: 'IS-PERIMETER-PV-9', controlName: 'Resource perimeter — restrict org principals to trusted resources', sev: 'high' },
     ],
   },

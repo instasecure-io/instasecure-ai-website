@@ -423,7 +423,7 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
           <p style="margin:0;font-size:12.5px;line-height:1.55;color:${GR.muted};text-wrap:pretty">The full MITRE tactic progression. Each stage shows the charted preventive controls that break attacks there — thin stages are where exposure concentrates.<span class="gr-hint-screen"> Select a stage to see its controls.</span></p>
           <div class="gr-lc-grid">${gridCells}</div>
           ${detail}
-          <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">${mappedN} of 11 stages are mapped today; unmapped stages fill in as the 122-control MITRE classification lands.</p>
+          <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">${mappedN} of 11 stages carry charted preventive controls from the ATT&amp;CK v19.1 catalog — stages without one are detection territory.</p>
         </div>`;
       return grSection('02', 'Attack-lifecycle coverage', '', inner, 'gr-attack');
     };
