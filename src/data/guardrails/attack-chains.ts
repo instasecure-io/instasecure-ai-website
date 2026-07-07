@@ -84,12 +84,12 @@ export const CHAINS: { id: string; steps: PlaybookStep[] }[] = [
     id: 'scattered-spider',
     steps: [
       { label: 'Ride a valid identity in', api: 'valid creds + MFA bypass (SIM-swap, push-fatigue, AiTM)', technique: 'T1078.004', techniqueName: 'Valid Accounts: Cloud Accounts', tactic: 'Initial Access', control: 'IS-PERIMETER-PV-16', controlName: 'Restrict IAM user credentials to trusted networks', sev: 'high' },
-      { label: 'Harvest secrets', api: 'SecretsManager / Terraform via CloudShell', technique: 'T1552.005', techniqueName: 'Cloud Instance Metadata / secrets', tactic: 'Credential Access', control: 'IS-PERIMETER-PV-1', controlName: 'Identity perimeter — deny non-org principals on org resources', sev: 'high', partial: true },
+      { label: 'Harvest secrets', api: 'SecretsManager / Terraform via CloudShell', technique: 'T1537', techniqueName: 'Transfer Data to Cloud Account', tactic: 'Exfiltration', control: 'IS-PERIMETER-PV-1', controlName: 'Identity perimeter — deny non-org principals on org resources', sev: 'high', partial: true },
       { label: 'Enumerate the estate', api: 'SSM AWS-GatherSoftwareInventory, S3 Browser', technique: 'T1526', techniqueName: 'Cloud Service Discovery', tactic: 'Discovery', control: null, controlName: null, sev: null },
       { label: 'Plant IAM persistence', api: 'CreateUser + CreateAccessKey + UpdateLoginProfile', technique: 'T1098.001', techniqueName: 'Account Manipulation: Additional Cloud Credentials', tactic: 'Persistence', control: 'IS-IAM-PV-9', controlName: 'Restrict IAM user lifecycle and credential management to privileged principals', sev: 'high' },
       { label: 'Backdoor the identity provider', api: 'modify federation trust + register rogue MFA', technique: 'T1556', techniqueName: 'Modify Authentication Process', tactic: 'Persistence', control: 'IS-IAM-PV-6', controlName: 'Restrict modifications to identity provider trust configurations', sev: 'critical' },
       { label: 'Swap the instance role', api: 'ReplaceIamInstanceProfileAssociation', technique: 'T1098.003', techniqueName: 'Account Manipulation: Additional Cloud Roles', tactic: 'Privilege Escalation', control: null, controlName: null, sev: null },
-      { label: 'Blind the sensors', api: 'DeleteTrail / StopLogging; GuardDuty DeleteDetector / DisassociateFromMasterAccount', technique: 'T1562.001', techniqueName: 'Impair Defenses', tactic: 'Defense Evasion', control: 'IS-GUARDDUTY-PV-1', controlName: 'Deny disabling Amazon GuardDuty or modifying its configuration', sev: 'critical' },
+      { label: 'Blind the sensors', api: 'DeleteTrail / StopLogging; GuardDuty DeleteDetector / DisassociateFromMasterAccount', technique: 'T1685', techniqueName: 'Disable or Modify Tools', tactic: 'Defense Impairment', control: 'IS-GUARDDUTY-PV-1', controlName: 'Deny disabling Amazon GuardDuty or modifying its configuration', sev: 'critical' },
       { label: 'Open a serial backdoor', api: 'EnableSerialConsoleAccess + SendSerialConsoleSSHPublicKey', technique: 'T1563', techniqueName: 'Remote Service Session Hijacking', tactic: 'Defense Evasion', control: null, controlName: null, sev: null },
       { label: 'Exfil to their own account', api: 'S3 Browser → adversary S3; RDS/DynamoDB', technique: 'T1537', techniqueName: 'Transfer Data to Cloud Account', tactic: 'Exfiltration', control: 'IS-PERIMETER-PV-9', controlName: 'Resource perimeter — restrict org principals to trusted resources', sev: 'high' },
     ],
@@ -105,7 +105,7 @@ export const CHAINS: { id: string; steps: PlaybookStep[] }[] = [
   {
     id: 'scarleteel',
     steps: [
-      { label: 'Disable CloudTrail', api: 'StopLogging + --endpoint-url dodge', technique: 'T1562.008', techniqueName: 'Impair Defenses: Disable or Modify Cloud Logs', tactic: 'Defense Evasion', control: 'IS-CT-PV-1', controlName: 'Disallow configuration changes to AWS CloudTrail trails', sev: 'critical' },
+      { label: 'Disable CloudTrail', api: 'StopLogging + --endpoint-url dodge', technique: 'T1685.002', techniqueName: 'Disable or Modify Cloud Log', tactic: 'Defense Impairment', control: 'IS-CT-PV-1', controlName: 'Disallow configuration changes to AWS CloudTrail trails', sev: 'critical' },
       { label: 'Copy data cross-account', api: 'instance-role → foreign S3', technique: 'T1537', techniqueName: 'Transfer Data to Cloud Account', tactic: 'Exfiltration', control: 'IS-PERIMETER-PV-9', controlName: 'Resource perimeter — restrict org principals to trusted resources', sev: 'high' },
       { label: 'Spin up mining compute', api: 'GPU instances in unused region', technique: 'T1496', techniqueName: 'Resource Hijacking', tactic: 'Impact', control: 'IS-REGION-PV-1', controlName: 'Deny actions outside approved AWS Regions', sev: 'medium' },
     ],
@@ -124,25 +124,24 @@ export const LIFECYCLE: LifecycleTactic[] = [
     { control: 'IS-IAM-PV-9', controlName: 'Restrict IAM user lifecycle and credential management to privileged principals', technique: 'T1098.001' },
     { control: 'IS-IAM-PV-6', controlName: 'Restrict modifications to identity provider trust configurations', technique: 'T1556' },
     { control: 'IS-IAM-PV-12', controlName: 'Disallow creation or modification of IAM SAML/OIDC federation providers', technique: 'T1556' },
+    { control: 'IS-BEDROCK-PV-3', controlName: 'Disallow Amazon Bedrock invocations using long-term API keys', technique: 'T1078.004' },
   ] },
   { tactic: 'Privilege Escalation', populated: true, controls: [
     { control: 'IS-IAM-PV-10', controlName: 'Protect designated privileged IAM roles from modification or assumption', technique: 'T1098.003' },
-    { control: 'IS-IAM-PV-5', controlName: 'Prevent root credentials management in member accounts', technique: 'T1078' },
+    { control: 'IS-IAM-PV-5', controlName: 'Prevent root credentials management in member accounts', technique: 'T1078.004' },
   ] },
-  { tactic: 'Defense Evasion', populated: true, controls: [
-    { control: 'IS-CT-PV-1', controlName: 'Disallow configuration changes to AWS CloudTrail trails', technique: 'T1562.008' },
-    { control: 'IS-GUARDDUTY-PV-1', controlName: 'Deny disabling Amazon GuardDuty or modifying its configuration', technique: 'T1562.001' },
-    { control: 'IS-ORG-PV-1', controlName: 'Deny member accounts from leaving the AWS Organization', technique: 'T1562' },
+  { tactic: 'Defense Impairment', populated: true, controls: [
+    { control: 'IS-CT-PV-1', controlName: 'Disallow configuration changes to AWS CloudTrail trails', technique: 'T1685.002' },
+    { control: 'IS-GUARDDUTY-PV-1', controlName: 'Deny disabling Amazon GuardDuty or modifying its configuration', technique: 'T1685' },
+    { control: 'IS-ORG-PV-1', controlName: 'Deny member accounts from leaving the AWS Organization', technique: 'T1666' },
   ] },
-  { tactic: 'Credential Access', populated: true, controls: [
-    { control: 'IS-BEDROCK-PV-3', controlName: 'Disallow Amazon Bedrock invocations using long-term API keys', technique: 'T1552' },
-  ] },
+  { tactic: 'Credential Access', populated: false, controls: [] },
   { tactic: 'Discovery', populated: false, controls: [] },
   { tactic: 'Lateral Movement', populated: false, controls: [] },
   { tactic: 'Collection', populated: false, controls: [] },
   { tactic: 'Exfiltration', populated: true, controls: [
     { control: 'IS-PERIMETER-PV-9', controlName: 'Resource perimeter — restrict org principals to trusted resources', technique: 'T1537' },
-    { control: 'IS-PERIMETER-PV-12', controlName: 'Prevent service-issued S3 presigned URLs that bypass the network perimeter', technique: 'T1567' },
+    { control: 'IS-PERIMETER-PV-12', controlName: 'Prevent service-issued S3 presigned URLs that bypass the network perimeter', technique: 'T1048' },
     { control: 'IS-RAM-PV-1', controlName: 'Deny AWS RAM resource shares to external accounts', technique: 'T1537' },
     { control: 'IS-EC2-PV-3', controlName: 'Disallow public sharing of EBS snapshots', technique: 'T1537' },
   ] },
