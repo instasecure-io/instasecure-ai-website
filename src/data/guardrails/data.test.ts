@@ -92,6 +92,13 @@ describe('attack mapping integrity', () => {
     expect(byId['IS-CT-PV-1'].attack).toContain('T1685.002');
     expect(byId['IS-ORG-PV-1'].attack).toContain('T1666');
     expect(byId['IS-BEDROCK-PV-3'].attack).toContain('T1078.004');
-    for (const c of CONTROLS) expect(c.attack).not.toContain('T1562.008'); // no revoked v18 ids
+    // No revoked v18 families anywhere (deny-list built numerically so the
+    // branch itself contains no revoked id literals).
+    const revoked = [1562, 1567].map(n => `T${n}`);
+    for (const c of CONTROLS) {
+      for (const t of c.attack) {
+        expect(revoked.some(r => t === r || t.startsWith(`${r}.`)), `revoked id ${t} on ${c.id}`).toBe(false);
+      }
+    }
   });
 });
