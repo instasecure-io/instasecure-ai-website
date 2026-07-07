@@ -57,3 +57,41 @@ describe('guardrails assessment data integrity', () => {
     expect(CONTROLS.filter(c => c.tags.includes('audit-tampering')).length).toBeGreaterThan(0);
   });
 });
+
+describe('attack mapping integrity', () => {
+  const TECH_RE = /^T\d{4}(\.\d{3})?$/;
+  const IAAS_TACTICS = new Set([
+    'Initial Access', 'Execution', 'Persistence', 'Privilege Escalation',
+    'Defense Impairment', 'Stealth', 'Credential Access', 'Discovery',
+    'Lateral Movement', 'Collection', 'Exfiltration', 'Impact',
+  ]);
+
+  it('still has exactly 122 controls after regeneration', () => {
+    expect(CONTROLS).toHaveLength(122);
+  });
+
+  it('every attack id is a v19-shaped technique id', () => {
+    for (const c of CONTROLS) for (const t of c.attack) {
+      expect(t, `bad technique ${t} on ${c.id}`).toMatch(TECH_RE);
+    }
+  });
+
+  it('tactics are non-empty iff attack is non-empty, and drawn from the 12 IaaS tactics', () => {
+    for (const c of CONTROLS) {
+      expect(c.tactics.length > 0, `tactic/technique mismatch on ${c.id}`).toBe(c.attack.length > 0);
+      for (const t of c.tactics) expect(IAAS_TACTICS.has(t), `unknown tactic ${t} on ${c.id}`).toBe(true);
+    }
+  });
+
+  it('attack data actually flowed (attestation gate open)', () => {
+    expect(CONTROLS.filter(c => c.attack.length > 0).length).toBeGreaterThanOrEqual(100);
+  });
+
+  it('spot checks match the catalog adjudications', () => {
+    const byId = Object.fromEntries(CONTROLS.map(c => [c.id, c]));
+    expect(byId['IS-CT-PV-1'].attack).toContain('T1685.002');
+    expect(byId['IS-ORG-PV-1'].attack).toContain('T1666');
+    expect(byId['IS-BEDROCK-PV-3'].attack).toContain('T1078.004');
+    for (const c of CONTROLS) expect(c.attack).not.toContain('T1562.008'); // no revoked v18 ids
+  });
+});
