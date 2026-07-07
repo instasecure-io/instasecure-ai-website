@@ -1,4 +1,6 @@
 // Pure assessment logic — no DOM, no localStorage, no Date.now (now is injected).
+import type { PlaybookStep, LifecycleTactic } from '@/data/guardrails/attack-chains';
+
 export const SEV_WEIGHT: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
 
 export interface AssessControl {
@@ -106,4 +108,123 @@ export function auditTamperGaps(have: ReadonlySet<string>, auditTamperIds: strin
 
 export function orgScopeGapCount(have: ReadonlySet<string>, controls: AssessControl[]): number {
   return controls.filter(c => c.scope === 'org' && !have.has(c.id)).length;
+}
+
+// ---------- attack sections (§2 lifecycle + §3 playbooks) ----------
+export type AttackState = 'closed' | 'open' | 'no-control';
+
+export function stepState(have: ReadonlySet<string>, control: string | null): AttackState {
+  if (control === null) return 'no-control';
+  return have.has(control) ? 'closed' : 'open';
+}
+
+export interface LifecycleCell {
+  tactic: string;
+  populated: boolean;
+  total: number;
+  closed: number;
+  controls: { control: string; controlName: string; technique: string; state: 'closed' | 'open' }[];
+}
+
+export function lifecycleView(have: ReadonlySet<string>, lifecycle: LifecycleTactic[]): LifecycleCell[] {
+  return lifecycle.map(t => {
+    const controls = t.controls.map(c => ({
+      ...c,
+      state: (have.has(c.control) ? 'closed' : 'open') as 'closed' | 'open',
+    }));
+    return {
+      tactic: t.tactic,
+      populated: t.populated,
+      total: controls.length,
+      closed: controls.filter(c => c.state === 'closed').length,
+      controls,
+    };
+  });
+}
+
+export interface PlaybookNode extends PlaybookStep {
+  state: AttackState;
+  scenario: { title: string; explain: string } | null;
+}
+export interface PlaybookView {
+  id: string;
+  steps: PlaybookNode[];
+  openLinks: number;
+  detectionOnly: number;
+  tacticsCount: number;
+}
+
+export function playbookView(
+  have: ReadonlySet<string>,
+  chains: { id: string; steps: PlaybookStep[] }[],
+  storyMap: Record<string, { title: string; explain: string }>,
+): PlaybookView[] {
+  return chains.map(ch => {
+    const steps: PlaybookNode[] = ch.steps.map(s => ({
+      ...s,
+      state: stepState(have, s.control),
+      scenario: s.control ? storyMap[s.control] ?? null : null,
+    }));
+    return {
+      id: ch.id,
+      steps,
+      openLinks: steps.filter(s => s.state === 'open').length,
+      detectionOnly: steps.filter(s => s.state === 'no-control').length,
+      tacticsCount: new Set(ch.steps.map(s => s.tactic)).size,
+    };
+  });
+}
+
+export interface AttackCompleteness {
+  techniques: number;
+  openTechniques: number;
+  openTactics: number;
+  detectionOnly: number;
+}
+
+export function attackCompleteness(
+  have: ReadonlySet<string>,
+  chains: { id: string; steps: PlaybookStep[] }[],
+  lifecycle: LifecycleTactic[],
+): AttackCompleteness {
+  const techniques = new Set<string>();
+  const openTechniques = new Set<string>();
+  const openTactics = new Set<string>();
+  const consider = (technique: string, tactic: string, control: string | null) => {
+    techniques.add(technique);
+    if (control !== null && !have.has(control)) {
+      openTechniques.add(technique);
+      openTactics.add(tactic);
+    }
+  };
+  for (const t of lifecycle) for (const c of t.controls) consider(c.technique, t.tactic, c.control);
+  let detectionOnly = 0;
+  for (const ch of chains)
+    for (const s of ch.steps) {
+      consider(s.technique, s.tactic, s.control);
+      if (s.control === null) detectionOnly++;
+    }
+  return {
+    techniques: techniques.size,
+    openTechniques: openTechniques.size,
+    openTactics: openTactics.size,
+    detectionOnly,
+  };
+}
+
+export function sharedOpenGaps(
+  have: ReadonlySet<string>,
+  chains: { id: string; steps: PlaybookStep[] }[],
+): Record<string, number> {
+  const perControl: Record<string, Set<string>> = {};
+  for (const ch of chains) {
+    for (const s of ch.steps) {
+      if (s.control && !have.has(s.control)) {
+        (perControl[s.control] ??= new Set<string>()).add(ch.id);
+      }
+    }
+  }
+  const out: Record<string, number> = {};
+  for (const [ctrl, set] of Object.entries(perControl)) if (set.size >= 2) out[ctrl] = set.size;
+  return out;
 }
