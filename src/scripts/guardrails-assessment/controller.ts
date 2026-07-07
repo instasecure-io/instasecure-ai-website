@@ -792,6 +792,8 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const t = e.target instanceof Element ? e.target : null;
+    // links inside story rows navigate natively (mirrors the click path)
+    if (t?.closest('a[href]')) return;
     const story = t?.closest<HTMLElement>('[data-ga-story]');
     if (story) { e.preventDefault(); toggleSet(state.expandedStories, story.dataset.gaStory!); rerenderReport(); }
   };
