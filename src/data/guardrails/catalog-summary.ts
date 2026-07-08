@@ -3,7 +3,7 @@
 // Per-group counts + severity weights + per-tactic counts drive the *estimate* assessment
 // and the \"…and N more\" framing. The full 122-control catalog (names, policies, mappings)
 // is private IP (src/data/guardrails/controls.ts is gitignored; regenerate from the KB).
-export interface CatalogGroup { count: number; weight: number; mandatory: number }
+export interface CatalogGroup { count: number; weight: number; mandatory: number; crit: number; high: number }
 export interface CatalogSummary {
   total: number;
   groups: Record<string, CatalogGroup>;
@@ -20,42 +20,58 @@ export const CATALOG: CatalogSummary = {
     "security_tooling_tamper_protection": {
       "count": 23,
       "weight": 83,
-      "mandatory": 14
+      "mandatory": 14,
+      "crit": 16,
+      "high": 5
     },
     "identity_and_resource_perimeter": {
       "count": 29,
       "weight": 73,
-      "mandatory": 0
+      "mandatory": 0,
+      "crit": 0,
+      "high": 15
     },
     "network_boundaries": {
       "count": 6,
       "weight": 14,
-      "mandatory": 0
+      "mandatory": 0,
+      "crit": 0,
+      "high": 2
     },
     "backup_and_recovery_integrity": {
       "count": 5,
       "weight": 20,
-      "mandatory": 1
+      "mandatory": 1,
+      "crit": 5,
+      "high": 0
     },
     "identity_and_privilege_hardening": {
       "count": 24,
       "weight": 75,
-      "mandatory": 2
+      "mandatory": 2,
+      "crit": 8,
+      "high": 11
     },
     "resource_tampering_protection": {
       "count": 10,
       "weight": 22,
-      "mandatory": 0
+      "mandatory": 0,
+      "crit": 0,
+      "high": 4
     },
     "data_protection_and_encryption": {
       "count": 17,
       "weight": 53,
-      "mandatory": 0
+      "mandatory": 0,
+      "crit": 4,
+      "high": 11
     },
     "region_and_data_residency": {
       "count": 8,
       "weight": 20,
-      "mandatory": 0
+      "mandatory": 0,
+      "crit": 0,
+      "high": 4
     }
   },
   "phaseWeight": {

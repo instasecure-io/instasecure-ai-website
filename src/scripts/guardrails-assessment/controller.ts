@@ -26,54 +26,18 @@ export interface AssessData {
   storyMap: Record<string, { title: string; explain: string }>;
 }
 
-// v2 key — the model changed from a per-control Set to a per-group level map, so old data is ignored.
-const LEVELS_KEY = 'arena.assess.v2';
+// v2 key — 5-level fractional estimate per group. An ABSENT key means "no estimate yet" (≠ 0:
+// None is an answer, absence is not). Old 4-level data under the previous key is simply ignored.
+const EST_KEY = 'assess.estimates.v2';
 
-const LEVEL_LABELS = ['None', 'Some', 'Most', 'All'];
-
-// Org-profile presets — one click sets all 8 group levels. "clear" empties the map (all level 0).
-const PRESETS: Record<string, { label: string; levels: Record<string, number> }> = {
-  starting: {
-    label: 'Just getting started',
-    levels: {
-      security_tooling_tamper_protection: 1,
-      identity_and_privilege_hardening: 1,
-      region_and_data_residency: 0,
-      network_boundaries: 0,
-      data_protection_and_encryption: 0,
-      resource_tampering_protection: 0,
-      backup_and_recovery_integrity: 0,
-      identity_and_resource_perimeter: 0,
-    },
-  },
-  foundation: {
-    label: 'Solid foundation',
-    levels: {
-      security_tooling_tamper_protection: 2,
-      identity_and_privilege_hardening: 2,
-      data_protection_and_encryption: 2,
-      region_and_data_residency: 1,
-      network_boundaries: 1,
-      resource_tampering_protection: 1,
-      backup_and_recovery_integrity: 1,
-      identity_and_resource_perimeter: 1,
-    },
-  },
-  advanced: {
-    label: 'Advanced / regulated',
-    levels: {
-      security_tooling_tamper_protection: 3,
-      identity_and_privilege_hardening: 3,
-      data_protection_and_encryption: 3,
-      resource_tampering_protection: 3,
-      backup_and_recovery_integrity: 3,
-      identity_and_resource_perimeter: 3,
-      network_boundaries: 2,
-      region_and_data_residency: 2,
-    },
-  },
-  clear: { label: 'Clear', levels: {} },
-};
+// Segmented estimate options: None/Some/Half/Most/All → fraction of the group's controls enforced.
+const GA_EST_OPTIONS: { v: number; label: string }[] = [
+  { v: 0, label: 'None' },
+  { v: 0.25, label: 'Some' },
+  { v: 0.5, label: 'Half' },
+  { v: 0.75, label: 'Most' },
+  { v: 1, label: 'All' },
+];
 
 // Report palette — the Gap Report is a self-contained "document" with its own darker ink
 // (#0e1230), distinct from the site --color-text. Content-signaling colors are literal hex;
@@ -190,8 +154,6 @@ function infoPop(actor: ActorMeta): string {
   </span>`;
 }
 
-const MONO = 'font-mono uppercase';
-
 // Calm, estimate-framed verdicts — never assert breach.
 const VERDICT_COPY: Record<string, string> = {
   open: 'Early days, by your own estimate — a lot of ground still to cover. The upside: most of it is enforceable org-wide in a single pass.',
@@ -199,15 +161,23 @@ const VERDICT_COPY: Record<string, string> = {
   strong: 'Strong posture, on this estimate. The last stretch is about proof — confirming each guardrail is actually enforced everywhere you think it is.',
 };
 
+// Estimate masthead verdict — shorter than the report's VERDICT_COPY (it's paired with a live
+// sub-line). Calm register, no breach assertions (recast from the handoff's edgier tier lines).
+const GA_TIER_LINE: Record<string, string> = {
+  open: 'Early days, by your estimate — plenty of ground still to cover. Most of it is enforceable org-wide in a single pass.',
+  foundation: 'A solid foundation, on this estimate — the remaining gaps are the ones worth verifying next.',
+  strong: 'Strong posture, on this estimate — the last stretch is proving each guardrail is enforced everywhere.',
+};
+
 export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): () => void {
   const prefersReduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const barTransition = prefersReduced ? '' : 'transition-[width] duration-500 ease-out';
   const catTotal = data.catalog.total;
 
   const state = {
-    levels: readJSON<Record<string, number>>(LEVELS_KEY, {}),
+    estimates: readJSON<Record<string, number>>(EST_KEY, {}),
     view: 'assess' as 'assess' | 'report',
-    // §1/§2 interaction state
+    assessStage: null as string | null,   // §02 lifecycle stage selection (assess view)
+    // §1/§2 interaction state (report view)
     selectedStage: null as string | null,
     expandedStories: new Set<string>(),
     collapsedActors: new Set<string>(
@@ -215,84 +185,234 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
     ),
     openPopover: null as string | null,
   };
-  const persistLevels = () => writeJSON(LEVELS_KEY, state.levels);
-  const levelOf = (key: string): number => state.levels[key] ?? 0;
+  const persistEstimates = () => writeJSON(EST_KEY, state.estimates);
+  // null = "no estimate yet" (key absent); a numeric 0 means the user picked "None".
+  const estOf = (key: string): number | null => {
+    const v = state.estimates[key];
+    return typeof v === 'number' ? v : null;
+  };
 
-  // ---------- assess view (rendered ONCE; targeted updates after) ----------
-  const scoreboardHTML = () => {
-    const cov = estimateCoverage(state.levels, data.catalog, data.phases);
-    return `
-      <div class="bg-white border border-black/5 rounded-2xl p-5 flex gap-5 items-center flex-wrap">
-        ${ringSVG(cov.pct, 92, 9, covColor(cov.pct), 'ga-cov-fill', `
-          <div class="text-center">
-            <div class="text-[22px] font-extrabold text-[var(--color-text)] leading-none"><span id="ga-cov-pct">${Math.round(cov.pct * 100)}</span><span class="text-[12px] font-semibold">%</span></div>
-            <span class="${MONO} tracking-[0.1em] text-[8.5px] text-slate-400">est. coverage</span>
-          </div>`)}
-        <div class="flex-1 min-w-[260px] grid gap-2">
-          ${cov.perPhase.map(p => `
-            <div class="flex items-center gap-2.5">
-              <span class="${MONO} text-[10px] w-5 flex-none" style="color:${p.color}">0${p.n}</span>
-              <span class="text-[12.5px] font-semibold text-slate-600 w-[190px] flex-none">${esc(p.name)}</span>
-              <div class="flex-1 h-[7px] rounded-full bg-[#eef1fb] overflow-hidden">
-                <div data-phase-fill="${p.n}" class="h-full rounded-full ${barTransition}" style="width:${p.pct * 100}%;background:${p.color}"></div>
-              </div>
-              <span data-phase-pct="${p.n}" class="${MONO} text-[10px] text-slate-400 w-[34px] text-right flex-none">${Math.round(p.pct * 100)}%</span>
-            </div>`).join('')}
+  // ---------- assess view: one gr-sheet document (masthead → §01 → §02 → §03) ----------
+  const GA_TIER_RING: Record<string, string> = { open: GR.amber, foundation: GR.brand, strong: GR.green };
+  const gaPctTone = (pct: number | null): string =>
+    pct === null ? GR.faint : pct >= 75 ? tone(GR.green) : pct >= 25 ? tone(GR.amber) : tone(GR.red);
+  const gaScore = () => estimateCoverage(state.estimates, data.catalog, data.phases);
+  const gaSubStarted = (s: ReturnType<typeof gaScore>): string =>
+    `<strong style="color:${GR.ink}">${s.answered} of ${s.groupsTotal}</strong> groups estimated · roughly <strong style="color:${GR.ink}">${s.expected} of ${s.controlsTotal}</strong> controls enforced, severity-weighted.`;
+  const GA_SUB_EMPTY = `Severity does the ranking — a critical control counts <strong style="color:${GR.ink}">4×</strong> a low one, so even a rough estimate orders your gaps honestly.`;
+  const GA_VERDICT_EMPTY = 'Work through the eight groups below — the ring fills in as you estimate.';
+
+  // §02 projection — a representative control's rail state comes from its GROUP estimate (public
+  // data only; a control missing from the sample degrades to ghost, never throws).
+  const repById = new Map(data.representative.map(c => [c.id, c] as const));
+  const railStateFor = (controlId: string): { state: 'closed' | 'part' | 'open' | 'ghost'; est: number | null; group: string } => {
+    const groupKey = repById.get(controlId)?.group;
+    const short = groupKey ? (data.groups[groupKey]?.short ?? groupKey) : '—';
+    const e = groupKey ? estOf(groupKey) : null;
+    if (e === null) return { state: 'ghost', est: null, group: short };
+    return { state: e >= 0.75 ? 'closed' : e >= 0.25 ? 'part' : 'open', est: e, group: short };
+  };
+  type LcControl = LifecycleTactic['controls'][number] & { state: 'closed' | 'part' | 'open' | 'ghost'; est: number | null; group: string };
+  type LcRow = Omit<LifecycleTactic, 'controls'> & { controls: LcControl[]; pct: number | null };
+  const gaLifecycle = (): LcRow[] => data.lifecycle.map(row => {
+    if (!row.populated) return { ...row, controls: [], pct: null };
+    const controls: LcControl[] = row.controls.map(c => ({ ...c, ...railStateFor(c.control) }));
+    const known = controls.filter(c => c.est !== null);
+    const pct = known.length ? Math.round((known.reduce((s, c) => s + (c.est as number), 0) / known.length) * 100) : null;
+    return { ...row, controls, pct };
+  });
+
+  // -- masthead --
+  const mastheadHTML = (): string => {
+    const s = gaScore();
+    const started = s.answered > 0;
+    const pctInt = Math.round(s.pct * 100);
+    const tier = verdictTier(s.pct);
+    const dateLabel = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const ringInner = `<div style="display:grid;gap:2px;justify-items:center">
+      <span id="ga-m-num" style="font-family:var(--font-serif);font-size:38px;font-weight:600;color:${started ? GR.ink : GR.faint};line-height:1">${started ? `${pctInt}<span style="font-size:20px">%</span>` : '—'}</span>
+      ${grMono('Coverage', { size: 9.5, color: GR.muted, ls: '0.14em' })}
+    </div>`;
+    const phaseBars = s.perPhase.map(p => {
+      const answered = p.answered > 0;
+      const pInt = Math.round(p.pct * 100);
+      return `<div style="flex:1;display:grid;gap:6px;justify-items:center;min-width:72px">
+        <span data-ga-phlabel="${p.n}" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em;text-transform:uppercase;font-weight:600;color:${answered ? GR.ink : GR.faint};font-variant-numeric:tabular-nums">${answered ? `${pInt}%` : '—'}</span>
+        <div style="width:100%;max-width:54px;height:64px;border-radius:8px;background:${GR.track};position:relative;overflow:hidden">
+          <div data-ga-phfill="${p.n}" class="ga-phbar-fill" style="position:absolute;bottom:0;left:0;right:0;height:${pInt}%;background:${p.color};border-radius:${pInt === 100 ? '8px' : '0 0 8px 8px'}"></div>
         </div>
-        <div class="grid gap-2 justify-items-center">
-          <button id="ga-open-report" class="px-5 py-2.5 rounded-full bg-[var(--color-text)] text-white font-bold text-[14px] hover:opacity-90 transition cursor-pointer">View gap report</button>
-          <button id="ga-reset" class="text-[12px] text-slate-400 underline cursor-pointer bg-transparent border-0">Reset</button>
+        <div style="display:grid;gap:1px;justify-items:center">
+          ${grMono(`Phase ${p.n}`, { size: 9.5, color: p.color, ls: '0.1em', weight: 600 })}
+          <span style="font-size:10.5px;color:${GR.muted};text-align:center">${esc(p.name)}</span>
         </div>
       </div>`;
-  };
-
-  const leadHTML = `<p class="text-[14px] leading-relaxed text-slate-600 max-w-[680px]">Estimate how much of each guardrail group your org enforces today — this is a rough self-estimate. For a precise, control-by-control assessment of your actual AWS environment, <a href="/contact" class="text-[var(--color-brand)] font-semibold">talk to us</a>.</p>`;
-
-  const presetsHTML = () => `
-    <div class="grid gap-2.5">
-      <span class="${MONO} tracking-[0.14em] text-[11px] text-slate-500">Start from a profile</span>
-      <div class="flex flex-wrap gap-2">
-        ${Object.entries(PRESETS).map(([key, p]) => `<button type="button" data-ga-preset="${key}" class="px-3.5 py-2 rounded-full border border-black/10 bg-white text-[12.5px] font-semibold text-slate-600 hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] transition cursor-pointer">${esc(p.label)}</button>`).join('')}
-      </div>
-    </div>`;
-
-  const segInner = (key: string): string => {
-    const lvl = levelOf(key);
-    return LEVEL_LABELS.map((lab, n) => {
-      const on = lvl === n;
-      return `<button type="button" data-ga-level="${key}:${n}" aria-pressed="${on}" class="px-3.5 py-1.5 rounded-full text-[12px] font-semibold cursor-pointer transition ${on ? 'bg-[var(--color-text)] text-white shadow-sm' : 'text-slate-500 hover:text-[var(--color-text)]'}">${lab}</button>`;
     }).join('');
+    return `<header class="gr-masthead" style="display:grid;gap:26px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:9px">${lockMark(22)}${grMono('Instasecure', { size: 12, color: GR.ink, ls: '0.2em', weight: 600 })}</div>
+        <span style="padding:5px 12px;border-radius:6px;border:1.5px solid ${GR.amber};background:${GR.amber}0d">${grMono('Self-estimate', { size: 10.5, color: '#b26a0f', ls: '0.16em', weight: 600 })}</span>
+      </div>
+      <div style="display:grid;gap:10px">
+        ${grMono(`Guardrails assessment · ${esc(dateLabel)}`, { size: 11.5, color: GR.brand, ls: '0.2em', weight: 600 })}
+        <h1 style="margin:0;font-family:var(--font-serif);font-size:clamp(33px,5vw,42px);font-weight:600;letter-spacing:-0.02em;line-height:1.08;color:${GR.ink}">122 guardrails. How many do you actually have enforced?</h1>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:${GR.body};text-wrap:pretty;max-width:640px">Estimate how much of each guardrail group your org enforces today — a rough self-estimate, weighted by severity — and see it mapped across the attack lifecycle. For a precise, control-by-control assessment of your AWS environment, <a href="/contact" style="color:${GR.brand};font-weight:600">talk to us</a>.</p>
+      </div>
+      <div class="gr-verdict" style="display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;padding-top:6px">
+        ${ringSVG(started ? s.pct : 0, 132, 11, started ? GA_TIER_RING[tier] : GR.faint, 'ga-m-ring', ringInner)}
+        <div style="display:grid;gap:10px">
+          <p id="ga-m-verdict" style="margin:0;font-family:var(--font-serif);font-size:20px;line-height:1.45;color:${GR.ink};text-wrap:pretty">${started ? GA_TIER_LINE[tier] : GA_VERDICT_EMPTY}</p>
+          <p id="ga-m-sub" style="margin:0;font-size:14px;line-height:1.6;color:${GR.body};text-wrap:pretty">${started ? gaSubStarted(s) : GA_SUB_EMPTY}</p>
+        </div>
+      </div>
+      <div style="display:grid;gap:12px;padding-top:4px">
+        ${grMono('Coverage by phase', { size: 10.5, color: GR.muted, ls: '0.16em', weight: 600 })}
+        <div class="gr-phasechart" style="display:flex;gap:14px;align-items:flex-end">${phaseBars}</div>
+      </div>
+    </header>`;
   };
 
-  const slidersHTML = () => data.phases.map(p => `
-    <section class="border border-black/5 rounded-2xl bg-white overflow-hidden">
-      <div class="px-[18px] py-3 flex items-center gap-3 border-b border-[#f0f2fa]" style="background:${p.color}08">
-        <span class="${MONO} tracking-[0.14em] text-[11px]" style="color:${p.color}">Phase 0${p.n}</span>
-        <span class="font-bold text-[15px] text-[var(--color-text)]">${esc(p.name)}</span>
-      </div>
-      ${p.groups.map(key => {
+  // -- §01 estimate your coverage --
+  const segHTML = (key: string): string => {
+    const cur = estOf(key);
+    return GA_EST_OPTIONS.map(o => `<button type="button" data-ga-est="${key}:${o.v}" aria-pressed="${cur === o.v}">${o.label}</button>`).join('');
+  };
+  const estimateSectionHTML = (): string => {
+    const s = gaScore();
+    const reset = `<button type="button" id="ga-reset" class="ga-reset" style="display:${s.answered > 0 ? 'inline-block' : 'none'}">Reset estimates</button>`;
+    const cards = data.phases.map(p => {
+      const ps = s.perPhase.find(x => x.n === p.n)!;
+      const answered = ps.answered > 0;
+      const pInt = Math.round(ps.pct * 100);
+      const rows = p.groups.map(key => {
         const g = data.groups[key];
-        const count = data.catalog.groups[key]?.count ?? 0;
-        return `
-          <div class="border-b border-[#f0f2fa] last:border-b-0 px-[18px] py-3.5 grid gap-2.5">
-            <div class="flex items-baseline gap-2.5 flex-wrap">
-              <span class="font-semibold text-[14px] text-[var(--color-text)]">${esc(g ? g.label : key)}</span>
-              <span class="${MONO} tracking-[0.1em] text-[10px] text-slate-400">${count} guardrails</span>
+        const cg = data.catalog.groups[key];
+        const meta = [`${cg?.count ?? 0} controls`, cg?.crit ? `${cg.crit} critical` : null, cg?.high ? `${cg.high} high` : null].filter(Boolean).join(' · ');
+        return `<div class="ga-grow">
+          <div style="display:grid;gap:3px;min-width:0">
+            <div class="ga-grow-head"><span class="ga-grow-name">${esc(g ? g.label : key)}</span><span class="ga-grow-meta">${esc(meta)}</span></div>
+            ${g ? `<p class="ga-grow-blurb">${esc(g.blurb)}</p>` : ''}
+          </div>
+          <div class="ga-seg" data-ga-seg="${key}" role="group" aria-label="Estimate for ${esc(g ? g.label : key)}">${segHTML(key)}</div>
+        </div>`;
+      }).join('');
+      return `<section class="ga-phase" aria-label="Phase ${p.n} — ${esc(p.name)}">
+        <div class="ga-phead">
+          ${grMono(`Phase 0${p.n}`, { size: 10, color: p.color, ls: '0.12em', weight: 600 })}
+          <span class="ga-phead-name">${esc(p.name)}</span>
+          <span class="ga-phead-pct" data-ga-phpct="${p.n}" style="color:${answered ? gaPctTone(pInt) : GR.faint}">${answered ? `${pInt}%` : '—'}</span>
+        </div>
+        ${rows}
+      </section>`;
+    }).join('');
+    const intro = `<p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">Enforced means a deny actually in place today — not “on the roadmap.” Rough is fine; the severity weighting handles the rest.</p>`;
+    return grSection('01', 'Estimate your coverage', reset, `${intro}<div style="display:grid;gap:12px">${cards}</div>`);
+  };
+
+  // -- §02 across the attack lifecycle (estimate-colored walls, percent labels) --
+  const lifecycleSectionHTML = (): string => {
+    const rows = gaLifecycle();
+    const mappedN = rows.filter(r => r.populated).length;
+    const maxCount = Math.max(1, ...rows.map(r => r.controls.length));
+    const unit = Math.max(2, Math.min(13, Math.floor(53 / maxCount)));
+    const railH = unit >= 6 ? unit - 3 : unit;
+    const wallH = 23 + maxCount * unit;
+    const order: Record<string, number> = { open: 0, part: 1, closed: 2, ghost: 3 };
+    const legend = `<div class="gr-legend">${([['is-closed', 'Likely enforced (≥75%)'], ['is-part', 'Partial (25–75%)'], ['is-open', 'Likely open (<25%)'], ['is-ghost', 'No estimate yet']] as const)
+      .map(([cls, label]) => `<span class="gr-leg-item"><span class="gr-lcp-rail ${cls}" style="width:14px;height:8px;--rail:8px"></span>${label}</span>`).join('')}</div>`;
+    const cells = rows.map((row, i) => {
+      const idx = String(i + 1).padStart(2, '0');
+      if (!row.populated) {
+        return `<div class="gr-lcp-cell is-tbd" title="${esc(row.tactic)} — control mapping in progress">
+          <span class="gr-lcp-wall"><span class="gr-lcp-rail is-ghost"></span></span>
+          <span class="gr-lcp-nodestrip"><span class="gr-lcp-node is-tbd"></span></span>
+          <span class="gr-lcp-meta"><span class="gr-lcp-idx">${idx}</span><span class="gr-lcp-tactic is-tbd">${esc(row.tactic)}</span></span>
+        </div>`;
+      }
+      const sel = state.assessStage === row.tactic;
+      const rails = [...row.controls].sort((a, b) => order[a.state] - order[b.state])
+        .map(c => `<span class="gr-lcp-rail is-${c.state}" style="--rail:${railH}px" title="${esc(c.controlName)} — ${c.est === null ? esc(c.group) + ': no estimate' : esc(c.group) + ' estimated at ' + Math.round(c.est * 100) + '%'}"></span>`).join('');
+      return `<button type="button" class="gr-lcp-cell${sel ? ' is-sel' : ''}" data-ga-astage="${esc(row.tactic)}" aria-pressed="${sel}" title="${esc(row.tactic)}${row.pct === null ? ' — no estimate yet' : ` — estimated ${row.pct}% of charted controls enforced`}">
+        <span class="gr-lcp-wall">
+          <span class="gr-lcp-ratio" style="color:${gaPctTone(row.pct)}">${row.pct === null ? '—' : `${row.pct}%`}</span>
+          ${rails}
+        </span>
+        <span class="gr-lcp-nodestrip"><span class="gr-lcp-node"></span></span>
+        <span class="gr-lcp-meta"><span class="gr-lcp-idx">${idx}</span><span class="gr-lcp-tactic">${esc(row.tactic)}</span></span>
+      </button>`;
+    }).join('');
+    let detail = '';
+    const selRow = rows.find(r => r.tactic === state.assessStage && r.populated);
+    if (selRow) {
+      const detailRows = selRow.controls.map(c => {
+        const open = c.state === 'open';
+        const estPct = c.est === null ? null : Math.round(c.est * 100);
+        return `<div class="gr-vstep${open ? ' is-open' : ''}${c.state === 'ghost' ? ' is-nc' : ''}">
+          <span class="gr-vnode"><span class="ga-railchip is-${c.state}"></span></span>
+          <div class="gr-vbody">
+            <div class="gr-vrow1">
+              <span class="gr-vlabel" style="color:${open ? GR.ink : GR.body};font-weight:${open ? 600 : 500}">${esc(c.controlName)}</span>
+              <span class="gr-vctl" style="color:${gaPctTone(estPct)}">${esc(c.group)} · ${estPct === null ? 'no estimate' : `${estPct}%`}</span>
             </div>
-            ${g ? `<p class="text-[12.5px] leading-relaxed text-slate-500 max-w-[560px]">${esc(g.blurb)}</p>` : ''}
-            <div data-ga-seg="${key}" role="group" aria-label="${esc(g ? g.label : key)} coverage level" class="inline-flex flex-wrap gap-0.5 self-start rounded-full border border-black/10 bg-[#f8f9fe] p-0.5">${segInner(key)}</div>
-          </div>`;
-      }).join('')}
-    </section>`).join('');
+            <div class="gr-vrow2"><a class="gr-vtech gr-b2-link" href="${mitreUrl(c.technique)}" target="_blank" rel="noreferrer" style="color:${open ? tone(GR.red) : '#6d7290'}">${esc(c.technique)}</a></div>
+          </div>
+        </div>`;
+      }).join('');
+      detail = `<div class="gr-lc-detail">
+        <div class="gr-lc-detail-head">
+          ${grMono(esc(selRow.tactic), { size: 10, color: GR.slate, ls: '0.14em', weight: 600 })}
+          ${grMono(selRow.pct === null ? 'No estimate yet' : `Estimated ${selRow.pct}% enforced`, { size: 10, color: GR.faint, ls: '0.06em' })}
+          <button type="button" class="gr-lc-close" aria-label="Close stage detail" data-ga-astage-close>×</button>
+        </div>
+        ${detailRows}
+      </div>`;
+    }
+    const inner = `
+      <div style="display:grid;gap:9px">
+        <p style="margin:0;font-family:var(--font-serif);font-size:18.5px;line-height:1.5;color:${GR.ink};text-wrap:pretty">Where does your estimate leave the attack path open?</p>
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">Every campaign moves left to right through these MITRE ATT&amp;CK stages. Each stage raises a wall of the charted preventive control-plane guardrails that break attacks there, colored by your group estimates — low walls are where exposure concentrates.<span class="gr-hint-screen"> Select a stage to see its controls.</span></p>
+        ${legend}
+      </div>
+      <div style="display:grid;gap:9px">
+        <div class="gr-lcp" style="--gr-wall-h:${wallH}px;--gr-axis-y:${wallH + 15}px">${cells}</div>
+        ${detail}
+        <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">Directional — built from your group estimates, not per-control attestation. ${mappedN} of ${rows.length} stages are mapped today; unmapped stages fill in as the ${catTotal}-control MITRE classification lands.</p>
+      </div>`;
+    return grSection('02', 'Across the attack lifecycle', '', inner, 'gr-attack');
+  };
+
+  // -- §03 handoff to the gap report --
+  const handoffSubHTML = (): string => {
+    const s = gaScore();
+    return s.answered > 0 ? `Built from your ${Math.round(s.pct * 100)}% estimate` : 'Estimate above to build your report';
+  };
+  const handoffSectionHTML = (): string => {
+    const inner = `<div class="gr-close-panel" style="display:grid;gap:20px;padding:28px 30px;border-radius:16px;background:${GR.ink};color:#fff">
+      <p style="margin:0;font-size:14.5px;line-height:1.65;color:#ffffffd9;text-wrap:pretty">Your estimate becomes a gap report: per-phase coverage, the attack chains still open, the compliance evidence queue, and the top missing controls — the same document a real scan produces with verified data.</p>
+      <div class="gr-cta-row" style="display:flex;gap:12px;flex-wrap:wrap;align-items:stretch">
+        <button type="button" id="ga-open-report" class="gr-cta-primary" style="display:grid;gap:2px;padding:12px 22px;border-radius:11px;background:${GR.brand};color:#fff;border:0;text-align:left;cursor:pointer;box-shadow:0 10px 24px -10px #4d66e099">
+          <span style="font-size:14.5px;font-weight:700">Open your gap report</span>
+          <span id="ga-handoff-sub" style="font-size:11.5px;color:#ffffffb3">${handoffSubHTML()}</span>
+        </button>
+        <a href="/contact" class="gr-cta-secondary" style="display:grid;place-content:center;padding:12px 22px;border-radius:11px;background:transparent;border:1px solid #ffffff3d;color:#fff;text-decoration:none;font-size:14px;font-weight:600">Get the precise assessment</a>
+      </div>
+    </div>
+    <div style="display:grid;gap:5px;padding-top:2px">
+      <p style="margin:0;font-size:12px;line-height:1.6;color:${GR.muted}">A self-estimate ≠ enforcement. A real scan verifies every control across every account, OU, and region.</p>
+      <p style="margin:0;font-size:12px;line-height:1.6;color:${GR.muted}">Think you know these controls? <a href="/learn/guardrails-challenge" style="color:${GR.brand};font-weight:600;text-decoration:none">Play the Challenge</a>.</p>
+    </div>`;
+    return grSection('03', 'From estimate to gap report', '', inner);
+  };
 
   const renderAssess = () => {
     root.innerHTML = `
-      <div data-ga-assess class="grid gap-6">
-        ${scoreboardHTML()}
-        <div class="grid gap-3.5">
-          ${leadHTML}
-          ${presetsHTML()}
-          ${slidersHTML()}
+      <div data-ga-assess>
+        <div style="max-width:920px;margin:0 auto">
+          <article class="gr-sheet" aria-label="Guardrails Assessment">
+            ${mastheadHTML()}
+            ${estimateSectionHTML()}
+            <div data-ga-lc>${lifecycleSectionHTML()}</div>
+            ${handoffSectionHTML()}
+          </article>
         </div>
       </div>
       <div data-ga-report hidden></div>`;
@@ -300,42 +420,70 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
 
   // ---------- targeted updates ----------
   const q = <T extends Element>(sel: string) => root.querySelector<T>(sel);
-  const updateScore = () => {
-    const cov = estimateCoverage(state.levels, data.catalog, data.phases);
-    const fill = q<SVGCircleElement>('#ga-cov-fill');
-    if (fill) {
-      const r = (92 - 9) / 2, C = 2 * Math.PI * r;
-      fill.setAttribute('stroke-dasharray', `${C * Math.min(1, Math.max(0, cov.pct))} ${C}`);
-      fill.setAttribute('stroke', covColor(cov.pct));
-    }
-    const pctEl = q<HTMLElement>('#ga-cov-pct');
-    if (pctEl) pctEl.textContent = String(Math.round(cov.pct * 100));
-    for (const p of cov.perPhase) {
-      const bar = q<HTMLElement>(`[data-phase-fill="${p.n}"]`);
-      if (bar) bar.style.width = `${p.pct * 100}%`;
-      const txt = q<HTMLElement>(`[data-phase-pct="${p.n}"]`);
-      if (txt) txt.textContent = `${Math.round(p.pct * 100)}%`;
-    }
-  };
   const updateSeg = (key: string) => {
     const seg = q<HTMLElement>(`[data-ga-seg="${key}"]`);
-    if (seg) seg.innerHTML = segInner(key);
+    if (seg) seg.innerHTML = segHTML(key);
   };
-  const updateAllSegs = () => {
-    for (const key of Object.keys(data.groups)) updateSeg(key);
-    updateScore();
+  const updateAllSegs = () => { for (const key of Object.keys(data.groups)) updateSeg(key); };
+  const renderLc = () => {
+    const lc = q<HTMLElement>('[data-ga-lc]');
+    if (lc) lc.innerHTML = lifecycleSectionHTML();
   };
+  const updateMasthead = () => {
+    const s = gaScore();
+    const started = s.answered > 0;
+    const pctInt = Math.round(s.pct * 100);
+    const tier = verdictTier(s.pct);
+    const ring = q<SVGCircleElement>('#ga-m-ring');
+    if (ring) {
+      const r = (132 - 11) / 2, C = 2 * Math.PI * r;
+      ring.setAttribute('stroke-dasharray', `${C * Math.min(1, Math.max(0, started ? s.pct : 0))} ${C}`);
+      ring.setAttribute('stroke', started ? GA_TIER_RING[tier] : GR.faint);
+    }
+    const num = q<HTMLElement>('#ga-m-num');
+    if (num) { num.innerHTML = started ? `${pctInt}<span style="font-size:20px">%</span>` : '—'; num.style.color = started ? GR.ink : GR.faint; }
+    const verdict = q<HTMLElement>('#ga-m-verdict');
+    if (verdict) verdict.textContent = started ? GA_TIER_LINE[tier] : GA_VERDICT_EMPTY;
+    const sub = q<HTMLElement>('#ga-m-sub');
+    if (sub) sub.innerHTML = started ? gaSubStarted(s) : GA_SUB_EMPTY;
+    for (const p of s.perPhase) {
+      const answered = p.answered > 0;
+      const pInt = Math.round(p.pct * 100);
+      const label = q<HTMLElement>(`[data-ga-phlabel="${p.n}"]`);
+      if (label) { label.textContent = answered ? `${pInt}%` : '—'; label.style.color = answered ? GR.ink : GR.faint; }
+      const fill = q<HTMLElement>(`[data-ga-phfill="${p.n}"]`);
+      if (fill) { fill.style.height = `${pInt}%`; fill.style.borderRadius = pInt === 100 ? '8px' : '0 0 8px 8px'; }
+    }
+  };
+  const updatePhasePcts = () => {
+    for (const p of gaScore().perPhase) {
+      const answered = p.answered > 0;
+      const pInt = Math.round(p.pct * 100);
+      const el = q<HTMLElement>(`[data-ga-phpct="${p.n}"]`);
+      if (el) { el.textContent = answered ? `${pInt}%` : '—'; el.style.color = answered ? gaPctTone(pInt) : GR.faint; }
+    }
+  };
+  const updateReset = () => {
+    const btn = q<HTMLElement>('#ga-reset');
+    if (btn) btn.style.display = gaScore().answered > 0 ? 'inline-block' : 'none';
+  };
+  const updateHandoffSub = () => {
+    const el = q<HTMLElement>('#ga-handoff-sub');
+    if (el) el.textContent = handoffSubHTML();
+  };
+  // Everything state-dependent outside the changed segment: masthead, phase headers, §02 walls, §03.
+  const updateAll = () => { updateMasthead(); updatePhasePcts(); updateReset(); renderLc(); updateHandoffSub(); };
 
   // ---------- report view (estimate-driven arc + CTA) ----------
   const reportHTML = (): string => {
     const now = new Date();
     const dateLabel = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    const cov = estimateCoverage(state.levels, data.catalog, data.phases);
+    const cov = estimateCoverage(state.estimates, data.catalog, data.phases);
     const pctInt = Math.round(cov.pct * 100);
     const tier = verdictTier(cov.pct);
     // The single source of truth every estimate-driven section consults, so §1, §2, table-stakes,
     // top-missing and AI all agree on what "covered" means.
-    const covered = estimateCoveredIds(state.levels, data.representative);
+    const covered = estimateCoveredIds(state.estimates, data.representative);
 
     /* ===== estimate masthead (unnumbered) ===== */
     const masthead = (): string => {
@@ -748,30 +896,29 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
   const onClick = (e: Event) => {
     const t = e.target instanceof Element ? e.target : null;
     if (!t) return;
-    // org-profile preset — sets all group levels at once
-    const preset = t.closest<HTMLElement>('[data-ga-preset]');
-    if (preset) {
-      const p = PRESETS[preset.dataset.gaPreset ?? ''];
-      if (p) { state.levels = { ...p.levels }; persistLevels(); updateAllSegs(); }
-      return;
-    }
-    // per-group segmented level (key:n)
-    const seg = t.closest<HTMLElement>('[data-ga-level]');
+    // per-group segmented estimate (key:frac) — click the pressed value again to clear to "no estimate"
+    const seg = t.closest<HTMLElement>('[data-ga-est]');
     if (seg) {
-      const [key, nStr] = (seg.dataset.gaLevel ?? '').split(':');
-      const n = Number(nStr);
-      if (key && Number.isFinite(n) && n >= 0 && n <= 3) {
-        state.levels[key] = n; persistLevels(); updateSeg(key); updateScore();
+      const [key, vStr] = (seg.dataset.gaEst ?? '').split(':');
+      const v = Number(vStr);
+      if (key && Number.isFinite(v)) {
+        if (state.estimates[key] === v) delete state.estimates[key];
+        else state.estimates[key] = v;
+        persistEstimates(); updateSeg(key); updateAll();
       }
       return;
     }
     if (t.closest('#ga-open-report')) { showView('report'); return; }
     if (t.closest('#ga-back')) { showView('assess'); return; }
-    if (t.closest('#ga-reset')) { state.levels = {}; persistLevels(); updateAllSegs(); return; }
+    if (t.closest('#ga-reset')) { state.estimates = {}; persistEstimates(); updateAllSegs(); updateAll(); return; }
     if (t.closest('#ga-print')) { window.print(); return; }
+    // assess §02 lifecycle stage selection (own state, separate from the report's §01 stages)
+    if (t.closest('[data-ga-astage-close]')) { state.assessStage = null; renderLc(); return; }
+    const astage = t.closest<HTMLElement>('[data-ga-astage]');
+    if (astage) { const tac = astage.dataset.gaAstage!; state.assessStage = state.assessStage === tac ? null : tac; renderLc(); return; }
     // report links (technique / source / CTA) navigate natively
     if (t.closest('a[href]')) return;
-    // §1/§2 interactions
+    // report §1/§2 interactions
     if (t.closest('[data-ga-stage-close]')) { state.selectedStage = null; rerenderReport(); return; }
     const stage = t.closest<HTMLElement>('[data-ga-stage]');
     if (stage) { const tac = stage.dataset.gaStage!; state.selectedStage = state.selectedStage === tac ? null : tac; rerenderReport(); return; }
