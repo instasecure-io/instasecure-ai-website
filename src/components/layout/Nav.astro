@@ -19,11 +19,13 @@ import logo from '@/assets/brand/logo.png';
 
           {item.children && (
             <div class="absolute left-0 top-full hidden group-hover:block pt-2">
-              <ul class="bg-white shadow-xl rounded-xl border border-black/5 p-2 min-w-[260px]">
+              <ul class="bg-white shadow-xl rounded-xl border border-black/5 p-2 min-w-[280px]">
                 {item.children.map(c => (
                   <li>
-                    <a href={c.href} class="block px-4 py-3 rounded-lg hover:bg-slate-50 transition">
-                      <div class="font-semibold text-[var(--color-text)]">{c.label}</div>
+                    <a href={c.href} class={`block px-4 py-3 rounded-lg transition ${c.featured ? 'bg-[var(--color-accent)]/[0.06] hover:bg-[var(--color-accent)]/[0.12]' : 'hover:bg-slate-50'}`}>
+                      <div class={`font-semibold ${c.featured ? 'text-[var(--color-accent-bold)]' : 'text-[var(--color-text)]'}`}>
+                        {c.featured && <span aria-hidden="true">★ </span>}{c.label}
+                      </div>
                       {c.description && <div class="text-xs text-slate-600 mt-0.5">{c.description}</div>}
                     </a>
                   </li>
@@ -131,8 +133,8 @@ import logo from '@/assets/brand/logo.png';
               <ul class="pl-3 pr-1 py-1 space-y-0.5">
                 {item.children && item.children.map(c => (
                   <li>
-                    <a href={c.href} class="block px-3 py-2 rounded-md text-[15px] text-slate-700 hover:bg-slate-50 hover:text-[var(--color-brand)] transition">
-                      {c.label}
+                    <a href={c.href} class={`block px-3 py-2 rounded-md text-[15px] transition hover:bg-slate-50 ${c.featured ? 'font-semibold text-[var(--color-accent-bold)]' : 'text-slate-700 hover:text-[var(--color-brand)]'}`}>
+                      {c.featured && <span aria-hidden="true">★ </span>}{c.label}
                     </a>
                   </li>
                 ))}

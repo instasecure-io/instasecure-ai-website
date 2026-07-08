@@ -12,6 +12,7 @@ export const FOOTER_SECTIONS = [
     { label: 'Events', href: '/events' },
   ]},
   { title: 'Resources', links: [
+    { label: 'Learn', href: '/learn' },
     { label: 'Blog', href: '/blog' },
     { label: 'AWS Marketplace', href: 'https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs' },
   ]},
