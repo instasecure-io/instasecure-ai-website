@@ -1,13 +1,14 @@
 ---
 // src/components/sections/GuardrailsChallenge.astro
-// Options are drawn ONLY from the public representative pool — the full 122-control catalog
-// is private IP and is never imported here or shipped in the payload.
+// Run-based arcade version. Options AND the control name/severity map are drawn ONLY from the
+// public representative pool — the full 122-control catalog is private IP and is never imported
+// here or shipped in the payload. Severities feed the game's scoring (critical/high/medium saves).
 import { SCENARIOS } from '@/data/guardrails/scenarios';
 import { THREATS } from '@/data/guardrails/threats';
 import { REPRESENTATIVE_CONTROLS } from '@/data/guardrails/representative-controls';
 import { CATALOG } from '@/data/guardrails/catalog-summary';
 
-const nameById = new Map(REPRESENTATIVE_CONTROLS.map(c => [c.id, c.name]));
+const repById = new Map(REPRESENTATIVE_CONTROLS.map(c => [c.id, c]));
 const pool = REPRESENTATIVE_CONTROLS.map(c => c.id);
 // Deterministic distractor pick from the representative pool (no build-time randomness).
 function distractors(correct: string, i: number): string[] {
@@ -19,17 +20,35 @@ function distractors(correct: string, i: number): string[] {
   }
   return out;
 }
-const scenarios = SCENARIOS.map((s, i) => ({
-  id: s.id, threat: s.threat, title: s.title, scenario: s.scenario, explain: s.explain, correct: s.correct,
-  options: [s.correct, ...distractors(s.correct, i)].map(id => ({ id, name: nameById.get(id) ?? id })),
-}));
-const payload = { rounds: 8, timerOn: true, threats: THREATS, scenarios, catalogTotal: CATALOG.total };
+
+const usedIds = new Set<string>();
+const scenarios = SCENARIOS.map((s, i) => {
+  const options = [s.correct, ...distractors(s.correct, i)];
+  options.forEach(id => usedIds.add(id));
+  return { id: s.id, threat: s.threat, title: s.title, scenario: s.scenario, explain: s.explain, correct: s.correct, options };
+});
+// Only the controls that actually appear as options — name + severity, nothing else.
+const controls: Record<string, { name: string; sev: string }> = {};
+for (const id of usedIds) {
+  const c = repById.get(id);
+  if (c) controls[id] = { name: c.name, sev: c.sev };
+}
+
+const config = { stages: 10, baseTimer: 20, breachLimit: 3, zeroDay: true, timerOn: true };
+const payload = { config, scenarios, controls, threats: THREATS, catalogTotal: CATALOG.total };
 ---
 <section class="gc-arena relative">
-  <div class="mx-auto max-w-[1080px] px-5 py-8">
-    <div data-gc-root class="min-h-[420px]"></div>
+  <div class="mx-auto max-w-[1080px] px-5 pt-8 pb-1 flex items-center justify-center gap-2.5">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+      <rect x="3" y="5" width="20" height="16" rx="7" fill="none" stroke="var(--color-brand)" stroke-width="3"></rect>
+      <rect x="10" y="11" width="6" height="4" rx="1.5" fill="var(--color-brand)"></rect>
+    </svg>
+    <span class="c2-cabinet">InstaSecure · Guardrails Challenge</span>
   </div>
-  <footer class="mx-auto max-w-[1080px] px-5 grid gap-1.5 justify-items-center text-center pt-4 pb-2">
+  <div class="mx-auto max-w-[1080px] px-5 pb-6">
+    <div data-gc-root class="min-h-[460px]"></div>
+  </div>
+  <footer class="mx-auto max-w-[1080px] px-5 grid gap-1.5 justify-items-center text-center pt-2 pb-3">
     <span class="text-[12.5px] text-slate-400">A representative sample of InstaSecure's {payload.catalogTotal} guardrails — see the full catalog in action. <a href="/contact" class="text-[var(--color-brand)] font-semibold">Talk to us</a>.</span>
     <span class="text-[12.5px] text-slate-400">Wondering where your org stands? <a href="/learn/guardrails-assessment" class="text-[var(--color-brand)] font-semibold">Assess your coverage</a>.</span>
     <span class="text-[12.5px] text-slate-400">Every one of these ships enforced, org-wide, in minutes. <a href="/contact" class="text-[var(--color-brand)] font-semibold">Book a demo</a>.</span>
@@ -61,5 +80,123 @@ const payload = { rounds: 8, timerOn: true, threats: THREATS, scenarios, catalog
     background-size: 24px 24px;
     border-top: 1px solid var(--color-border, rgba(0,0,0,0.05));
     border-bottom: 1px solid var(--color-border, rgba(0,0,0,0.05));
+  }
+  .c2-cabinet {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+</style>
+
+<style is:global>
+  /* War-room console + motion for the Guardrails Challenge (injected by the controller). */
+  .c2-console {
+    position: relative;
+    background: #0e1230;
+    border-radius: 20px;
+    padding: 26px 28px 28px;
+    color: #fff;
+    display: grid;
+    gap: 20px;
+    box-shadow: 0 40px 90px -40px #0e123080;
+    overflow: hidden;
+  }
+  .c2-console::after { /* danger vignette, driven by [data-danger] */
+    content: '';
+    position: absolute; inset: 0;
+    pointer-events: none;
+    border-radius: 20px;
+    box-shadow: inset 0 0 0 1.5px #ff547000, inset 0 0 90px #ff547000;
+    transition: box-shadow 300ms;
+  }
+  .c2-console[data-danger="true"]::after {
+    box-shadow: inset 0 0 0 1.5px #ff5470aa, inset 0 0 90px #ff547026;
+    animation: c2-vignette 900ms ease-in-out infinite;
+  }
+  @keyframes c2-vignette {
+    50% { box-shadow: inset 0 0 0 1.5px #ff547055, inset 0 0 50px #ff547014; }
+  }
+  .c2-console.c2-shake { animation: c2-shake 340ms cubic-bezier(.36,.07,.19,.97); }
+  @keyframes c2-shake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-7px); }
+    40%, 60% { transform: translateX(7px); }
+  }
+
+  .c2-track { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 4px 2px; }
+  .c2-track::before { content: ''; position: absolute; left: 6px; right: 6px; top: 50%; height: 2px; background: #ffffff1f; }
+  .c2-node { position: relative; width: 13px; height: 13px; border-radius: 999px; box-sizing: border-box; background: #0e1230; border: 2px solid #ffffff3d; }
+  .c2-node[data-s="held"] { background: #22b07d; border-color: #22b07d; }
+  .c2-node[data-s="breached"] { background: #ff5470; border-color: #ff5470; }
+  .c2-node[data-s="current"] { background: #4d66e0; border-color: #8fa2ff; }
+  .c2-node[data-s="current"]::after {
+    content: ''; position: absolute; inset: -6px; border-radius: 999px;
+    border: 1.5px solid #8fa2ff88; animation: c2-ping 1.3s ease-out infinite;
+  }
+  @keyframes c2-ping { 0% { transform: scale(.55); opacity: 1; } 100% { transform: scale(1.25); opacity: 0; } }
+
+  .c2-timerbar { height: 7px; border-radius: 999px; background: #ffffff17; overflow: hidden; }
+  .c2-timerbar > div { height: 100%; border-radius: 999px; background: #4d66e0; transition: width 950ms linear, background 300ms; }
+  .c2-timerbar[data-low="true"] > div { background: #ff5470; }
+  .c2-timerbar[data-low="true"] { animation: c2-barpulse 700ms ease-in-out infinite; }
+  @keyframes c2-barpulse { 50% { box-shadow: 0 0 0 3px #ff547029; } }
+
+  .c2-opt {
+    display: flex; align-items: center; gap: 13px;
+    padding: 13px 16px; border-radius: 12px;
+    border: 1.5px solid #ffffff1f; background: #ffffff08;
+    font: inherit; color: #fff; text-align: left; cursor: pointer; width: 100%;
+    transition: border-color 130ms, background 130ms, transform 130ms, opacity 200ms;
+  }
+  .c2-opt:hover:not(:disabled) { border-color: #ffffff59; background: #ffffff0f; transform: translateY(-1px); }
+  .c2-opt:focus-visible { outline: 2px solid #8fa2ff; outline-offset: 2px; }
+  .c2-opt:disabled { cursor: default; }
+  .c2-opt[data-r="correct"] { border-color: #22b07d; background: #22b07d1f; box-shadow: 0 0 24px -6px #22b07d66; }
+  .c2-opt[data-r="wrong"] { border-color: #ff5470; background: #ff54701f; }
+  .c2-opt[data-r="dim"] { opacity: 0.38; }
+  .c2-key {
+    flex: none; width: 22px; height: 22px; border-radius: 6px;
+    border: 1px solid #ffffff30; display: grid; place-content: center;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #ffffff8c;
+  }
+
+  .c2-pop {
+    position: absolute; right: 26px; top: 60px;
+    font-family: var(--font-mono); font-weight: 700; font-size: 22px; color: #22b07d;
+    pointer-events: none; animation: c2-rise 1000ms ease-out forwards;
+  }
+  @keyframes c2-rise { 0% { opacity: 0; transform: translateY(8px); } 18% { opacity: 1; } 100% { opacity: 0; transform: translateY(-34px); } }
+
+  .c2-count { display: grid; place-items: center; min-height: 320px; }
+  .c2-count-num {
+    font-family: var(--font-mono); font-size: 120px; font-weight: 700; color: #fff;
+    animation: c2-countin 780ms cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes c2-countin { 0% { opacity: 0; transform: scale(1.7); } 30% { opacity: 1; transform: scale(1); } 85% { opacity: 1; } 100% { opacity: 0.15; } }
+
+  .c2-zd { border: 1.5px solid #ff5470; background: #ff547014; border-radius: 999px; padding: 3px 11px; animation: c2-zd 1s ease-in-out infinite; }
+  @keyframes c2-zd { 50% { box-shadow: 0 0 0 4px #ff547021; } }
+
+  .c2-best { animation: c2-bestin 700ms cubic-bezier(.22,1,.36,1) both; }
+  @keyframes c2-bestin { 0% { transform: scale(.92); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .c2-badge-new { animation: c2-badge 900ms ease-in-out 2; }
+  @keyframes c2-badge { 50% { box-shadow: 0 0 0 5px #f59f3c26; } }
+
+  @media (max-width: 640px) {
+    .c2-console { padding: 18px 16px 20px; border-radius: 16px; }
+    .c2-key { display: none; }
+    .c2-hud-score { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .c2-console::after, .c2-console.c2-shake, .c2-node[data-s="current"]::after,
+    .c2-timerbar[data-low="true"], .c2-pop, .c2-count-num, .c2-zd, .c2-best, .c2-badge-new {
+      animation: none !important;
+    }
+    .c2-timerbar > div { transition: width 950ms linear; }
   }
 </style>
