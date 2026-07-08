@@ -193,6 +193,53 @@ const payload = {
   .gr-vstory-title { font-size: 12.5px; font-weight: 600; color: #0e1230; }
   .gr-vstory-text { font-size: 12px; line-height: 1.55; color: #4a4f6e; }
 
+  /* ---------- Assessment layer (ga-*) — estimate document on top of the shared report styles ---------- */
+  .gr-sheet a { color: #4d66e0; }
+  .gr-sheet a:hover { color: #0e1230; }
+
+  /* Live ring + phase bars animate as you estimate (reduced-motion is killed by the .gr-sheet rule) */
+  #ga-m-ring { transition: stroke-dasharray 600ms cubic-bezier(.22, 1, .36, 1), stroke 300ms ease-out; }
+  .ga-phbar-fill { transition: height 500ms cubic-bezier(.22, 1, .36, 1); }
+
+  /* Phase cluster cards (echo .gr-actor) */
+  .ga-phase { border: 1px solid #e5e7f0; border-radius: 14px; background: #fff; padding: 2px 18px 4px; }
+  .ga-phead { display: flex; align-items: baseline; gap: 11px; padding: 13px 0 10px; border-bottom: 1px solid #f0f2fa; flex-wrap: wrap; }
+  .ga-phead-name { font-size: 14.5px; font-weight: 700; color: #0e1230; letter-spacing: -0.01em; }
+  .ga-phead-pct { margin-left: auto; font-family: var(--font-mono); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* One guardrail group row */
+  .ga-grow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 22px; align-items: center; padding: 12px 0 13px; border-bottom: 1px solid #f0f2fa; }
+  .ga-phase .ga-grow:last-child { border-bottom: none; }
+  .ga-grow-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .ga-grow-name { font-size: 14px; font-weight: 600; color: #0e1230; }
+  .ga-grow-meta { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #8a8fa8; white-space: nowrap; }
+  .ga-grow-blurb { margin: 0; font-size: 12.5px; line-height: 1.5; color: #6d7290; max-width: 520px; }
+
+  /* Segmented estimate control (NONE / SOME / HALF / MOST / ALL) */
+  .ga-seg { display: flex; gap: 3px; padding: 3px; border-radius: 999px; border: 1px solid #e5e7f0; background: #f8f9fe; flex-shrink: 0; align-self: center; grid-row: span 2; }
+  .ga-seg button { border: none; background: transparent; padding: 6px 12px; border-radius: 999px; cursor: pointer; font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; transition: background 140ms, color 140ms; }
+  .ga-seg button:hover { color: #0e1230; }
+  .ga-seg button[aria-pressed="true"] { background: #0e1230; color: #fff; }
+
+  .ga-reset { background: none; border: none; padding: 0; cursor: pointer; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8a8fa8; text-decoration: underline; text-underline-offset: 3px; }
+  .ga-reset:hover { color: #0e1230; }
+
+  /* Lifecycle wall — partial-estimate rail on top of the report's closed/open/ghost states */
+  .gr-lcp-rail.is-part { background: #f59f3c; border: 0; }
+
+  /* Stage-detail state chip */
+  .ga-railchip { width: 12px; height: 16px; border-radius: 3px; box-sizing: border-box; display: inline-block; margin-top: 2px; }
+  .ga-railchip.is-closed { background: #22b07d; }
+  .ga-railchip.is-part { background: #f59f3c; }
+  .ga-railchip.is-open { background: #fff; border: 2px solid #ff5470; }
+  .ga-railchip.is-ghost { border: 1.5px dashed #cdd2e4; }
+
+  @media (max-width: 640px) {
+    .ga-grow { grid-template-columns: 1fr; }
+    .ga-seg { grid-row: auto; justify-self: start; margin-top: 4px; }
+    .ga-phase { padding: 2px 14px 4px; }
+  }
+
   /* Print-only header hidden on screen */
   .gr-print-header { display: none; }
   /* Print-only rows (§6 expansion) and print more-line hidden on screen */

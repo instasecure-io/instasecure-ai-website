@@ -32,14 +32,13 @@ export function coverage(have: ReadonlySet<string>, controls: AssessControl[], p
   return { pct: total ? got / total : 0, perPhase };
 }
 
-// ---------- ESTIMATE model (public: per-group coverage level, no per-control catalog) ----------
+// ---------- ESTIMATE model (public: per-group coverage fraction, no per-control catalog) ----------
 // The public assessment ships only the catalog *summary* (per-group severity weight + counts),
-// never the 122-control array. The user picks a coverage LEVEL per group (None/Some/Most/All);
-// each level maps to a fraction of that group's weight. This is a rough self-estimate, not an
-// attestation — the precise number comes from a real scan.
-export const LEVEL_FRAC = [0, 0.34, 0.67, 1] as const;
+// never the 122-control array. The user estimates a coverage FRACTION per group (None/Some/Half/
+// Most/All → 0/.25/.5/.75/1). This is a rough self-estimate, not an attestation — the precise
+// number comes from a real scan.
 
-export interface CatalogGroupRef { count: number; weight: number; mandatory: number }
+export interface CatalogGroupRef { count: number; weight: number; mandatory: number; crit: number; high: number }
 export interface CatalogRef {
   total: number;
   groups: Record<string, CatalogGroupRef>;
@@ -51,40 +50,62 @@ export interface CatalogRef {
   frameworks: Record<string, number>;
 }
 
-export interface EstimatePhase { n: number; name: string; color: string; pct: number }
+export interface EstimatePhase { n: number; name: string; color: string; pct: number; answered: number }
+export interface EstimateResult {
+  pct: number;
+  perPhase: EstimatePhase[];
+  answered: number;
+  groupsTotal: number;
+  expected: number;
+  controlsTotal: number;
+}
 
+// Estimates are per-group fractions in {0, .25, .5, .75, 1}; a MISSING key means "no estimate yet"
+// (absent ≠ 0 — None is an answer, absence is not) and counts 0 toward coverage. Severity-weighted
+// with the catalog's group weights, exactly like the report's coverage math. Extra fields
+// (answered / expected / controlsTotal) feed the estimate masthead's live verdict + sub-line.
 export function estimateCoverage(
-  levels: Record<string, number>,
-  catalog: { groups: Record<string, { weight: number }> },
+  estimates: Record<string, number>,
+  catalog: { groups: Record<string, { weight: number; count: number }> },
   phases: PhaseRef[],
-): { pct: number; perPhase: EstimatePhase[] } {
-  const frac = (key: string): number => LEVEL_FRAC[levels[key] ?? 0] ?? 0;
-  // overall = Σ_groups(weight × frac[level]) / Σ_groups(weight); a missing group ⇒ level 0.
-  let got = 0, total = 0;
+): EstimateResult {
+  const frac = (key: string): number => estimates[key] ?? 0;
+  const isAnswered = (key: string): boolean => typeof estimates[key] === 'number';
+  let got = 0, total = 0, expected = 0, controlsTotal = 0, answered = 0;
   for (const [key, g] of Object.entries(catalog.groups)) {
     const w = g.weight ?? 0;
     total += w;
     got += w * frac(key);
+    controlsTotal += g.count ?? 0;
+    if (isAnswered(key)) { answered++; expected += (g.count ?? 0) * frac(key); }
   }
   const perPhase: EstimatePhase[] = phases.map(p => {
-    let pGot = 0, pTotal = 0;
+    let pGot = 0, pTotal = 0, pAnswered = 0;
     for (const key of p.groups) {
       const w = catalog.groups[key]?.weight ?? 0;
       pTotal += w;
       pGot += w * frac(key);
+      if (isAnswered(key)) pAnswered++;
     }
-    return { n: p.n, name: p.name, color: p.color, pct: pTotal ? pGot / pTotal : 0 };
+    return { n: p.n, name: p.name, color: p.color, pct: pTotal ? pGot / pTotal : 0, answered: pAnswered };
   });
-  return { pct: total ? got / total : 0, perPhase };
+  return {
+    pct: total ? got / total : 0,
+    perPhase,
+    answered,
+    groupsTotal: Object.keys(catalog.groups).length,
+    expected: Math.round(expected),
+    controlsTotal,
+  };
 }
 
-// Deterministic per-control "covered by your estimate?" projection from per-group levels.
+// Deterministic per-control "covered by your estimate?" projection from per-group estimates.
 // The public assessment has no per-control `have` set — the report still needs a stable answer
 // to "is THIS representative control covered?" so §1 rails, §2 steps, table-stakes and top-missing
-// all agree. Within each group, cover the top round(LEVEL_FRAC[level] * groupCount) controls by
-// stable id sort: a group rated "Some" shows ~1/3 covered, "Most" ~2/3, "All" all, "None" none.
+// all agree. Within each group, cover the top round(frac * groupCount) controls by stable id sort:
+// a group at .25 shows ~1/4 covered, .5 half, .75 ~3/4, 1 all, 0/absent none.
 export function estimateCoveredIds(
-  levels: Record<string, number>,
+  estimates: Record<string, number>,
   representative: { id: string; group: string }[],
 ): Set<string> {
   const byGroup: Record<string, string[]> = {};
@@ -92,8 +113,8 @@ export function estimateCoveredIds(
   const covered = new Set<string>();
   for (const [g, ids] of Object.entries(byGroup)) {
     ids.sort();
-    const lvl = levels[g] ?? 0;
-    const n = Math.round((LEVEL_FRAC[lvl] ?? 0) * ids.length);
+    const frac = estimates[g] ?? 0;
+    const n = Math.round(frac * ids.length);
     for (let i = 0; i < n; i++) covered.add(ids[i]);
   }
   return covered;
