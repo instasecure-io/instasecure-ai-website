@@ -362,19 +362,37 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
       const mappedN = data.lifecycle.filter(t => t.populated).length;
       const line = `Of the <strong>${comp.techniques}</strong> techniques charted here, your self-attestation leaves <strong>${comp.openTechniques}</strong> open across <strong>${comp.openTactics}</strong> tactics; <strong>${comp.detectionOnly}</strong> are detection-only. A scan verifies which denies are actually enforced.`;
 
-      const gridCells = cells.map((row, i) => {
+      // Wall scale — one rail per charted control. Rails stay discrete bricks while they fit
+      // the band; past ~8 controls/stage they compress (gaps + hollow borders drop) into a
+      // proportional green/red wall. Exact count always stays in the ratio label.
+      const maxCount = Math.max(1, ...cells.map(r => r.total));
+      const unit = Math.max(2, Math.min(13, Math.floor(53 / maxCount)));
+      const roomy = unit >= 6;
+      const railH = roomy ? unit - 3 : unit;
+      const wallH = 23 + maxCount * unit;
+
+      const axisCells = cells.map((row, i) => {
         const idx = String(i + 1).padStart(2, '0');
         if (!row.populated) {
-          return `<div class="gr-lc-cell is-tbd"><span class="gr-lc-idx">${idx}</span><span class="gr-lc-tactic">${esc(row.tactic)}</span><span class="gr-lc-tbd">Detection territory</span></div>`;
+          return `<div class="gr-lcp-cell is-tbd" title="${esc(row.tactic)} — no preventive guardrail (detection territory)">
+            <span class="gr-lcp-wall"><span class="gr-lcp-rail is-ghost"></span></span>
+            <span class="gr-lcp-nodestrip"><span class="gr-lcp-node is-tbd"></span></span>
+            <span class="gr-lcp-meta"><span class="gr-lcp-idx">${idx}</span><span class="gr-lcp-tactic is-tbd">${esc(row.tactic)}</span></span>
+          </div>`;
         }
         const anyOpen = row.closed < row.total;
         const sel = state.selectedStage === row.tactic;
-        const dots = row.controls.map(c => `<span class="gr-lc-dot" title="${esc(c.control)} — ${esc(c.controlName)} (${c.state === 'closed' ? 'enforced' : 'open'})" style="${c.state === 'closed' ? `background:${GR.green}` : `background:#fff;border:2px solid ${GR.red}`}"></span>`).join('');
-        return `<button type="button" class="gr-lc-cell${sel ? ' is-sel' : ''}" data-ga-stage="${esc(row.tactic)}" aria-pressed="${sel}" title="${esc(row.tactic)} — ${row.closed} of ${row.total} charted controls attested as enforced">
-          <span class="gr-lc-idx">${idx}</span>
-          <span class="gr-lc-tactic">${esc(row.tactic)}</span>
-          <span class="gr-lc-ratio" style="color:${anyOpen ? tone(GR.red) : tone(GR.green)}">${row.closed}/${row.total}<small>enforced</small></span>
-          <div class="gr-lc-dots">${dots}</div>
+        const rails = [...row.controls]
+          .sort((a, b) => (a.state === 'open' ? 0 : 1) - (b.state === 'open' ? 0 : 1))
+          .map(c => `<span class="gr-lcp-rail ${c.state === 'closed' ? 'is-closed' : 'is-open'}" style="--rail:${railH}px" title="${esc(c.control)} — ${esc(c.controlName)} (${c.state === 'closed' ? 'enforced' : 'open'})"></span>`)
+          .join('');
+        return `<button type="button" class="gr-lcp-cell${sel ? ' is-sel' : ''}" data-ga-stage="${esc(row.tactic)}" aria-pressed="${sel}" title="${esc(row.tactic)} — ${row.closed} of ${row.total} charted controls attested as enforced">
+          <span class="gr-lcp-wall${roomy ? '' : ' is-compact'}"${roomy ? '' : ' style="gap:0"'}>
+            <span class="gr-lcp-ratio" style="color:${anyOpen ? tone(GR.red) : tone(GR.green)}">${row.closed}/${row.total}</span>
+            ${rails}
+          </span>
+          <span class="gr-lcp-nodestrip"><span class="gr-lcp-node"></span></span>
+          <span class="gr-lcp-meta"><span class="gr-lcp-idx">${idx}</span><span class="gr-lcp-tactic">${esc(row.tactic)}</span></span>
         </button>`;
       }).join('');
 
@@ -420,8 +438,8 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
           ${stateLegend()}
         </div>
         <div style="display:grid;gap:9px">
-          <p style="margin:0;font-size:12.5px;line-height:1.55;color:${GR.muted};text-wrap:pretty">The full MITRE tactic progression. Each stage shows the charted preventive controls that break attacks there — thin stages are where exposure concentrates.<span class="gr-hint-screen"> Select a stage to see its controls.</span></p>
-          <div class="gr-lc-grid">${gridCells}</div>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:${GR.muted};text-wrap:pretty">The attack path, in MITRE tactic order — every campaign moves left to right through these stages. Each stage raises a wall of the charted preventive controls that break attacks there (one rail per control; the count is how many are attested as enforced); low walls are where exposure concentrates.<span class="gr-hint-screen"> Select a stage to see its controls.</span></p>
+          <div class="gr-lcp" style="--gr-wall-h:${wallH}px;--gr-axis-y:${wallH + 15}px">${axisCells}</div>
           ${detail}
           <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">${mappedN} of ${data.lifecycle.length} stages carry charted preventive controls from the ATT&amp;CK v19.1 catalog — stages without one are detection territory.</p>
         </div>`;
