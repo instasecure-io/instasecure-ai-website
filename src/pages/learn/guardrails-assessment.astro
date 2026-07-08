@@ -5,11 +5,47 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 // Aliased: this file name PascalCases to `GuardrailsAssessment`, which would
 // collide with a same-named import (astro check ts2440).
 import GuardrailsAssessmentSection from '@/components/sections/GuardrailsAssessment.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
+
+const appSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['WebApplication', 'LearningResource'],
+  name: 'Guardrails Assessment',
+  headline: 'Guardrails Assessment — how many of the 122 do you actually enforce?',
+  description: 'A self-service, in-browser estimate of how much of each AWS preventive guardrail group — SCPs, RCPs, data-perimeter policies — an organization enforces, rendered as a severity-weighted coverage snapshot mapped to the MITRE ATT&CK kill chain. A rough estimate; nothing leaves the page.',
+  url: 'https://instasecure.ai/learn/guardrails-assessment/',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Any (web browser)',
+  isAccessibleForFree: true,
+  learningResourceType: 'Self assessment',
+  educationalLevel: 'Professional',
+  about: ['AWS Service Control Policies', 'AWS Resource Control Policies', 'AWS Data Perimeter', 'MITRE ATT&CK', 'Cloud security posture'],
+  provider: {
+    '@type': 'Organization',
+    name: 'InstaSecure',
+    url: 'https://instasecure.ai/',
+  },
+  inLanguage: 'en-US',
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://instasecure.ai/' },
+    { '@type': 'ListItem', position: 2, name: 'Learn', item: 'https://instasecure.ai/learn/' },
+    { '@type': 'ListItem', position: 3, name: 'Guardrails Assessment', item: 'https://instasecure.ai/learn/guardrails-assessment/' },
+  ],
+};
 ---
 <BaseLayout
   title="Guardrails Assessment — score your AWS preventive coverage | InstaSecure"
   description="Estimate how much of each AWS preventive guardrail group (SCPs, RCPs, data-perimeter policies) your org enforces and see a severity-weighted coverage snapshot mapped to the MITRE ATT&CK kill chain. For a precise, control-by-control assessment, talk to us."
 >
+  <Fragment slot="head">
+    <StructuredData data={appSchema} />
+    <StructuredData data={breadcrumbSchema} />
+  </Fragment>
   <section class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
     <div class="mx-auto max-w-4xl px-6 pt-20 pb-14 text-center">
       <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Guardrails Assessment</div>
