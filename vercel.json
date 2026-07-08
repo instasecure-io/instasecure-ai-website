@@ -12,7 +12,8 @@
       "destination": "https://instasecure.ai/:path*",
       "permanent": true
     },
-    { "source": "/main", "destination": "/", "permanent": true }
+    { "source": "/main", "destination": "/", "permanent": true },
+    { "source": "/platform", "destination": "/howitworks", "permanent": true }
   ],
   "headers": [
     {

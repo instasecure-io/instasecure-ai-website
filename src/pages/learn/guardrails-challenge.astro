@@ -5,11 +5,47 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 // Aliased: this file name PascalCases to `GuardrailsChallenge`, which would
 // collide with a same-named import (astro check ts2440).
 import GuardrailsChallengeSection from '@/components/sections/GuardrailsChallenge.astro';
+import StructuredData from '@/components/seo/StructuredData.astro';
+
+const appSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['WebApplication', 'LearningResource'],
+  name: 'Guardrails Challenge',
+  headline: 'Guardrails Challenge — can you pick the guardrail that stops each attack?',
+  description: 'A timed browser game on a representative sample of InstaSecure\'s 122 AWS preventive guardrails. Each gate is a documented cloud breach scenario; the player picks the one guardrail — SCP, RCP, or data-perimeter policy — that stops it.',
+  url: 'https://instasecure.ai/learn/guardrails-challenge/',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Any (web browser)',
+  isAccessibleForFree: true,
+  learningResourceType: 'Interactive quiz',
+  educationalLevel: 'Professional',
+  about: ['AWS Service Control Policies', 'AWS Resource Control Policies', 'AWS Data Perimeter', 'Cloud security guardrails'],
+  provider: {
+    '@type': 'Organization',
+    name: 'InstaSecure',
+    url: 'https://instasecure.ai/',
+  },
+  inLanguage: 'en-US',
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://instasecure.ai/' },
+    { '@type': 'ListItem', position: 2, name: 'Learn', item: 'https://instasecure.ai/learn/' },
+    { '@type': 'ListItem', position: 3, name: 'Guardrails Challenge', item: 'https://instasecure.ai/learn/guardrails-challenge/' },
+  ],
+};
 ---
 <BaseLayout
   title="Guardrails Challenge — Can you hold the wall against a live cloud intrusion? | InstaSecure"
   description="A timed run through a real cloud kill-chain on a representative sample of InstaSecure's 122 AWS preventive guardrails: each gate is a documented breach — pick the one guardrail (SCP / RCP / data-perimeter) that stops it. Streaks, ranks, a breach limit, and a shareable after-action report."
 >
+  <Fragment slot="head">
+    <StructuredData data={appSchema} />
+    <StructuredData data={breadcrumbSchema} />
+  </Fragment>
   <section class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
     <div class="mx-auto max-w-4xl px-6 pt-20 pb-14 text-center">
       <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Guardrails Challenge</div>

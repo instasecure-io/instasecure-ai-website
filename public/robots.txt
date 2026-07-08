@@ -34,6 +34,16 @@ User-agent: Claude-Web
 Disallow: /private/
 Allow: /
 
+# Anthropic split its crawlers in 2026: ClaudeBot = training,
+# Claude-SearchBot = search indexing, Claude-User = user-initiated fetches.
+User-agent: Claude-SearchBot
+Disallow: /private/
+Allow: /
+
+User-agent: Claude-User
+Disallow: /private/
+Allow: /
+
 User-agent: Google-Extended
 Disallow: /private/
 Allow: /

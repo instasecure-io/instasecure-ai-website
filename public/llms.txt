@@ -35,17 +35,24 @@ Preventive AWS cloud security controls · AWS Data Perimeter · AWS service cont
 - [How It Works](https://instasecure.ai/howitworks) — the whole-house-water-filter analogy: preventive controls at organizational entry points protect everything downstream.
 - [Pricing](https://instasecure.ai/pricing) — contact-based pricing; free trial on AWS Marketplace.
 - [Blog](https://instasecure.ai/blog) — threat research, product deep-dives, AWS IAM technical content.
-- [Learn](https://instasecure.ai/learn) — vendor-neutral field guides on cloud security architecture and AWS organizational policy.
+- [Learn](https://instasecure.ai/learn) — the learning hub: interactive tools (a guardrails game, a coverage self-assessment, a policy simulator) plus vendor-neutral field guides on cloud security architecture and AWS organizational policy.
 - [About](https://instasecure.ai/about) — founding team + 4-person technical advisory board (veterans from JPMorgan, Netflix, fwd:cloudsec).
 - [Contact](https://instasecure.ai/contact) — sales and demo requests.
 - [News](https://instasecure.ai/news) — press releases and partnerships.
 - [Events](https://instasecure.ai/events) — upcoming conferences (RSAC, Black Hat, DEF CON).
 
-## Learn — vendor-neutral field guides
+## Learn — interactive tools and field guides
 
-These long-form pages are written for engineers and AI search tools. They are intentionally vendor-neutral and AWS-native.
+The Learn hub (https://instasecure.ai/learn) is organized into three categories: **Interactive Tools** (games, simulators, self-assessments), **Field Guides** (long-form vendor-neutral articles), and the **Blog**. Written for engineers and AI search tools; intentionally AWS-native.
 
-- [AWS Organizational Policy Controls — interactive simulator](https://instasecure.ai/learn/aws-organizational-policies) — a click-through simulator for AWS Service Control Policies (SCP), Resource Control Policies (RCP), and the Data Perimeter pattern. Six concrete trust scenarios; each one shows which policy gate blocks it. Below the simulator: tabbed deep-dive on AWS policy evaluation, SCPs, RCPs, and the data perimeter framework. Pinned as the primary Learn entry point.
+### Interactive Tools
+
+- [Guardrails Challenge](https://instasecure.ai/learn/guardrails-challenge) — the featured Learn entry point. A timed game built on a representative sample of InstaSecure's 122 AWS preventive guardrails: each gate is a documented cloud breach scenario, and the player picks the one guardrail (SCP / RCP / data-perimeter policy) that stops it. Streaks, ranks, and a shareable after-action report.
+- [Guardrails Assessment](https://instasecure.ai/learn/guardrails-assessment) — a self-service estimate of how much of each preventive guardrail group (SCPs, RCPs, data-perimeter policies) an org enforces, rendered as a severity-weighted coverage snapshot mapped to the MITRE ATT&CK kill chain. A rough estimate that runs entirely in the browser; precise control-by-control analysis is a sales conversation.
+- [AWS Organizational Policy Controls — interactive simulator](https://instasecure.ai/learn/aws-organizational-policies) — a click-through simulator for AWS Service Control Policies (SCP), Resource Control Policies (RCP), and the Data Perimeter pattern. Six concrete trust scenarios; each one shows which policy gate blocks it. Below the simulator: tabbed deep-dive on AWS policy evaluation, SCPs, RCPs, and the data perimeter framework.
+
+### Field Guides
+
 - [Cloud Hardening as a Proactive Defense Against Adversarial AI](https://instasecure.ai/learn/cloud-architecture-gaps) — adapted from a May 2026 AWS Meetup talk. Walks through a live LLM-driven AWS breach (recorded asciinema cast embedded), names the four shifts that made AI-speed attacks possible (attackers got AI; NHIs outnumber humans 45:1; every employee is a developer now via co-pilots; detection economics broke), and the three architectural gaps each attack exploits — tenancy, perimeter, blast radius. Maps each phase of a five-phase hardening ladder to working SCP examples in `aws-samples/service-control-policy-examples`.
 
 ## Use Cases
@@ -69,7 +76,10 @@ These long-form pages are written for engineers and AI search tools. They are in
 ## Contact & Marketplace
 
 - AWS Marketplace listing: https://aws.amazon.com/marketplace/pp/prodview-kmlldyula7axs
+- AWS Marketplace seller profile: https://aws.amazon.com/marketplace/seller-profile?id=4a6c459c-f656-480a-812c-eab216c22824
 - LinkedIn: https://www.linkedin.com/company/instasecure/
+- Crunchbase: https://www.crunchbase.com/organization/instasecure
+- GitHub: https://github.com/instasecure-io
 - Security contact: security@instasecure.io
 
 ## Company
