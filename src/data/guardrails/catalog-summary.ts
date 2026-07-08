@@ -11,6 +11,8 @@ export interface CatalogSummary {
   tactics: Record<string, number>;
   aiTotal: number;
   auditTamperTotal: number;
+  mandatoryTotal: number;
+  frameworks: Record<string, number>;
 }
 export const CATALOG: CatalogSummary = {
   "total": 122,
@@ -77,5 +79,16 @@ export const CATALOG: CatalogSummary = {
     "Credential Access": 5
   },
   "aiTotal": 4,
-  "auditTamperTotal": 25
+  "auditTamperTotal": 25,
+  "mandatoryTotal": 17,
+  "frameworks": {
+    "SSAE-18-SOC-2-Oct-2023": 20,
+    "PCI-DSS-v4.0": 21,
+    "ISO-IEC-27001:2013-Annex-A": 23,
+    "FedRAMP-r4": 23,
+    "NIST-SP-800-53-r5": 23,
+    "NIST-SP-800-171-r2": 23,
+    "CIS-v8.0": 15,
+    "NIST-CSF-v1.1": 18
+  }
 };
