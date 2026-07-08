@@ -32,6 +32,50 @@ export function coverage(have: ReadonlySet<string>, controls: AssessControl[], p
   return { pct: total ? got / total : 0, perPhase };
 }
 
+// ---------- ESTIMATE model (public: per-group coverage level, no per-control catalog) ----------
+// The public assessment ships only the catalog *summary* (per-group severity weight + counts),
+// never the 122-control array. The user picks a coverage LEVEL per group (None/Some/Most/All);
+// each level maps to a fraction of that group's weight. This is a rough self-estimate, not an
+// attestation — the precise number comes from a real scan.
+export const LEVEL_FRAC = [0, 0.34, 0.67, 1] as const;
+
+export interface CatalogGroupRef { count: number; weight: number; mandatory: number }
+export interface CatalogRef {
+  total: number;
+  groups: Record<string, CatalogGroupRef>;
+  phaseWeight: Record<string, number>;
+  tactics: Record<string, number>;
+  aiTotal: number;
+  auditTamperTotal: number;
+}
+
+export interface EstimatePhase { n: number; name: string; color: string; pct: number }
+
+export function estimateCoverage(
+  levels: Record<string, number>,
+  catalog: { groups: Record<string, { weight: number }> },
+  phases: PhaseRef[],
+): { pct: number; perPhase: EstimatePhase[] } {
+  const frac = (key: string): number => LEVEL_FRAC[levels[key] ?? 0] ?? 0;
+  // overall = Σ_groups(weight × frac[level]) / Σ_groups(weight); a missing group ⇒ level 0.
+  let got = 0, total = 0;
+  for (const [key, g] of Object.entries(catalog.groups)) {
+    const w = g.weight ?? 0;
+    total += w;
+    got += w * frac(key);
+  }
+  const perPhase: EstimatePhase[] = phases.map(p => {
+    let pGot = 0, pTotal = 0;
+    for (const key of p.groups) {
+      const w = catalog.groups[key]?.weight ?? 0;
+      pTotal += w;
+      pGot += w * frac(key);
+    }
+    return { n: p.n, name: p.name, color: p.color, pct: pTotal ? pGot / pTotal : 0 };
+  });
+  return { pct: total ? got / total : 0, perPhase };
+}
+
 export function openThreatWeights(have: ReadonlySet<string>, controls: AssessControl[]): Array<[string, number]> {
   const agg: Record<string, number> = {};
   for (const c of controls) {

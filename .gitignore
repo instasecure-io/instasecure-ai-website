@@ -12,3 +12,13 @@ test-results/
 CLAUDE.md
 
 private/
+
+# InstaSecure control catalog — private IP. Do NOT put the full 122-control catalog in the
+# public repo. controls.ts is the generated projection; the three test files below import it.
+# All four stay local only — regenerate controls.ts from the control-knowledge-base with
+# scripts/generate-guardrails-controls.mjs. Public code ships only the catalog *summary*
+# (catalog-summary.ts) + a representative sample (representative-controls.ts).
+/src/data/guardrails/controls.ts
+/src/data/guardrails/data.test.ts
+/src/data/guardrails/attack-chains.test.ts
+/src/scripts/guardrails-assessment/assess.test.ts
