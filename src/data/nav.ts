@@ -1,4 +1,6 @@
-export interface NavLeaf { label: string; href: string; description?: string; }
+import { LEARN_CATEGORIES, LEARN_ITEMS } from '@/data/learn/catalog';
+
+export interface NavLeaf { label: string; href: string; description?: string; featured?: boolean; }
 export interface NavGroup { heading: string; description?: string; items: NavLeaf[]; }
 export interface NavEntry {
   label: string;
@@ -7,6 +9,20 @@ export interface NavEntry {
   groups?: NavGroup[];
   description?: string;
 }
+
+const featuredLearnItem = LEARN_ITEMS.find(i => i.featured);
+
+const LEARN_NAV_CHILDREN: NavLeaf[] = [
+  ...(featuredLearnItem
+    ? [{
+        label: featuredLearnItem.shortTitle,
+        href: featuredLearnItem.href,
+        description: featuredLearnItem.blurb,
+        featured: true,
+      }]
+    : []),
+  ...LEARN_CATEGORIES.map(c => ({ label: c.label, href: c.href, description: c.description })),
+];
 
 export const PRIMARY_NAV: NavEntry[] = [
   {
@@ -66,15 +82,9 @@ export const PRIMARY_NAV: NavEntry[] = [
   {
     label: 'Learn',
     href: '/learn',
-    children: [
-      { label: 'Guardrails Challenge', href: '/learn/guardrails-challenge', description: 'Timed quiz: pick the guardrail that stops each attack' },
-      { label: 'Guardrails Assessment', href: '/learn/guardrails-assessment', description: 'Score your enforced coverage + get a gap report' },
-      { label: 'AWS Organizational Policies', href: '/learn/aws-organizational-policies', description: 'Interactive SCP / RCP / Data Perimeter simulator' },
-      { label: 'Cloud Architecture Gaps', href: '/learn/cloud-architecture-gaps', description: 'Field guide: tenancy, perimeter, blast radius' },
-    ],
+    children: LEARN_NAV_CHILDREN,
   },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },
 ];
 
