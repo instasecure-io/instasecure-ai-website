@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LEVEL_FRAC, estimateCoverage } from './assess';
+import { LEVEL_FRAC, estimateCoverage, estimateCoveredIds } from './assess';
 
 // Minimal structural catalog + phases — deliberately does NOT import the private control catalog.
 const CAT = { groups: { g1: { weight: 10 }, g2: { weight: 5 }, g3: { weight: 5 } } };
@@ -60,5 +60,52 @@ describe('estimateCoverage', () => {
   it('clamps unknown/out-of-range levels to 0', () => {
     const r = estimateCoverage({ g1: 9 as unknown as number }, CAT, PH);
     expect(r.pct).toBe(0);
+  });
+});
+
+describe('estimateCoveredIds', () => {
+  // Ids deliberately given out of sort order to prove the stable id-sort inside each group.
+  const REP = [
+    { id: 'IS-A-3', group: 'g1' },
+    { id: 'IS-A-1', group: 'g1' },
+    { id: 'IS-A-2', group: 'g1' },
+    { id: 'IS-B-2', group: 'g2' },
+    { id: 'IS-B-1', group: 'g2' },
+  ];
+
+  it('empty levels cover nothing', () => {
+    expect(estimateCoveredIds({}, REP).size).toBe(0);
+  });
+
+  it('all-All covers every id', () => {
+    const covered = estimateCoveredIds({ g1: 3, g2: 3 }, REP);
+    expect(covered.size).toBe(5);
+    for (const c of REP) expect(covered.has(c.id)).toBe(true);
+  });
+
+  it('a group at level Some (1) covers ~34% of its ids, lowest ids first', () => {
+    // round(0.34 * 3) = 1 for g1; g2 absent → level 0 → 0.
+    const covered = estimateCoveredIds({ g1: 1 }, REP);
+    expect(covered.size).toBe(1);
+    expect(covered.has('IS-A-1')).toBe(true); // lexicographically smallest in g1
+    expect(covered.has('IS-A-2')).toBe(false);
+    expect(covered.has('IS-B-1')).toBe(false); // g2 untouched
+  });
+
+  it('a group at level Most (2) covers ~67% by stable sort', () => {
+    // round(0.67 * 3) = 2 → the two lowest ids in g1.
+    const covered = estimateCoveredIds({ g1: 2 }, REP);
+    expect([...covered].sort()).toEqual(['IS-A-1', 'IS-A-2']);
+  });
+
+  it('is deterministic and independent of input order', () => {
+    const a = estimateCoveredIds({ g1: 2, g2: 1 }, REP);
+    const shuffled = [REP[3], REP[0], REP[4], REP[2], REP[1]];
+    const b = estimateCoveredIds({ g1: 2, g2: 1 }, shuffled);
+    expect([...a].sort()).toEqual([...b].sort());
+  });
+
+  it('treats an out-of-range level as 0', () => {
+    expect(estimateCoveredIds({ g1: 9 as unknown as number }, REP).size).toBe(0);
   });
 });

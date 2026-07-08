@@ -1,10 +1,14 @@
 import {
-  estimateCoverage, verdictTier,
+  estimateCoverage, estimateCoveredIds, verdictTier,
   type PhaseRef, type FrameworkRef, type CatalogRef,
 } from './assess';
 import type { ActorMeta, PlaybookStep, LifecycleTactic } from '@/data/guardrails/attack-chains';
 
-export interface RepControlLite { id: string; name: string; sev: string; group: string }
+export interface RepControlLite {
+  id: string; name: string; sev: string;
+  tier: 'mandatory' | 'strongly_recommended' | 'elective';
+  group: string;
+}
 
 export interface AssessData {
   catalog: CatalogRef;
@@ -12,8 +16,10 @@ export interface AssessData {
   phases: PhaseRef[];
   representative: RepControlLite[];
   frameworks: FrameworkRef[];
+  // Still shipped in the payload but unused — the email/PDF gate was removed (fix 6).
   formspreeEndpoint: string | null;
-  // attack sections (§2 lifecycle + §3 playbooks) — shared capability content, no per-user state
+  // attack sections (§1 lifecycle + §2 playbooks) — shared capability content, projected
+  // against the per-group estimate at render time via estimateCoveredIds.
   actors: Record<string, ActorMeta>;
   chains: { id: string; steps: PlaybookStep[] }[];
   lifecycle: LifecycleTactic[];
@@ -22,8 +28,6 @@ export interface AssessData {
 
 // v2 key — the model changed from a per-control Set to a per-group level map, so old data is ignored.
 const LEVELS_KEY = 'arena.assess.v2';
-const AUDIT_KEY = 'arena.assess.audit';
-const EMAIL_KEY = 'arena.assess.email';
 
 const LEVEL_LABELS = ['None', 'Some', 'Most', 'All'];
 
@@ -85,6 +89,13 @@ const TEXT_TONE: Record<string, string> = {
 };
 const tone = (c: string): string => TEXT_TONE[c] ?? c;
 
+const SEV_META: Record<string, { label: string; color: string }> = {
+  critical: { label: 'Critical', color: '#ff5470' },
+  high: { label: 'High', color: '#f59f3c' },
+  medium: { label: 'Medium', color: '#4d66e0' },
+  low: { label: 'Low', color: '#8a8fa8' },
+};
+
 function esc(s: string): string {
   return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
@@ -127,6 +138,19 @@ function grSection(index: string, title: string, right: string, inner: string, e
     ${inner}
   </section>`;
 }
+function grAllClear(inner: string): string {
+  return `<div style="display:flex;gap:12px;align-items:flex-start;padding:16px 18px;border-radius:12px;background:${GR.green}0d;border:1px solid ${GR.green}14">
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="flex-shrink:0;margin-top:1px"><circle cx="9" cy="9" r="9" fill="${GR.green}"></circle><path d="M5 9.2 L7.8 12 L13 6.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <p style="margin:0;font-size:15px;line-height:1.55;color:${GR.ink};font-weight:500;text-wrap:pretty">${inner}</p>
+  </div>`;
+}
+function grSevBadge(sev: string): string {
+  const m = SEV_META[sev] ?? SEV_META.low;
+  return `<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:${m.color}14;flex-shrink:0"><span style="width:6px;height:6px;border-radius:999px;background:${m.color}"></span>${grMono(m.label, { size: 10, color: tone(m.color), ls: '0.1em', weight: 600 })}</span>`;
+}
+function grGroupPill(short: string): string {
+  return `<span style="padding:2px 9px;border-radius:999px;border:1px solid ${GR.slate}33;flex-shrink:0">${grMono(short, { size: 9, color: GR.slate, ls: '0.08em', weight: 600 })}</span>`;
+}
 function lockMark(size = 24, color = GR.brand): string {
   return `<svg width="${size}" height="${size}" viewBox="0 0 26 26" aria-hidden="true" style="aspect-ratio:1/1"><rect x="3" y="5" width="20" height="16" rx="7" fill="none" stroke="${color}" stroke-width="3"></rect><rect x="10" y="11" width="6" height="4" rx="1.5" fill="${color}"></rect></svg>`;
 }
@@ -135,12 +159,13 @@ function lockMark(size = 24, color = GR.brand): string {
 const mitreUrl = (t: string): string => `https://attack.mitre.org/techniques/${t.replace('.', '/')}/`;
 function stateIcon(st: string, size = 16): string {
   if (st === 'no-control') return `<span style="width:${size}px;height:${size}px;border-radius:999px;background:#fff;border:1.5px dashed ${GR.slate}99;display:grid;place-content:center;flex-shrink:0;box-sizing:border-box" aria-label="No preventive control — scan/detect territory"><svg width="${size * 0.52}" height="${size * 0.52}" viewBox="0 0 12 12"><path d="M6 2.4 L10.1 9.7 H1.9 Z" fill="none" stroke="${GR.slate}" stroke-width="1.5" stroke-linejoin="round"></path></svg></span>`;
-  if (st === 'open') return `<span style="width:${size}px;height:${size}px;border-radius:999px;background:#fff;border:2px solid ${GR.red};display:grid;place-content:center;flex-shrink:0;box-sizing:border-box" aria-label="Open"><svg width="${size * 0.44}" height="${size * 0.44}" viewBox="0 0 11 11"><path d="M2 2 L9 9 M9 2 L2 9" stroke="${GR.red}" stroke-width="2.4" stroke-linecap="round"></path></svg></span>`;
-  return `<span style="width:${size}px;height:${size}px;border-radius:999px;background:${GR.green};display:grid;place-content:center;flex-shrink:0;box-sizing:border-box" aria-label="Enforced guardrail"><svg width="${size * 0.56}" height="${size * 0.56}" viewBox="0 0 14 14"><path d="M3 7.4 L5.8 10 L11 4.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>`;
+  if (st === 'open') return `<span style="width:${size}px;height:${size}px;border-radius:999px;background:#fff;border:2px solid ${GR.red};display:grid;place-content:center;flex-shrink:0;box-sizing:border-box" aria-label="Not yet enforced, by your estimate"><svg width="${size * 0.44}" height="${size * 0.44}" viewBox="0 0 11 11"><path d="M2 2 L9 9 M9 2 L2 9" stroke="${GR.red}" stroke-width="2.4" stroke-linecap="round"></path></svg></span>`;
+  return `<span style="width:${size}px;height:${size}px;border-radius:999px;background:${GR.green};display:grid;place-content:center;flex-shrink:0;box-sizing:border-box" aria-label="Enforced guardrail, by your estimate"><svg width="${size * 0.56}" height="${size * 0.56}" viewBox="0 0 14 14"><path d="M3 7.4 L5.8 10 L11 4.4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>`;
 }
-function capabilityLegend(): string {
+function coverageLegend(): string {
   return `<div class="gr-legend">
-    <span class="gr-leg-item">${stateIcon('closed', 14)} Representative guardrail (enforced)</span>
+    <span class="gr-leg-item">${stateIcon('closed', 14)} Enforced, by your estimate</span>
+    <span class="gr-leg-item">${stateIcon('open', 14)} Not yet enforced</span>
     <span class="gr-leg-item">${stateIcon('no-control', 14)} No preventive control — scan / detect territory</span>
   </div>`;
 }
@@ -167,7 +192,7 @@ function infoPop(actor: ActorMeta): string {
 
 const MONO = 'font-mono uppercase';
 
-// Calm, estimate-framed verdicts — never assert breach; no "gaps below" (§2/§3 are capability, not gaps).
+// Calm, estimate-framed verdicts — never assert breach.
 const VERDICT_COPY: Record<string, string> = {
   open: 'Early days, by your own estimate — a lot of ground still to cover. The upside: most of it is enforceable org-wide in a single pass.',
   foundation: 'A solid foundation, on this estimate. The controls that separate "good" from "hard to move through" are the ones worth verifying next.',
@@ -182,13 +207,7 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
   const state = {
     levels: readJSON<Record<string, number>>(LEVELS_KEY, {}),
     view: 'assess' as 'assess' | 'report',
-    audit: readJSON<string>(AUDIT_KEY, ''),
-    email: readJSON<string>(EMAIL_KEY, ''),
-    gateOpen: false,
-    gateBusy: false,
-    gateError: false,
-    emailDraft: '',
-    // §2/§3 interaction state
+    // §1/§2 interaction state
     selectedStage: null as string | null,
     expandedStories: new Set<string>(),
     collapsedActors: new Set<string>(
@@ -307,15 +326,18 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
     updateScore();
   };
 
-  // ---------- report view (estimate + capability showcase + CTA) ----------
+  // ---------- report view (estimate-driven arc + CTA) ----------
   const reportHTML = (): string => {
     const now = new Date();
     const dateLabel = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const cov = estimateCoverage(state.levels, data.catalog, data.phases);
     const pctInt = Math.round(cov.pct * 100);
     const tier = verdictTier(cov.pct);
+    // The single source of truth every estimate-driven section consults, so §1, §2, table-stakes,
+    // top-missing and AI all agree on what "covered" means.
+    const covered = estimateCoveredIds(state.levels, data.representative);
 
-    /* ===== §1 — estimate masthead ===== */
+    /* ===== estimate masthead (unnumbered) ===== */
     const masthead = (): string => {
       const tierRing: Record<string, string> = { open: GR.amber, foundation: GR.brand, strong: GR.green };
       const phaseBars = cov.perPhase.map(p => {
@@ -355,7 +377,13 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
       </header>`;
     };
 
-    /* ===== §2 — attack-lifecycle coverage (InstaSecure capability map) ===== */
+    /* ===== positioning strip — what "guardrail" means here (contrast vs IaC/CI-CD) ===== */
+    const positioningNote = (): string => `<div style="display:grid;gap:7px;padding:16px 18px;border-radius:12px;border:1px solid ${GR.brand}24;background:${GR.brand}07">
+      ${grMono('Control-plane guardrails', { size: 10, color: GR.brand, ls: '0.16em', weight: 600 })}
+      <p style="margin:0;font-size:13px;line-height:1.6;color:${GR.body};text-wrap:pretty">InstaSecure enforces preventive guardrails at the AWS control plane — <strong style="color:${GR.ink}">SCPs, RCPs, and data-perimeter policies</strong> that execute at runtime, org-wide. Not an IaC or CI/CD policy check that runs before deploy and can be skipped; the cloud itself enforces these on every request.</p>
+    </div>`;
+
+    /* ===== §01 — attack-lifecycle coverage (estimate-projected) ===== */
     const renderLifecycle = (): string => {
       const rows = data.lifecycle;
       const mappedN = rows.filter(t => t.populated).length;
@@ -378,15 +406,22 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
           </div>`;
         }
         const shown = row.controls.length;
+        const closedCount = row.controls.filter(c => covered.has(c.control)).length;
+        const allClosed = closedCount === shown;
         const catCount = data.catalog.tactics[row.tactic] ?? shown;
         const more = Math.max(0, catCount - shown);
         const sel = state.selectedStage === row.tactic;
-        // Every rail is enforced (green) — this is InstaSecure's capability, not the user's gaps.
-        const rails = row.controls
-          .map(c => `<span class="gr-lcp-rail is-closed" style="--rail:${railH}px" title="${esc(c.control)} — ${esc(c.controlName)} (enforced)"></span>`)
+        // Rail is green where your estimate covers the control, red-outline where it isn't yet.
+        // Open rails sort to the top of the wall (missing bricks).
+        const rails = [...row.controls]
+          .sort((a, b) => (covered.has(a.control) ? 1 : 0) - (covered.has(b.control) ? 1 : 0))
+          .map(c => {
+            const isCov = covered.has(c.control);
+            return `<span class="gr-lcp-rail ${isCov ? 'is-closed' : 'is-open'}" style="--rail:${railH}px" title="${esc(c.control)} — ${esc(c.controlName)} (${isCov ? 'enforced, by your estimate' : 'not yet enforced, by your estimate'})"></span>`;
+          })
           .join('');
-        const ratio = `<span class="gr-lcp-ratio" style="color:${tone(GR.green)}">${shown}${more > 0 ? `<span style="color:${GR.faint};font-weight:500;font-size:9px"> +${more}</span>` : ''}</span>`;
-        return `<button type="button" class="gr-lcp-cell${sel ? ' is-sel' : ''}" data-ga-stage="${esc(row.tactic)}" aria-pressed="${sel}" title="${esc(row.tactic)} — ${shown} representative guardrails shown, ${catCount} in the full catalog">
+        const ratio = `<span class="gr-lcp-ratio" style="color:${allClosed ? tone(GR.green) : tone(GR.red)}">${closedCount}/${shown}${more > 0 ? `<span style="color:${GR.faint};font-weight:500;font-size:9px"> +${more}</span>` : ''}</span>`;
+        return `<button type="button" class="gr-lcp-cell${sel ? ' is-sel' : ''}" data-ga-stage="${esc(row.tactic)}" aria-pressed="${sel}" title="${esc(row.tactic)} — ${closedCount} of ${shown} covered on your estimate, ${catCount} in the full catalog">
           <span class="gr-lcp-wall${roomy ? '' : ' is-compact'}"${roomy ? '' : ' style="gap:0"'}>
             ${ratio}
             ${rails}
@@ -400,22 +435,25 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
       const selRow = rows.find(r => r.tactic === state.selectedStage && r.populated);
       if (selRow) {
         const shown = selRow.controls.length;
+        const closedCount = selRow.controls.filter(c => covered.has(c.control)).length;
         const catCount = data.catalog.tactics[selRow.tactic] ?? shown;
         const more = Math.max(0, catCount - shown);
         const detailRows = selRow.controls.map(c => {
+          const isCov = covered.has(c.control);
           const sc = data.storyMap[c.control] ?? null;
           const key = `lc:${selRow.tactic}:${c.control}`;
           const storyOpen = state.expandedStories.has(key);
-          return `<div class="gr-vstep${sc ? ' has-story' : ''}"${sc ? ` data-ga-story="${esc(key)}" role="button" tabindex="0" aria-expanded="${storyOpen}"` : ''} title="${esc(c.technique)} · ${esc(selRow.tactic)} — enforced guardrail">
-            <span class="gr-vnode">${stateIcon('closed', 18)}</span>
+          const ctlColor = isCov ? '#6d7290' : tone(GR.red);
+          return `<div class="gr-vstep${isCov ? '' : ' is-open'}${sc ? ' has-story' : ''}"${sc ? ` data-ga-story="${esc(key)}" role="button" tabindex="0" aria-expanded="${storyOpen}"` : ''} title="${esc(c.technique)} · ${esc(selRow.tactic)} — ${isCov ? 'enforced, by your estimate' : 'not yet enforced, by your estimate'}">
+            <span class="gr-vnode">${stateIcon(isCov ? 'closed' : 'open', 18)}</span>
             <div class="gr-vbody">
               <div class="gr-vrow1">
-                <span class="gr-vlabel" style="color:${GR.body};font-weight:500">${esc(c.controlName)}</span>
+                <span class="gr-vlabel" style="color:${isCov ? GR.body : GR.ink};font-weight:${isCov ? 500 : 600}">${esc(c.controlName)}</span>
                 ${sc ? storyCaret(storyOpen) : ''}
-                <span class="gr-vctl" style="color:#6d7290">${esc(c.control)}</span>
+                <span class="gr-vctl" style="color:${ctlColor}">${esc(c.control)}</span>
               </div>
               <div class="gr-vrow2">
-                <a class="gr-vtech gr-b2-link" href="${mitreUrl(c.technique)}" target="_blank" rel="noreferrer" style="color:#6d7290">${esc(c.technique)}</a>
+                <a class="gr-vtech gr-b2-link" href="${mitreUrl(c.technique)}" target="_blank" rel="noreferrer" style="color:${ctlColor}">${esc(c.technique)}</a>
               </div>
               ${sc && storyOpen ? storyBlock(sc) : ''}
             </div>
@@ -424,7 +462,7 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
         detail = `<div class="gr-lc-detail">
           <div class="gr-lc-detail-head">
             ${grMono(esc(selRow.tactic), { size: 10, color: GR.slate, ls: '0.14em', weight: 600 })}
-            ${grMono(`${shown} shown${more > 0 ? ` · ${more} more in catalog` : ''}`, { size: 10, color: GR.faint, ls: '0.06em' })}
+            ${grMono(`${closedCount}/${shown} covered${more > 0 ? ` · ${more} more in catalog` : ''}`, { size: 10, color: GR.faint, ls: '0.06em' })}
             <button type="button" class="gr-lc-close" aria-label="Close stage detail" data-ga-stage-close>×</button>
           </div>
           ${detailRows}
@@ -433,36 +471,38 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
 
       const inner = `
         <div class="gr-b2-lead" style="display:grid;gap:9px">
-          <p style="margin:0;font-family:var(--font-serif);font-size:18.5px;line-height:1.5;color:${GR.ink};text-wrap:pretty">Every InstaSecure guardrail maps to MITRE ATT&amp;CK.</p>
-          <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">Here's a representative sample across the kill chain — the full catalog covers far more at each stage. InstaSecure's ${catTotal} preventive controls reach every MITRE ATT&amp;CK (cloud) technique a guardrail can close, then go further into AWS-native data-perimeter controls the vendor-neutral matrix has no technique ID for.</p>
-          ${capabilityLegend()}
+          <p style="margin:0;font-family:var(--font-serif);font-size:18.5px;line-height:1.5;color:${GR.ink};text-wrap:pretty">Based on your estimate, here's where the kill chain is covered — and where it's still open.</p>
+          <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">Every InstaSecure guardrail maps to MITRE ATT&amp;CK. This is a representative sample across the kill chain — a rail for each control we name, green where your estimate says it's enforced, red where it's not yet. The full catalog covers far more at each stage: InstaSecure's ${catTotal} control-plane guardrails reach every MITRE ATT&amp;CK (cloud) technique a guardrail can close, then go further into AWS-native data-perimeter controls the vendor-neutral matrix has no technique ID for.</p>
+          ${coverageLegend()}
         </div>
         <div style="display:grid;gap:9px">
-          <p style="margin:0;font-size:12.5px;line-height:1.55;color:${GR.muted};text-wrap:pretty">The attack path, in MITRE tactic order — every campaign moves left to right through these stages. Each stage raises a wall of the guardrails that break attacks there; the number is how many we're showing, and “+N” is how many more the catalog enforces.<span class="gr-hint-screen"> Select a stage to see its controls.</span></p>
+          <p style="margin:0;font-size:12.5px;line-height:1.55;color:${GR.muted};text-wrap:pretty">The attack path, in MITRE tactic order — every campaign moves left to right through these stages. Each stage raises a wall of the guardrails that break attacks there: green where your estimate covers them, red where it doesn't yet; “+N” is how many more the catalog enforces.<span class="gr-hint-screen"> Select a stage to see its controls.</span></p>
           <div class="gr-lcp" style="--gr-wall-h:${wallH}px;--gr-axis-y:${wallH + 15}px">${axisCells}</div>
           ${detail}
           <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">${mappedN} of ${rows.length} stages carry preventive controls in the ATT&amp;CK v19.1 catalog — stages without one are detection territory. Representative sample — ${data.representative.length} guardrails named here; InstaSecure enforces ${catTotal} in total.</p>
         </div>`;
-      return grSection('02', 'Attack-lifecycle coverage', '', inner, 'gr-attack');
+      return grSection('01', 'Attack-lifecycle coverage', '', inner, 'gr-attack');
     };
 
-    /* ===== §3 — real-adversary playbooks (capability demo) ===== */
+    /* ===== §02 — real-adversary playbooks (estimate-projected) ===== */
     const vStep = (s: PlaybookStep, i: number, actorId: string): string => {
       const nc = s.control === null;
+      const isCov = !nc && covered.has(s.control!);
+      const open = !nc && !isCov;
+      const st = nc ? 'no-control' : isCov ? 'closed' : 'open';
       const sc = s.control ? data.storyMap[s.control] ?? null : null;
       const key = `pb:${actorId}:${i}`;
       const storyOpen = state.expandedStories.has(key);
-      const st = nc ? 'no-control' : 'closed';
-      const labelColor = nc ? GR.slateDark : GR.body;
-      const ctlColor = nc ? GR.slate : '#6d7290';
-      const techColor = nc ? GR.slate : '#6d7290';
+      const labelColor = nc ? GR.slateDark : open ? GR.ink : GR.body;
+      const ctlColor = nc ? GR.slate : open ? tone(GR.red) : '#6d7290';
+      const techColor = nc ? GR.slate : open ? tone(GR.red) : '#6d7290';
       const ctlText = nc ? '△ scan / detect' : esc(s.control!) + (s.partial ? ' · partial' : '');
-      const title = `${s.techniqueName} · ${s.tactic}\n${s.api}\n${nc ? 'No preventive guardrail — detection / scan territory.' : 'Enforced by ' + (s.controlName ?? '') + (s.sev ? ` (${s.sev})` : '') + (s.partial ? ' — partial coverage' : '')}`;
-      return `<div class="gr-vstep${nc ? ' is-nc' : ''}${sc ? ' has-story' : ''}"${sc ? ` data-ga-story="${esc(key)}" role="button" tabindex="0" aria-expanded="${storyOpen}"` : ''} title="${esc(title)}">
+      const title = `${s.techniqueName} · ${s.tactic}\n${s.api}\n${nc ? 'No preventive guardrail — detection / scan territory.' : (isCov ? 'Enforced by ' : 'Not yet enforced, by your estimate — ') + (s.controlName ?? '') + (s.sev ? ` (${s.sev})` : '') + (s.partial ? ' — partial coverage' : '')}`;
+      return `<div class="gr-vstep${open ? ' is-open' : nc ? ' is-nc' : ''}${sc ? ' has-story' : ''}"${sc ? ` data-ga-story="${esc(key)}" role="button" tabindex="0" aria-expanded="${storyOpen}"` : ''} title="${esc(title)}">
         <span class="gr-vnode">${stateIcon(st, 18)}</span>
         <div class="gr-vbody">
           <div class="gr-vrow1">
-            <span class="gr-vlabel" style="color:${labelColor};font-weight:500">${esc(s.label)}</span>
+            <span class="gr-vlabel" style="color:${labelColor};font-weight:${open ? 700 : 500}">${esc(s.label)}</span>
             ${sc ? storyCaret(storyOpen) : ''}
             <span class="gr-vctl" style="color:${ctlColor}">${ctlText}</span>
           </div>
@@ -482,10 +522,14 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
         const collapsed = state.collapsedActors.has(ch.id);
         const openState = !collapsed;
         const cite = [actor.mitreGroup ? `MITRE ${actor.mitreGroup}` : 'No MITRE group designation', ...actor.sources.map(s => `${s.name} (${s.date})`)].join(' · ');
-        const spark = collapsed ? `<span class="gr-spark" aria-hidden="true">${ch.steps.map(s => stateIcon(s.control === null ? 'no-control' : 'closed', 12)).join('')}</span>` : '';
+        const spark = collapsed ? `<span class="gr-spark" aria-hidden="true">${ch.steps.map(s => stateIcon(s.control === null ? 'no-control' : covered.has(s.control) ? 'closed' : 'open', 12)).join('')}</span>` : '';
         const preventive = ch.steps.filter(s => s.control !== null).length;
+        const closedSteps = ch.steps.filter(s => s.control !== null && covered.has(s.control)).length;
+        const openSteps = preventive - closedSteps;
         const detection = ch.steps.filter(s => s.control === null).length;
-        const covPill = `<span style="padding:3px 11px;border-radius:999px;background:${GR.green}14">${grMono(`${preventive} guardrails break this chain`, { size: 9.5, color: tone(GR.green), ls: '0.1em', weight: 600 })}</span>`;
+        const covPill = openSteps === 0
+          ? `<span style="padding:3px 11px;border-radius:999px;background:${GR.green}14">${grMono(`${closedSteps}/${preventive} guardrails hold`, { size: 9.5, color: tone(GR.green), ls: '0.1em', weight: 600 })}</span>`
+          : `<span style="padding:3px 11px;border-radius:999px;background:${GR.red}14">${grMono(`${openSteps} of ${preventive} open`, { size: 9.5, color: tone(GR.red), ls: '0.1em', weight: 600 })}</span>`;
         const ncPill = detection > 0 ? `<span style="padding:3px 11px;border-radius:999px;border:1px solid ${GR.slate}33">${grMono(`△ ${detection} detection-only`, { size: 9.5, color: GR.slate, ls: '0.1em', weight: 600 })}</span>` : '';
         const pop = state.openPopover === ch.id ? infoPop(actor) : '';
         const tacticsCount = new Set(ch.steps.map(s => s.tactic)).size;
@@ -521,67 +565,140 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
       const inner = `
         <div class="gr-b2-lead" style="display:grid;gap:9px">
           <p style="margin:0;font-family:var(--font-serif);font-size:18.5px;line-height:1.5;color:${GR.ink};text-wrap:pretty">How named adversaries move — and where InstaSecure breaks the chain.</p>
-          <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">Documented cloud campaigns from published threat research, walked step by step. Every move is cited; each preventive step names the InstaSecure guardrail that stops it. Steps with a dotted label expand to the scenario behind them.</p>
+          <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">Documented cloud campaigns from published threat research, walked step by step. Every move is cited; each preventive step names the InstaSecure control-plane guardrail that stops it — green where your estimate says it's enforced, red where it's not yet. Steps with a dotted label expand to the scenario behind them.</p>
         </div>
         <div style="display:grid;gap:10px">${cards}</div>
-        <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">Technique IDs link to the MITRE ATT&amp;CK® Enterprise (IaaS) matrix; actor attributions are dated, cited claims. △ marks moves with no preventive control — detection / scan territory.</p>`;
-      return grSection('03', 'Real-adversary playbooks', '', inner, 'gr-attack');
+        <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">Technique IDs link to the MITRE ATT&amp;CK® Enterprise (IaaS) matrix; actor attributions are dated, cited claims. △ marks moves with no preventive control — detection / scan territory. Open = not yet enforced, by your estimate.</p>`;
+      return grSection('02', 'Real-adversary playbooks', '', inner, 'gr-attack');
     };
 
-    /* ===== §4 — from estimate to evidence (CTA) ===== */
-    const evidenceCTA = (): string => {
-      const fwList = data.frameworks.slice(0, 4).map(f => f.label).join(', ');
-      const inner = `<div style="display:grid;gap:15px;padding:24px 26px;border-radius:16px;border:1px solid ${GR.brand}24;background:${GR.brand}08">
-        <p style="margin:0;font-family:var(--font-serif);font-size:19px;line-height:1.5;color:${GR.ink};text-wrap:pretty">This is a rough estimate. A precise assessment is a scan.</p>
-        <p style="margin:0;font-size:14px;line-height:1.65;color:${GR.body};text-wrap:pretty">A precise assessment maps all <strong style="color:${GR.ink}">${catTotal}</strong> InstaSecure guardrails to your actual AWS organization — the specific gaps, the framework evidence you're missing (${esc(fwList)}), and the order to close them. It covers the <strong style="color:${GR.ink}">${data.catalog.auditTamperTotal}</strong> audit-integrity controls that keep your logs admissible, too. That's not a checkbox exercise — it's a scan.</p>
-        <div class="gr-cta-row" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-          <a href="/contact" class="gr-cta-primary" style="display:grid;gap:2px;padding:12px 22px;border-radius:11px;background:${GR.brand};color:#fff;text-decoration:none;box-shadow:0 10px 24px -10px #4d66e099">
-            <span style="font-size:14.5px;font-weight:700">Get a precise assessment</span>
-            <span style="font-size:11.5px;color:#ffffffb3">Map all ${catTotal} guardrails to your AWS org</span>
-          </a>
+    /* ===== §03 — table stakes (mandatory floor, representative sample) ===== */
+    const tableStakes = (): string => {
+      const mand = data.representative.filter(c => c.tier === 'mandatory');
+      const allCov = mand.length > 0 && mand.every(c => covered.has(c.id));
+      const footnote = `<p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">Representative sample — InstaSecure enforces ${data.catalog.mandatoryTotal} mandatory “table-stakes” controls org-wide. <a href="/contact" style="color:${GR.brand};font-weight:600;text-decoration:none">See them all: talk to us</a>.</p>`;
+      if (allCov) {
+        return grSection('03', 'Table stakes', '', `${grAllClear('On your estimate, the mandatory floor is covered — verify it with a scan.')}${footnote}`);
+      }
+      const rows = mand.map(c => {
+        const isCov = covered.has(c.id);
+        const g = data.groups[c.group];
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:#fff;border:1px solid ${GR.border}">
+          <span style="flex-shrink:0">${stateIcon(isCov ? 'closed' : 'open', 18)}</span>
+          <span style="width:94px;flex-shrink:0;display:inline-flex">${grSevBadge(c.sev)}</span>
+          <span style="flex:1;min-width:0;font-size:13.5px;font-weight:500;color:${GR.ink};line-height:1.45">${esc(c.name)}</span>
+          ${g ? grGroupPill(esc(g.short)) : ''}
+        </div>`;
+      }).join('');
+      const inner = `
+        <div style="display:grid;gap:6px">
+          <p style="margin:0;font-family:var(--font-serif);font-size:18.5px;line-height:1.5;color:${GR.ink};text-wrap:pretty">Before framework mapping, settle the floor.</p>
+          <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">Mandatory = InstaSecure's own day-one baseline, not a regulatory claim. Here's a representative sample of that floor; the icon shows where your estimate already covers it and where it's not yet enforced.</p>
         </div>
+        <div style="display:grid;gap:7px">${rows}</div>
+        ${footnote}`;
+      return grSection('03', 'Table stakes', '', inner);
+    };
+
+    /* ===== §04 — compliance evidence (public frameworks, estimate coverage) ===== */
+    const compliance = (): string => {
+      const pct = cov.pct;
+      const pctLabel = `${Math.round(pct * 100)}%`;
+      const gridCols = 'grid-template-columns:130px 92px 1fr';
+      const headerRow = `<div class="gr-fw-row" style="display:grid;${gridCols};gap:14px;align-items:center">
+        ${grMono('Framework', { size: 9.5, color: GR.faint, ls: '0.12em', weight: 600 })}
+        ${grMono('Controls map', { size: 9.5, color: GR.faint, ls: '0.12em', weight: 600 })}
+        <span style="text-align:right">${grMono('Estimated evidence coverage', { size: 9.5, color: GR.faint, ls: '0.12em', weight: 600 })}</span>
       </div>`;
-      return grSection('04', 'From estimate to evidence', '', inner);
+      const rows = data.frameworks.map(f => {
+        const n = data.catalog.frameworks[f.key] ?? 0;
+        return `<div class="gr-fw-row" style="display:grid;${gridCols};gap:14px;align-items:center">
+          ${grMono(esc(f.label), { size: 11, color: GR.ink, ls: '0.05em', weight: 600 })}
+          <span style="font-size:13.5px;color:${GR.body};font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">${n}<span style="color:${GR.muted};font-weight:500"> map</span></span>
+          <div style="display:flex;align-items:center;gap:9px">
+            <div style="flex:1;height:9px;border-radius:999px;background:${GR.track};overflow:hidden" role="img" aria-label="${pctLabel} estimated evidence coverage for ${esc(f.label)}">
+              <div style="width:${pct * 100}%;height:100%;background:${covColor(pct)}"></div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:10px;color:${GR.muted};width:34px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums">${pctLabel}</span>
+          </div>
+        </div>`;
+      }).join('');
+      const tamperCallout = `<div class="gr-b2-callout" style="display:grid;gap:8px;padding:16px 18px;border-radius:12px;border:1px solid ${GR.purple}14;background:${GR.purple}08">
+        ${grMono('Evidence integrity', { size: 10.5, color: tone(GR.purple), ls: '0.16em', weight: 600 })}
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.ink};text-wrap:pretty">InstaSecure enforces <strong>${data.catalog.auditTamperTotal}</strong> controls tagged audit-tampering — the ones that keep logs admissible if someone tries to silence them. A precise scan confirms these are enforced before your audit.</p>
+      </div>`;
+      const inner = `
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">Each guardrail maps to the public standards below. The count is how many InstaSecure control-plane guardrails provide preventive evidence for that framework; the bar applies your overall coverage estimate across them — a precise assessment resolves it per framework.</p>
+        <div style="display:grid;gap:9px">${headerRow}${rows}</div>
+        <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">Frameworks are public standards; InstaSecure guardrails provide preventive evidence for each. Coverage shown is your estimate — a precise assessment maps your enforced controls per framework. <a href="/contact" style="color:${GR.brand};font-weight:600;text-decoration:none">Talk to us</a>.</p>
+        ${tamperCallout}`;
+      return grSection('04', 'Compliance evidence', '', inner);
     };
 
-    /* ===== §7 — AI callout (capability, verbatim copy) ===== */
+    /* ===== §05 — top missing controls (representative higher-severity gaps) ===== */
+    const topMissingSec = (): string => {
+      const sevRank: Record<string, number> = { critical: 0, high: 1 };
+      const missing = data.representative
+        .filter(c => !covered.has(c.id) && (c.sev === 'critical' || c.sev === 'high'))
+        .sort((a, b) => (sevRank[a.sev] ?? 9) - (sevRank[b.sev] ?? 9))
+        .slice(0, 6);
+      if (missing.length === 0) {
+        return grSection('05', 'Top missing controls', '', grAllClear('On your estimate, no critical or high-severity gaps remain in this sample. Verify it — a scan confirms enforcement across every account, OU, and region.'));
+      }
+      const rows = missing.map(c => {
+        const g = data.groups[c.group];
+        return `<div class="gr-missing-row" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:#fff;border:1px solid ${GR.border}">
+          <span style="width:94px;flex-shrink:0;display:inline-flex">${grSevBadge(c.sev)}</span>
+          <span style="flex:1;min-width:0;font-size:13.5px;font-weight:500;color:${GR.ink};line-height:1.45">${esc(c.name)}</span>
+          ${g ? grGroupPill(esc(g.short)) : ''}
+        </div>`;
+      }).join('');
+      const inner = `
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.body};text-wrap:pretty">On your estimate, these higher-severity guardrails aren't yet enforced. This is a representative sample — a precise scan ranks your real gaps in priority order.</p>
+        <div style="display:grid;gap:7px">${rows}</div>
+        <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">Representative sample of higher-severity gaps on your estimate — InstaSecure's full catalog has more. A precise scan ranks your real gaps. <a href="/contact" style="color:${GR.brand};font-weight:600;text-decoration:none">Talk to us</a>.</p>`;
+      return grSection('05', 'Top missing controls', '', inner);
+    };
+
+    /* ===== §06 — AI guardrails (representative sample, verbatim board copy) ===== */
     const aiSection = (): string => {
-      return `<section class="gr-section" style="display:grid;gap:0">
-        <div style="display:grid;gap:8px;padding:18px 20px;border-radius:12px;border:1px solid ${GR.purple}14;background:${GR.purple}08">
-          <div style="display:flex;align-items:baseline;gap:14px">${grMono('05', { size: 11, color: GR.faint, ls: '0.18em', weight: 600 })}${grMono('AI guardrails', { size: 10.5, color: tone(GR.purple), ls: '0.16em', weight: 600 })}</div>
-          <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.ink};text-wrap:pretty">InstaSecure enforces <strong>${data.catalog.aiTotal}</strong> AI guardrails. Your genAI adoption may be ahead of your genAI governance — that's a board question this quarter.</p>
-        </div>
-      </section>`;
+      const aiControls = data.representative.filter(c => c.id.startsWith('IS-BEDROCK'));
+      const rows = aiControls.map(c => {
+        const isCov = covered.has(c.id);
+        return `<div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;background:#fff;border:1px solid ${GR.purple}1f">
+          <span style="flex-shrink:0">${stateIcon(isCov ? 'closed' : 'open', 16)}</span>
+          <span style="width:78px;flex-shrink:0;display:inline-flex">${grSevBadge(c.sev)}</span>
+          <span style="flex:1;min-width:0;font-size:12.5px;font-weight:500;color:${GR.ink};line-height:1.45">${esc(c.name)}</span>
+        </div>`;
+      }).join('');
+      const inner = `<div style="display:grid;gap:12px;padding:18px 20px;border-radius:12px;border:1px solid ${GR.purple}14;background:${GR.purple}08">
+        <p style="margin:0;font-size:13.5px;line-height:1.6;color:${GR.ink};text-wrap:pretty">InstaSecure enforces <strong>${data.catalog.aiTotal}</strong> AI guardrails (sample below; the AI guardrail catalog is expanding). Your genAI adoption may be ahead of your genAI governance — that's a board question this quarter.</p>
+        <div style="display:grid;gap:6px">${rows}</div>
+      </div>`;
+      return grSection('06', 'AI guardrails', '', inner);
     };
 
-    /* ===== §8 — close (CTA + Formspree email gate, preserved verbatim) ===== */
+    /* ===== §07 — from estimate to enforcement (close + Save as PDF) ===== */
     const closeSection = (): string => {
-      const gate = state.gateOpen ? `<form id="ga-gate-form" class="gr-gate" style="display:grid;gap:8px">
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <label for="ga-gate-email" class="sr-only">Work email</label>
-          <input id="ga-gate-email" type="email" required placeholder="you@company.com" value="${esc(state.emailDraft)}" ${state.gateBusy ? 'disabled' : ''} aria-label="Work email" style="flex:1;min-width:200px;padding:11px 14px;border-radius:10px;border:1px solid ${state.gateError ? GR.red : '#ffffff3d'};background:#ffffff14;color:#fff;font-family:var(--font-sans);font-size:14px;outline:none">
-          <button type="submit" ${state.gateBusy ? 'disabled' : ''} style="padding:11px 20px;border-radius:10px;border:none;background:${state.gateBusy ? '#ffffff33' : '#fff'};color:${GR.ink};font-family:var(--font-sans);font-size:13.5px;font-weight:700;cursor:${state.gateBusy ? 'default' : 'pointer'}">${state.gateBusy ? 'Sending…' : 'Send report'}</button>
-          <button type="button" id="ga-gate-cancel" ${state.gateBusy ? 'disabled' : ''} style="padding:11px 12px;border-radius:10px;border:none;background:transparent;color:#ffffff8c;font-family:var(--font-sans);font-size:13px;cursor:pointer">Cancel</button>
-        </div>
-        ${state.gateError ? `<span style="font-size:12.5px;color:${GR.red};font-weight:600">Couldn't send — try again</span>` : ''}
-      </form>` : '';
-      const secondaryBtn = state.gateOpen ? '' : `<button type="button" id="ga-export" class="gr-cta-secondary" style="padding:12px 22px;border-radius:11px;background:transparent;border:1px solid #ffffff3d;color:#fff;font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer">Email me this report (PDF)</button>`;
+      const fwList = data.frameworks.slice(0, 4).map(f => f.label).join(', ');
       const inner = `<div class="gr-close-panel" style="display:grid;gap:20px;padding:28px 30px;border-radius:16px;background:${GR.ink};color:#fff">
-        <p style="margin:0;font-size:14.5px;line-height:1.65;color:#ffffffd9;text-wrap:pretty">Every InstaSecure guardrail ships as an SCP, RCP, or VPC endpoint policy. A scan turns this estimate into an artifact checklist: which policy controls are present, missing, or not enforced across your org.</p>
+        <div style="display:grid;gap:12px">
+          <p style="margin:0;font-family:var(--font-serif);font-size:19px;line-height:1.5;color:#fff;text-wrap:pretty">This is a rough estimate. A precise assessment is a scan.</p>
+          <p style="margin:0;font-size:14px;line-height:1.65;color:#ffffffd9;text-wrap:pretty">A scan maps all <strong style="color:#fff">${catTotal}</strong> InstaSecure control-plane guardrails to your actual AWS organization — the specific gaps, the framework evidence you're missing (${esc(fwList)}), and the order to close them. It covers the <strong style="color:#fff">${data.catalog.auditTamperTotal}</strong> audit-integrity controls that keep your logs admissible, too. Every guardrail ships as an SCP, RCP, or VPC endpoint policy — enforced at the control plane, not a pre-deploy check.</p>
+        </div>
         <div class="gr-cta-row" style="display:flex;gap:12px;flex-wrap:wrap;align-items:stretch">
           <a href="/contact" class="gr-cta-primary" style="display:grid;gap:2px;padding:12px 22px;border-radius:11px;background:${GR.brand};color:#fff;text-decoration:none;box-shadow:0 10px 24px -10px #4d66e099">
             <span style="font-size:14.5px;font-weight:700">Verify with a real scan</span>
             <span style="font-size:11.5px;color:#ffffffb3">See your actual number — not the estimate</span>
           </a>
-          ${secondaryBtn}
+          <button type="button" id="ga-print" class="gr-cta-secondary" style="padding:12px 22px;border-radius:11px;background:transparent;border:1px solid #ffffff3d;color:#fff;font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer">Save as PDF</button>
         </div>
-        ${gate}
       </div>
       <div style="display:grid;gap:5px;padding-top:2px">
-        <p style="margin:0;font-size:12px;line-height:1.6;color:${GR.muted}">Every control above ships as an enforced, org-wide guardrail. Zero code.</p>
+        <p style="margin:0;font-size:12px;line-height:1.6;color:${GR.muted}">Every control above ships as an enforced, org-wide guardrail — an SCP, RCP, or data-perimeter policy. Zero code.</p>
         <p style="margin:0;font-size:12px;line-height:1.6;color:${GR.muted}">This report reflects what you estimated. An estimate ≠ enforcement — a real scan verifies every control across every account, OU, and region.</p>
       </div>`;
-      return grSection('06', 'From estimate to enforcement', '', inner, 'gr-close');
+      return grSection('07', 'From estimate to enforcement', '', inner, 'gr-close');
     };
 
     const printHeader = `<div class="gr-print-header">
@@ -595,9 +712,12 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
       ${backBtn}
       <article class="gr-sheet" aria-label="Guardrails Coverage Estimate">
         ${masthead()}
+        ${positioningNote()}
         ${renderLifecycle()}
         ${renderPlaybooks()}
-        ${evidenceCTA()}
+        ${tableStakes()}
+        ${compliance()}
+        ${topMissingSec()}
         ${aiSection()}
         ${closeSection()}
       </article>
@@ -620,44 +740,6 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
   const rerenderReport = () => {
     const report = q<HTMLElement>('[data-ga-report]');
     if (report && state.view === 'report') report.innerHTML = reportHTML();
-  };
-
-  // ---------- export / gate (preserved verbatim) ----------
-  const doExport = () => {
-    if (!data.formspreeEndpoint || state.email) { window.print(); return; }
-    state.gateOpen = true; state.gateError = false;
-    rerenderReport();
-    q<HTMLInputElement>('#ga-gate-email')?.focus();
-  };
-  const submitGate = async (form: HTMLFormElement) => {
-    const input = form.querySelector<HTMLInputElement>('#ga-gate-email');
-    if (!input || state.gateBusy || !data.formspreeEndpoint) return;
-    state.emailDraft = input.value;
-    state.gateBusy = true; state.gateError = false;
-    rerenderReport();
-    const cov = estimateCoverage(state.levels, data.catalog, data.phases);
-    try {
-      const res = await fetch(data.formspreeEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          email: state.emailDraft,
-          _subject: 'Guardrails Assessment report',
-          source: 'guardrails-assessment',
-          coverage_estimate: Math.round(cov.pct * 100),
-          tier: verdictTier(cov.pct),
-        }),
-      });
-      if (!res.ok) throw new Error(String(res.status));
-      state.email = state.emailDraft;
-      writeJSON(EMAIL_KEY, state.email);
-      state.gateOpen = false; state.gateBusy = false;
-      rerenderReport();
-      window.print();
-    } catch {
-      state.gateBusy = false; state.gateError = true;
-      rerenderReport();
-    }
   };
 
   const toggleSet = (set: Set<string>, key: string) => { if (set.has(key)) set.delete(key); else set.add(key); };
@@ -686,11 +768,10 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
     if (t.closest('#ga-open-report')) { showView('report'); return; }
     if (t.closest('#ga-back')) { showView('assess'); return; }
     if (t.closest('#ga-reset')) { state.levels = {}; persistLevels(); updateAllSegs(); return; }
-    if (t.closest('#ga-gate-cancel')) { state.gateOpen = false; state.emailDraft = ''; state.gateError = false; rerenderReport(); return; }
-    if (t.closest('#ga-export')) { doExport(); return; }
+    if (t.closest('#ga-print')) { window.print(); return; }
     // report links (technique / source / CTA) navigate natively
     if (t.closest('a[href]')) return;
-    // §2/§3 interactions
+    // §1/§2 interactions
     if (t.closest('[data-ga-stage-close]')) { state.selectedStage = null; rerenderReport(); return; }
     const stage = t.closest<HTMLElement>('[data-ga-stage]');
     if (stage) { const tac = stage.dataset.gaStage!; state.selectedStage = state.selectedStage === tac ? null : tac; rerenderReport(); return; }
@@ -709,13 +790,6 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
     const story = t?.closest<HTMLElement>('[data-ga-story]');
     if (story) { e.preventDefault(); toggleSet(state.expandedStories, story.dataset.gaStory!); rerenderReport(); }
   };
-  const onSubmit = (e: Event) => {
-    const t = e.target instanceof Element ? e.target : null;
-    const form = t?.closest<HTMLFormElement>('#ga-gate-form');
-    if (!form) return;
-    e.preventDefault();
-    void submitGate(form);
-  };
   // popover: close on outside pointer-down (mousedown fires before click) or Escape
   const onDocPointerDown = (e: Event) => {
     if (!state.openPopover) return;
@@ -731,7 +805,6 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
   const onAfterPrint = () => document.body.classList.remove('is-print');
 
   root.addEventListener('click', onClick);
-  root.addEventListener('submit', onSubmit);
   root.addEventListener('keydown', onKeyDown);
   document.addEventListener('mousedown', onDocPointerDown);
   document.addEventListener('keydown', onDocKey);
@@ -741,7 +814,6 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
 
   return () => {
     root.removeEventListener('click', onClick);
-    root.removeEventListener('submit', onSubmit);
     root.removeEventListener('keydown', onKeyDown);
     document.removeEventListener('mousedown', onDocPointerDown);
     document.removeEventListener('keydown', onDocKey);

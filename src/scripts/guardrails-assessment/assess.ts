@@ -47,6 +47,8 @@ export interface CatalogRef {
   tactics: Record<string, number>;
   aiTotal: number;
   auditTamperTotal: number;
+  mandatoryTotal: number;
+  frameworks: Record<string, number>;
 }
 
 export interface EstimatePhase { n: number; name: string; color: string; pct: number }
@@ -74,6 +76,27 @@ export function estimateCoverage(
     return { n: p.n, name: p.name, color: p.color, pct: pTotal ? pGot / pTotal : 0 };
   });
   return { pct: total ? got / total : 0, perPhase };
+}
+
+// Deterministic per-control "covered by your estimate?" projection from per-group levels.
+// The public assessment has no per-control `have` set — the report still needs a stable answer
+// to "is THIS representative control covered?" so §1 rails, §2 steps, table-stakes and top-missing
+// all agree. Within each group, cover the top round(LEVEL_FRAC[level] * groupCount) controls by
+// stable id sort: a group rated "Some" shows ~1/3 covered, "Most" ~2/3, "All" all, "None" none.
+export function estimateCoveredIds(
+  levels: Record<string, number>,
+  representative: { id: string; group: string }[],
+): Set<string> {
+  const byGroup: Record<string, string[]> = {};
+  for (const c of representative) (byGroup[c.group] ??= []).push(c.id);
+  const covered = new Set<string>();
+  for (const [g, ids] of Object.entries(byGroup)) {
+    ids.sort();
+    const lvl = levels[g] ?? 0;
+    const n = Math.round((LEVEL_FRAC[lvl] ?? 0) * ids.length);
+    for (let i = 0; i < n; i++) covered.add(ids[i]);
+  }
+  return covered;
 }
 
 export function openThreatWeights(have: ReadonlySet<string>, controls: AssessControl[]): Array<[string, number]> {
