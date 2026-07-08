@@ -1,32 +1,33 @@
 ---
 // src/components/sections/GuardrailsAssessment.astro
-import { CONTROLS } from '@/data/guardrails/controls';
+// PUBLIC estimate tool — ships only the catalog *summary* + a representative control sample.
+// The full 122-control catalog (controls.ts, private IP) must NEVER reach the browser: do not
+// import '@/data/guardrails/controls' here or in any file this page bundles.
+import { CATALOG } from '@/data/guardrails/catalog-summary';
+import { REPRESENTATIVE_CONTROLS } from '@/data/guardrails/representative-controls';
 import { SCENARIOS } from '@/data/guardrails/scenarios';
-import { THREATS } from '@/data/guardrails/threats';
 import { GROUPS } from '@/data/guardrails/groups';
 import { PHASES } from '@/data/guardrails/phases';
 import { CURATED_FRAMEWORKS } from '@/data/guardrails/frameworks';
 import { ACTORS, CHAINS, LIFECYCLE } from '@/data/guardrails/attack-chains';
 
-const curatedKeys = new Set(CURATED_FRAMEWORKS.map(f => f.key));
-const controls = CONTROLS.map(c => ({
-  id: c.id, name: c.name, sev: c.sev, tier: c.tier, impl: c.impl,
-  group: c.group, scope: c.scope, threats: c.threats,
-  fw: c.fw.filter(f => curatedKeys.has(f)),
-}));
-const scenarios = SCENARIOS.map(s => ({ id: s.id, title: s.title, threat: s.threat, correct: s.correct }));
-const aiControlIds = CONTROLS.filter(c => (c.service ?? '').includes('Bedrock') || c.id.startsWith('IS-BEDROCK')).map(c => c.id);
-const auditTamperIds = CONTROLS.filter(c => c.tags.includes('audit-tampering')).map(c => c.id);
+// Prefer an explicit endpoint env var; fall back to the repo-standard PUBLIC_FORMSPREE_FORM_ID
+// (used across ContactForm / learn) so the email gate keeps working without new config.
 const formspreeId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID;
+const formspreeEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT
+  ?? (formspreeId ? `https://formspree.io/f/${formspreeId}` : null);
 
 // §2/§3 story layer: keyed by the control a scenario closes (identical shape the controller consumes)
 const storyMap = Object.fromEntries(SCENARIOS.map(s => [s.correct, { title: s.title, explain: s.explain }]));
 
 const payload = {
-  controls, groups: GROUPS, phases: PHASES, threats: THREATS, scenarios,
-  frameworks: CURATED_FRAMEWORKS, aiControlIds, auditTamperIds,
-  formspreeEndpoint: formspreeId ? `https://formspree.io/f/${formspreeId}` : null,
+  catalog: CATALOG,
+  groups: GROUPS,
+  phases: PHASES,
+  representative: REPRESENTATIVE_CONTROLS,
+  frameworks: CURATED_FRAMEWORKS,
   actors: ACTORS, chains: CHAINS, lifecycle: LIFECYCLE, storyMap,
+  formspreeEndpoint,
 };
 ---
 <section data-ga-arena class="ga-arena relative">
