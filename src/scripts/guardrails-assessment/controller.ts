@@ -252,11 +252,7 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
         <div style="display:flex;align-items:center;gap:9px">${lockMark(22)}${grMono('Instasecure', { size: 12, color: GR.ink, ls: '0.2em', weight: 600 })}</div>
         <span style="padding:5px 12px;border-radius:6px;border:1.5px solid ${GR.amber};background:${GR.amber}0d">${grMono('Self-estimate', { size: 10.5, color: '#b26a0f', ls: '0.16em', weight: 600 })}</span>
       </div>
-      <div style="display:grid;gap:10px">
-        ${grMono(`Guardrails assessment · ${esc(dateLabel)}`, { size: 11.5, color: GR.brand, ls: '0.2em', weight: 600 })}
-        <h1 style="margin:0;font-family:var(--font-serif);font-size:clamp(33px,5vw,42px);font-weight:600;letter-spacing:-0.02em;line-height:1.08;color:${GR.ink}">122 guardrails. How many do you actually have enforced?</h1>
-        <p style="margin:0;font-size:14px;line-height:1.6;color:${GR.body};text-wrap:pretty;max-width:640px">Estimate how much of each guardrail group your org enforces today — a rough self-estimate, weighted by severity — and see it mapped across the attack lifecycle. For a precise, control-by-control assessment of your AWS environment, <a href="/contact" style="color:${GR.brand};font-weight:600">talk to us</a>.</p>
-      </div>
+      ${grMono(`Guardrails assessment · ${esc(dateLabel)}`, { size: 11.5, color: GR.brand, ls: '0.2em', weight: 600, extra: 'display:block' })}
       <div class="gr-verdict" style="display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;padding-top:6px">
         ${ringSVG(started ? s.pct : 0, 132, 11, started ? GA_TIER_RING[tier] : GR.faint, 'ga-m-ring', ringInner)}
         <div style="display:grid;gap:10px">
