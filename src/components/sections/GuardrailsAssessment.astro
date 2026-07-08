@@ -1,0 +1,275 @@
+---
+// src/components/sections/GuardrailsAssessment.astro
+import { CONTROLS } from '@/data/guardrails/controls';
+import { SCENARIOS } from '@/data/guardrails/scenarios';
+import { THREATS } from '@/data/guardrails/threats';
+import { GROUPS } from '@/data/guardrails/groups';
+import { PHASES } from '@/data/guardrails/phases';
+import { CURATED_FRAMEWORKS } from '@/data/guardrails/frameworks';
+import { ACTORS, CHAINS, LIFECYCLE } from '@/data/guardrails/attack-chains';
+
+const curatedKeys = new Set(CURATED_FRAMEWORKS.map(f => f.key));
+const controls = CONTROLS.map(c => ({
+  id: c.id, name: c.name, sev: c.sev, tier: c.tier, impl: c.impl,
+  group: c.group, scope: c.scope, threats: c.threats,
+  fw: c.fw.filter(f => curatedKeys.has(f)),
+}));
+const scenarios = SCENARIOS.map(s => ({ id: s.id, title: s.title, threat: s.threat, correct: s.correct }));
+const aiControlIds = CONTROLS.filter(c => (c.service ?? '').includes('Bedrock') || c.id.startsWith('IS-BEDROCK')).map(c => c.id);
+const auditTamperIds = CONTROLS.filter(c => c.tags.includes('audit-tampering')).map(c => c.id);
+const formspreeId = import.meta.env.PUBLIC_FORMSPREE_FORM_ID;
+
+// §2/§3 story layer: keyed by the control a scenario closes (identical shape the controller consumes)
+const storyMap = Object.fromEntries(SCENARIOS.map(s => [s.correct, { title: s.title, explain: s.explain }]));
+
+const payload = {
+  controls, groups: GROUPS, phases: PHASES, threats: THREATS, scenarios,
+  frameworks: CURATED_FRAMEWORKS, aiControlIds, auditTamperIds,
+  formspreeEndpoint: formspreeId ? `https://formspree.io/f/${formspreeId}` : null,
+  actors: ACTORS, chains: CHAINS, lifecycle: LIFECYCLE, storyMap,
+};
+---
+<section data-ga-arena class="ga-arena relative">
+  <div class="mx-auto max-w-[1080px] px-5 py-8">
+    <div data-ga-root class="min-h-[480px]"></div>
+  </div>
+  <footer class="ga-screen-chrome mx-auto max-w-[1080px] px-5 grid gap-1.5 justify-items-center text-center pt-4 pb-2">
+    <span class="text-[12.5px] text-slate-400">Think you know these controls? <a href="/learn/guardrails-challenge" class="text-[var(--color-brand)] font-semibold">Play the Challenge</a>.</span>
+    <span class="text-[12.5px] text-slate-400">Every one of these ships enforced, org-wide, in minutes. <a href="/contact" class="text-[var(--color-brand)] font-semibold">Book a demo</a>.</span>
+  </footer>
+</section>
+
+<script type="application/json" id="ga-data" is:inline set:html={JSON.stringify(payload).replace(/</g, '\\u003c')}></script>
+
+<script>
+  import { initGuardrailsAssessment } from '@/scripts/guardrails-assessment/controller';
+  function boot() {
+    const root = document.querySelector<HTMLElement>('[data-ga-root]');
+    const dataEl = document.getElementById('ga-data');
+    if (!root || !dataEl || root.dataset.gaBound === '1') return;
+    root.dataset.gaBound = '1';
+    const data = JSON.parse(dataEl.textContent || '{}');
+    const teardown = initGuardrailsAssessment(root, data);
+    document.addEventListener('astro:before-swap', () => teardown(), { once: true });
+  }
+  document.addEventListener('astro:page-load', boot);
+  if (document.readyState !== 'loading') boot();
+  else document.addEventListener('DOMContentLoaded', boot);
+</script>
+
+<style>
+  .ga-arena {
+    background-color: #f8f9fe;
+    background-image: radial-gradient(#dfe3f0 1px, transparent 1px);
+    background-size: 24px 24px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+</style>
+
+<!-- Gap Report stylesheet — ported from the designer's report-styles.css.
+     Fonts mapped to the site's --font-serif / --font-sans / --font-mono; the reference's
+     html/body + persona-switcher (body.mobile-sim) scaffolding is dropped. -->
+<style is:global>
+  .gr-sheet button { -webkit-tap-highlight-color: transparent; }
+  .gr-sheet input[type="month"]::-webkit-calendar-picker-indicator { opacity: 0.5; }
+
+  /* The report sheet — one document, not a stack of cards */
+  .gr-sheet {
+    background: #fff;
+    border: 1px solid #e5e7f0;
+    border-radius: 18px;
+    box-shadow: 0 30px 70px -40px #0e123024;
+    padding: 52px 56px 52px;
+    display: grid;
+    gap: 34px;
+  }
+
+  /* Keyboard craft: one consistent focus ring, interactive affordances only */
+  .gr-sheet button:focus-visible,
+  .gr-sheet a:focus-visible,
+  .gr-sheet [role="button"]:focus-visible,
+  .gr-backlink button:focus-visible {
+    outline: 2px solid #4d66e0;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+  .gr-audit-input input:focus { border-color: #4d66e0 !important; outline: none; }
+
+  .gr-cta-primary:hover { transform: translateY(-1px); transition: transform 150ms ease-out; }
+  .gr-cta-secondary:hover { border-color: #ffffff80; transition: border-color 150ms; }
+  .gr-backlink button:hover { color: #0e1230; }
+
+  /* §2/§3 — attack coverage: actor chains + lifecycle spine */
+  .gr-b2-link:hover { text-decoration: underline !important; }
+  .gr-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; padding-top: 3px; }
+  .gr-leg-item { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
+  .gr-actor { border-radius: 14px; background: #fff; border: 1px solid #e5e7f0; }
+  .gr-actor-hrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 13px 16px; }
+  .gr-actor[data-open="true"] .gr-actor-hrow { padding-bottom: 5px; }
+  .gr-actor-toggle { display: inline-flex; align-items: center; gap: 9px; background: none; border: 0; padding: 0; font: inherit; cursor: pointer; min-width: 0; }
+  .gr-actor-toggle:hover .gr-actor-name { color: #0e1230; }
+  .gr-chev { transition: transform 160ms ease-out; flex-shrink: 0; }
+  .gr-actor[data-open="true"] .gr-chev { transform: rotate(90deg); }
+  .gr-actor-name { font-size: 14.5px; font-weight: 700; color: #475569; letter-spacing: -0.01em; }
+  .gr-actor-meta { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #757b98; white-space: nowrap; }
+  .gr-spark { display: inline-flex; gap: 4px; align-items: center; }
+  .gr-cite { display: none; padding: 0 16px 10px; font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.06em; color: #64748b; }
+  .gr-actor-body { padding: 0 16px 14px; }
+  .gr-actor[data-open="false"] .gr-actor-body { display: none; }
+  .gr-actor-premise { margin: 0 0 6px; font-size: 12.5px; line-height: 1.5; color: #6d7290; }
+  .gr-vsteps { position: relative; }
+  .gr-vsteps::before { content: ''; position: absolute; left: 19px; top: 17px; bottom: 17px; width: 2px; background: #e1e4f0; }
+  .gr-tactic-mini { position: relative; padding: 9px 0 3px 42px; font-family: var(--font-mono); font-size: 8.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #475569; }
+  .gr-vstep { position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr); column-gap: 12px; align-items: start; padding: 8px 10px 9px; border-radius: 10px; }
+  .gr-vstep.is-open { background: #ff547012; box-shadow: inset 0 0 0 1px #ff547024; }
+  .gr-vstep.is-nc { background: #64748b0d; }
+  .gr-vnode { display: grid; place-items: center; padding-top: 1px; }
+  .gr-vbody { display: grid; gap: 3px; min-width: 0; }
+  .gr-vrow1 { display: flex; align-items: baseline; gap: 8px; min-width: 0; flex-wrap: wrap; }
+  .gr-vlabel { font-size: 13px; line-height: 1.45; }
+  .gr-vshared { font-family: var(--font-mono); font-size: 8px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #c2273f; border: 1px solid #ff547033; border-radius: 999px; padding: 1.5px 7px; white-space: nowrap; }
+  .gr-vctl { margin-left: auto; font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; letter-spacing: 0.04em; white-space: nowrap; }
+  .gr-vrow2 { display: flex; align-items: baseline; gap: 9px; min-width: 0; }
+  .gr-vtech { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.03em; text-decoration: none; flex-shrink: 0; }
+  .gr-vapi { font-family: var(--font-mono); font-size: 9.5px; color: #757b98; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .gr-info { position: relative; display: inline-flex; flex-shrink: 0; }
+  .gr-info-btn { width: 17px; height: 17px; border-radius: 999px; border: 1.5px solid #4d66e05c; color: #4d66e0; background: #fff; font-family: var(--font-serif); font-size: 10px; font-weight: 600; font-style: italic; display: grid; place-content: center; cursor: pointer; padding: 0; line-height: 1; }
+  .gr-info-btn:hover { background: #4d66e00d; }
+  .gr-info-pop { position: absolute; z-index: 40; top: 23px; left: -10px; width: 305px; background: #fff; border: 1px solid #e5e7f0; border-radius: 12px; box-shadow: 0 18px 44px -18px #0e123040; padding: 13px 15px; display: grid; gap: 9px; cursor: default; }
+  .gr-pop-row { display: grid; gap: 3px; }
+  .gr-pop-label { font-family: var(--font-mono); font-size: 8px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8a8fa8; }
+  .gr-pop-val { font-size: 12px; line-height: 1.5; color: #4a4f6e; }
+  .gr-pop-val a { color: #4d66e0; font-weight: 600; text-decoration: none; }
+  .gr-pop-val a:hover { text-decoration: underline; }
+  .gr-lc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(126px, 1fr)); gap: 8px; }
+  .gr-lc-cell { position: relative; border: 1px solid #e5e7f0; background: #fff; border-radius: 10px; padding: 10px 11px 11px; display: grid; gap: 7px; align-content: start; min-height: 92px; }
+  .gr-lc-cell.is-tbd { border-style: dashed; border-color: #dde1ee; background: transparent; }
+  .gr-lc-idx { position: absolute; top: 7px; right: 9px; font-family: var(--font-mono); font-size: 8px; color: #b7bccf; }
+  .gr-lc-tactic { font-family: var(--font-mono); font-size: 8.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; line-height: 1.5; min-height: 26px; padding-right: 12px; }
+  .gr-lc-ratio { font-family: var(--font-mono); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .gr-lc-ratio small { font-size: 8px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #8a8fa8; margin-left: 5px; }
+  .gr-lc-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+  .gr-lc-dot { width: 9px; height: 9px; border-radius: 999px; box-sizing: border-box; }
+  .gr-lc-tbd { font-family: var(--font-mono); font-size: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #b7bccf; align-self: end; line-height: 1.6; }
+  button.gr-lc-cell { font: inherit; text-align: left; cursor: pointer; transition: border-color 150ms, box-shadow 150ms; }
+  button.gr-lc-cell:hover { border-color: #c9cfe4; box-shadow: 0 3px 10px -6px #0e123026; }
+  .gr-lc-cell.is-sel { border-color: #4d66e0; box-shadow: 0 0 0 1px #4d66e0; background: #4d66e008; }
+  .gr-lc-detail { border: 1px solid #e5e7f0; border-radius: 12px; background: #fff; padding: 12px 14px 13px; display: grid; gap: 4px; }
+  .gr-lc-detail-head { display: flex; align-items: center; gap: 12px; padding: 2px 10px 7px; }
+  .gr-lc-close { margin-left: auto; width: 22px; height: 22px; border-radius: 999px; border: none; background: #f0f2fa; color: #4a4f6e; font-size: 13px; line-height: 1; cursor: pointer; display: grid; place-content: center; }
+  .gr-lc-close:hover { background: #e5e7f0; }
+  .gr-vstep.has-story { cursor: pointer; }
+  .gr-vstep.has-story:hover { box-shadow: inset 0 0 0 1.5px #dfe3f2; }
+  .gr-vstep.is-open.has-story:hover { box-shadow: inset 0 0 0 1.5px #ff547045; }
+  .gr-vstep.has-story .gr-vlabel { border-bottom: 1px dotted #b7bccf; }
+  .gr-story-caret { flex-shrink: 0; align-self: center; transition: transform 150ms ease-out; }
+  .gr-vstory { margin-top: 3px; background: #f8f9fe; border: 1px solid #e9ecf5; border-left: 2px solid #4d66e040; border-radius: 8px; padding: 10px 13px; display: grid; gap: 3px; }
+  .gr-vstory-title { font-size: 12.5px; font-weight: 600; color: #0e1230; }
+  .gr-vstory-text { font-size: 12px; line-height: 1.55; color: #4a4f6e; }
+
+  /* Print-only header hidden on screen */
+  .gr-print-header { display: none; }
+  /* Print-only rows (§6 expansion) and print more-line hidden on screen */
+  .gr-row-printonly { display: none !important; }
+  .gr-more-print { display: none; }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 640px) {
+    .gr-sheet { padding: 30px 20px 30px; border-radius: 14px; }
+    .gr-verdict { grid-template-columns: 1fr !important; justify-items: center; text-align: center; }
+    .gr-verdict > div { justify-items: center; }
+    .gr-phasechart { flex-wrap: wrap; row-gap: 16px; }
+    .gr-phasechart > div { min-width: 30% !important; }
+    .gr-fw-row { grid-template-columns: 90px 80px 1fr !important; gap: 8px !important; }
+    .gr-cta-row > * { flex: 1 1 100% !important; text-align: center; justify-items: center !important; }
+    .gr-audit-input { width: 100%; }
+    .gr-actor-hrow { padding: 12px 13px; }
+    .gr-actor-body { padding: 0 12px 13px; }
+    .gr-info-pop { width: 250px; }
+  }
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .gr-sheet *, .gr-sheet *::before, .gr-sheet *::after { transition: none !important; animation: none !important; }
+  }
+
+  /* ---------- Print / PDF ----------
+     Site chrome hiding is JS-independent (@media print). The report-internal print styling
+     is keyed on body.is-print, toggled by the controller on beforeprint/afterprint — the same
+     single source the design uses. Both apply together during a real print. */
+  @page { margin: 13mm 12mm; }
+
+  @media print {
+    body > header, body > footer { display: none !important; }
+    main > *:not([data-ga-arena]) { display: none !important; }
+    [data-ga-arena] { background: #fff !important; border: 0 !important; }
+    .ga-screen-chrome { display: none !important; }
+  }
+
+  body.is-print [data-ga-arena] { background: #fff !important; border: 0 !important; }
+  body.is-print .ga-screen-chrome,
+  body.is-print .gr-backlink,
+  body.is-print .gr-audit-input,
+  body.is-print .gr-cta-row,
+  body.is-print .gr-gate,
+  body.is-print .gr-more-screen { display: none !important; }
+
+  body.is-print .gr-print-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 0 14px;
+    margin-bottom: 26px;
+    border-bottom: 2px solid #0e1230;
+  }
+
+  body.is-print [data-ga-arena] > div { max-width: none; padding: 0; }
+  body.is-print .gr-sheet {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    gap: 26px;
+    max-width: none;
+  }
+
+  /* §6 expands in print */
+  body.is-print .gr-row-printonly { display: flex !important; }
+  body.is-print .gr-more-print { display: block !important; }
+
+  /* Dark close panel prints as a bordered card; CTAs are gone, footnotes stay */
+  body.is-print .gr-close-panel {
+    background: #fff !important;
+    color: #0e1230 !important;
+    border: 1px solid #e5e7f0;
+    padding: 16px 18px !important;
+  }
+  body.is-print .gr-close-panel p { color: #4a4f6e !important; }
+
+  /* Keep blocks intact across pages */
+  body.is-print .gr-section,
+  body.is-print .gr-masthead { break-inside: avoid; }
+  /* …except the attack sections, taller than a page: break BETWEEN their pieces instead */
+  body.is-print .gr-section.gr-attack { break-inside: auto; }
+  body.is-print .gr-attack > div:first-child { break-after: avoid; }
+  body.is-print .gr-b2-lead,
+  body.is-print .gr-actor,
+  body.is-print .gr-lc-grid,
+  body.is-print .gr-b2-callout { break-inside: avoid; }
+  body.is-print .gr-actor-body { display: block !important; }
+  body.is-print .gr-spark,
+  body.is-print .gr-info,
+  body.is-print .gr-chev { display: none !important; }
+  body.is-print .gr-cite { display: block !important; }
+  body.is-print .gr-missing-row { break-inside: avoid; }
+  body.is-print .gr-vstory,
+  body.is-print .gr-lc-detail,
+  body.is-print .gr-hint-screen,
+  body.is-print .gr-story-caret { display: none !important; }
+  body.is-print .gr-vstep.has-story .gr-vlabel { border-bottom: none; }
+
+  /* Exact colors in PDF */
+  body.is-print * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+</style>

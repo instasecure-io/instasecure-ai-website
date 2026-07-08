@@ -63,7 +63,16 @@ export const PRIMARY_NAV: NavEntry[] = [
     ],
   },
   { label: 'How It Works', href: '/howitworks' },
-  { label: 'Learn', href: '/learn' },
+  {
+    label: 'Learn',
+    href: '/learn',
+    children: [
+      { label: 'Guardrails Challenge', href: '/learn/guardrails-challenge', description: 'Timed quiz: pick the guardrail that stops each attack' },
+      { label: 'Guardrails Assessment', href: '/learn/guardrails-assessment', description: 'Score your enforced coverage + get a gap report' },
+      { label: 'AWS Organizational Policies', href: '/learn/aws-organizational-policies', description: 'Interactive SCP / RCP / Data Perimeter simulator' },
+      { label: 'Cloud Architecture Gaps', href: '/learn/cloud-architecture-gaps', description: 'Field guide: tenancy, perimeter, blast radius' },
+    ],
+  },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },

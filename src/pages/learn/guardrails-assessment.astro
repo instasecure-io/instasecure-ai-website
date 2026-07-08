@@ -1,0 +1,26 @@
+---
+// src/pages/learn/guardrails-assessment.astro
+export const prerender = true;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+// Aliased: this file name PascalCases to `GuardrailsAssessment`, which would
+// collide with a same-named import (astro check ts2440).
+import GuardrailsAssessmentSection from '@/components/sections/GuardrailsAssessment.astro';
+---
+<BaseLayout
+  title="Guardrails Assessment — score your AWS preventive coverage | InstaSecure"
+  description="Check off the AWS preventive guardrails (SCPs, RCPs, data-perimeter policies) your org enforces today and get a severity-weighted gap report: open scenario checks, your compliance evidence queue, and the controls to close first."
+>
+  <section class="relative overflow-hidden bg-gradient-to-br from-white via-[var(--color-brand)]/[0.04] to-[var(--color-accent)]/[0.05]">
+    <div class="mx-auto max-w-4xl px-6 pt-20 pb-14 text-center">
+      <div class="text-sm uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)] mb-4">Guardrails Assessment</div>
+      <h1 class="font-serif text-4xl md:text-6xl font-semibold leading-[1.05] tracking-tight text-[var(--color-text)]">
+        122 guardrails. How many do you actually have enforced?
+      </h1>
+      <p class="mt-6 max-w-2xl mx-auto text-lg text-slate-700 leading-relaxed">
+        Check off what your organization enforces today — deny in place, not on the roadmap — and get a severity-weighted gap report built from the real InstaSecure control catalog.
+      </p>
+    </div>
+  </section>
+
+  <GuardrailsAssessmentSection />
+</BaseLayout>

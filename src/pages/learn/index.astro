@@ -4,13 +4,33 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 
 const articles = [
   {
+    href: '/learn/guardrails-challenge',
+    eyebrow: 'Interactive game',
+    title: 'Guardrails Challenge — can you pick the control that stops each attack?',
+    summary: 'A timed quiz built from the real InstaSecure control catalog. Read a real cloud breach scenario, then pick the one AWS preventive guardrail (of four) that stops it cold. Score, streaks, ranks, and a browser leaderboard.',
+    readingTime: '5 min',
+    interactive: true,
+    featured: true,
+    topics: ['Quiz', 'SCP', 'RCP', 'Data Perimeter'],
+  },
+  {
+    href: '/learn/guardrails-assessment',
+    eyebrow: 'Interactive assessment',
+    title: 'Guardrails Assessment — how many of the 122 do you actually enforce?',
+    summary: 'Check off the preventive controls your org enforces today and get a severity-weighted gap report: open scenario checks, your compliance evidence queue, and the exact controls to close first. Self-attested in the browser — nothing leaves the page.',
+    readingTime: '10 min',
+    interactive: true,
+    featured: false,
+    topics: ['Assessment', 'SCP', 'RCP', 'Compliance'],
+  },
+  {
     href: '/learn/aws-organizational-policies',
     eyebrow: 'Interactive simulator',
     title: 'AWS Organizational Policy Controls — interactive simulator',
     summary: 'Try AWS organizational policies live: click through six trust scenarios and watch which gate blocks each one. Below the simulator, a tabbed deep-dive on Effective Permissions, Data Perimeter, SCPs, and RCPs — and the AWS evaluation logic that ties them together.',
     readingTime: 'Hands-on',
     interactive: true,
-    featured: true,
+    featured: false,
     topics: ['Simulator', 'SCP', 'RCP', 'Data Perimeter'],
   },
   {
