@@ -112,14 +112,20 @@ export const CHAINS: { id: string; steps: PlaybookStep[] }[] = [
   },
 ];
 
-// Attacker lifecycle — all 11 MITRE tactics in order. populated:false = control→technique
-// classification in progress (fills in when the catalog attack[] field propagates).
+// Attacker lifecycle — all 12 ATT&CK v19.1 (IaaS) tactics in order. populated:false means the
+// catalog maps no preventive control to that tactic (detection territory), not "pending". The
+// controls shown per tactic are a representative curation; per-tactic catalog totals are larger
+// (control-knowledge-base references/attack_coverage.json). Kept in sync by attack-chains.test.ts.
 export const LIFECYCLE: LifecycleTactic[] = [
   { tactic: 'Initial Access', populated: true, controls: [
     { control: 'IS-PERIMETER-PV-16', controlName: 'Restrict IAM user credentials to trusted networks', technique: 'T1078.004' },
     { control: 'IS-LAMBDA-PV-2', controlName: 'Require AWS Lambda function URLs to use IAM authentication', technique: 'T1190' },
   ] },
-  { tactic: 'Execution', populated: false, controls: [] },
+  { tactic: 'Execution', populated: true, controls: [
+    { control: 'IS-IAM-PV-8', controlName: 'Restrict AWS CLI login with console credentials to privileged roles', technique: 'T1059.009' },
+    { control: 'IS-NETWORK-PV-4', controlName: 'Enforce VPC deployment for compute and ML services', technique: 'T1651' },
+    { control: 'IS-ECR-PV-1', controlName: 'Enforce identity and resource perimeter on ECR API VPC endpoint', technique: 'T1204.003' },
+  ] },
   { tactic: 'Persistence', populated: true, controls: [
     { control: 'IS-IAM-PV-9', controlName: 'Restrict IAM user lifecycle and credential management to privileged principals', technique: 'T1098.001' },
     { control: 'IS-IAM-PV-6', controlName: 'Restrict modifications to identity provider trust configurations', technique: 'T1556' },
@@ -135,10 +141,26 @@ export const LIFECYCLE: LifecycleTactic[] = [
     { control: 'IS-GUARDDUTY-PV-1', controlName: 'Deny disabling Amazon GuardDuty or modifying its configuration', technique: 'T1685' },
     { control: 'IS-ORG-PV-1', controlName: 'Deny member accounts from leaving the AWS Organization', technique: 'T1666' },
   ] },
-  { tactic: 'Credential Access', populated: false, controls: [] },
+  { tactic: 'Stealth', populated: true, controls: [
+    { control: 'IS-REGION-PV-2', controlName: 'Restrict opt-in AWS Region enable/disable to a privileged role', technique: 'T1535' },
+    { control: 'IS-GLUE-PV-1', controlName: 'Enforce network perimeter on AWS Glue service roles', technique: 'T1535' },
+  ] },
+  { tactic: 'Credential Access', populated: true, controls: [
+    { control: 'IS-PERIMETER-PV-2', controlName: 'Network perimeter (SourceVPC) — deny resource access outside expected VPCs', technique: 'T1555.006' },
+    { control: 'IS-IAM-PV-7', controlName: 'Deny SAML provider changes for AWS IAM Identity Center', technique: 'T1556' },
+    { control: 'IS-IAM-PV-12', controlName: 'Disallow creation or modification of IAM SAML/OIDC federation providers', technique: 'T1556' },
+  ] },
   { tactic: 'Discovery', populated: false, controls: [] },
-  { tactic: 'Lateral Movement', populated: false, controls: [] },
-  { tactic: 'Collection', populated: false, controls: [] },
+  { tactic: 'Lateral Movement', populated: true, controls: [
+    { control: 'IS-PERIMETER-PV-11', controlName: 'Network perimeter — bind EC2 instance role usage to expected networks', technique: 'T1550.001' },
+    { control: 'IS-NETWORK-PV-3', controlName: 'Disallow VPN connections to Amazon VPCs', technique: 'T1021' },
+    { control: 'IS-PERIMETER-PV-16', controlName: 'Restrict IAM user credentials to trusted networks', technique: 'T1021.007' },
+  ] },
+  { tactic: 'Collection', populated: true, controls: [
+    { control: 'IS-EBS-PV-1', controlName: 'Disallow use of Amazon EBS direct APIs', technique: 'T1530' },
+    { control: 'IS-EC2-PV-2', controlName: 'Require encryption on attached Amazon EBS volumes', technique: 'T1530' },
+    { control: 'IS-S3-PV-5', controlName: 'Disallow modifications to audit S3 bucket policies', technique: 'T1530' },
+  ] },
   { tactic: 'Exfiltration', populated: true, controls: [
     { control: 'IS-PERIMETER-PV-9', controlName: 'Resource perimeter — restrict org principals to trusted resources', technique: 'T1537' },
     { control: 'IS-PERIMETER-PV-12', controlName: 'Prevent service-issued S3 presigned URLs that bypass the network perimeter', technique: 'T1048' },

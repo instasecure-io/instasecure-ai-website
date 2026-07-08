@@ -365,7 +365,7 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
       const gridCells = cells.map((row, i) => {
         const idx = String(i + 1).padStart(2, '0');
         if (!row.populated) {
-          return `<div class="gr-lc-cell is-tbd"><span class="gr-lc-idx">${idx}</span><span class="gr-lc-tactic">${esc(row.tactic)}</span><span class="gr-lc-tbd">Mapping in progress</span></div>`;
+          return `<div class="gr-lc-cell is-tbd"><span class="gr-lc-idx">${idx}</span><span class="gr-lc-tactic">${esc(row.tactic)}</span><span class="gr-lc-tbd">Detection territory</span></div>`;
         }
         const anyOpen = row.closed < row.total;
         const sel = state.selectedStage === row.tactic;
@@ -423,7 +423,7 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
           <p style="margin:0;font-size:12.5px;line-height:1.55;color:${GR.muted};text-wrap:pretty">The full MITRE tactic progression. Each stage shows the charted preventive controls that break attacks there — thin stages are where exposure concentrates.<span class="gr-hint-screen"> Select a stage to see its controls.</span></p>
           <div class="gr-lc-grid">${gridCells}</div>
           ${detail}
-          <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">${mappedN} of 11 stages carry charted preventive controls from the ATT&amp;CK v19.1 catalog — stages without one are detection territory.</p>
+          <p style="margin:0;font-size:11.5px;line-height:1.55;color:${GR.muted}">${mappedN} of ${data.lifecycle.length} stages carry charted preventive controls from the ATT&amp;CK v19.1 catalog — stages without one are detection territory.</p>
         </div>`;
       return grSection('02', 'Attack-lifecycle coverage', '', inner, 'gr-attack');
     };
@@ -481,7 +481,7 @@ export function initGuardrailsAssessment(root: HTMLElement, data: AssessData): (
           out += vStep(s, i, v.id, s.control && s.state === 'open' ? (shared[s.control] || 0) : 0);
           return out;
         }).join('');
-        const meta = `${v.steps.length} documented moves · ${v.tacticsCount}${actor.flagship ? ' of 11' : ''} tactics`;
+        const meta = `${v.steps.length} documented moves · ${v.tacticsCount}${actor.flagship ? ` of ${data.lifecycle.length}` : ''} tactics`;
         return `<div class="gr-actor" data-open="${openState}">
           <div class="gr-actor-hrow">
             <button type="button" class="gr-actor-toggle" data-ga-actor="${esc(v.id)}" aria-expanded="${openState}">
