@@ -1,0 +1,41 @@
+---
+interface Props {
+  href: string;
+  eyebrow: string;
+  title: string;
+  summary: string;
+  meta?: string;
+  metaDatetime?: string;
+  topics?: string[];
+  featured?: boolean;
+  compact?: boolean;
+  cta?: string;
+}
+const { href, eyebrow, title, summary, meta, metaDatetime, topics = [], featured = false, compact = false, cta = 'Read more →' } = Astro.props;
+---
+<a href={href} class={`group block rounded-2xl border bg-white hover:shadow-xl hover:-translate-y-0.5 transition ${compact ? 'p-6' : 'p-8 md:p-10'} ${featured ? 'border-[var(--color-accent)]/40 ring-1 ring-[var(--color-accent)]/15 shadow-md' : 'border-black/5'}`}>
+  <div class={`flex flex-wrap items-center gap-3 ${compact ? 'mb-3' : 'mb-5'}`}>
+    {featured && (
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 text-[10px] uppercase tracking-[0.14em] font-mono font-semibold text-[var(--color-accent-bold)]">★ Featured</span>
+    )}
+    <div class="text-xs uppercase tracking-[0.15em] font-mono font-medium text-[var(--color-brand)]">{eyebrow}</div>
+    {meta && (
+      <>
+        <span class="text-xs text-slate-400">·</span>
+        {metaDatetime
+          ? <time datetime={metaDatetime} class="text-xs text-slate-500">{meta}</time>
+          : <span class="text-xs text-slate-500">{meta}</span>}
+      </>
+    )}
+  </div>
+  <h3 class={`font-serif font-semibold leading-tight tracking-tight text-[var(--color-text)] group-hover:text-[var(--color-brand)] transition ${compact ? 'text-xl' : 'text-2xl md:text-3xl'}`}>{title}</h3>
+  <p class={`text-slate-700 leading-relaxed ${compact ? 'mt-3 text-sm line-clamp-3' : 'mt-4 text-base md:text-lg'}`}>{summary}</p>
+  {topics.length > 0 && (
+    <div class={`flex flex-wrap gap-2 ${compact ? 'mt-4' : 'mt-6'}`}>
+      {topics.map(t => (
+        <span class="px-3 py-1 rounded-full bg-slate-50 border border-black/5 text-xs font-medium text-slate-600">{t}</span>
+      ))}
+    </div>
+  )}
+  <div class={`text-sm font-semibold text-[var(--color-brand)] ${compact ? 'mt-4' : 'mt-6'}`}>{cta}</div>
+</a>
