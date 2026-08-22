@@ -3,6 +3,12 @@
 // timeline. Tab 1 plays the attack succeeding; tab 2 plays the same
 // attacker hitting the guardrails and going inert. Auto-plays on scroll
 // into view. Self-contained — no external deps. Honors prefers-reduced-motion.
+//
+// Each stage carries a command ladder (AttackCommandLadder) driven by
+// src/data/attack-sequence.ts: the real CLI sequence from our own demo
+// recording, and — on the defense stage — the control that stops each step,
+// which the visitor can switch off one layer at a time.
+import AttackCommandLadder from '@/components/sections/AttackCommandLadder.astro';
 ---
 <section class="is-attack">
   <div class="is-attack__container">
@@ -16,6 +22,10 @@
         <button type="button" class="is-attack__tab" data-target="defense" role="tab" aria-selected="false">With InstaSecure</button>
       </div>
       <div class="is-attack__controls-right">
+        <div class="is-attack__mode" role="group" aria-label="Playback mode">
+          <button type="button" class="is-attack__mode-btn is-active" data-mode-btn="auto" aria-pressed="true">Auto</button>
+          <button type="button" class="is-attack__mode-btn" data-mode-btn="manual" aria-pressed="false">Manual</button>
+        </div>
         <button type="button" class="is-attack__replay" data-replay>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           Replay
@@ -116,6 +126,8 @@
         </div>
       </div>
 
+      <AttackCommandLadder mode="attack" />
+
       <div class="is-attack__verdict">
         <div class="is-verdict__text">The breach finishes before the alert begins.</div>
         <div class="is-verdict__stats">
@@ -128,7 +140,7 @@
             <div class="is-verdict__stat-label">alerts fired</div>
           </div>
           <div>
-            <div class="is-verdict__stat-num">5</div>
+            <div class="is-verdict__stat-num">7</div>
             <div class="is-verdict__stat-label">API calls</div>
           </div>
         </div>
@@ -210,27 +222,35 @@
               <div class="is-asset" data-asset="s3">
                 <svg class="is-asset__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
                 <span class="is-asset__name">Customer data · safe</span>
-                <span class="is-asset__tag">RCP enforced</span>
+                <span class="is-asset__tag">no path out</span>
               </div>
             </div>
+          </div>
+
+          <!-- Only reached if the visitor switches every layer off. -->
+          <div class="is-exfil" data-exfil>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            Customer data exfiltrated
           </div>
         </div>
       </div>
 
-      <div class="is-attack__verdict is-good">
-        <div class="is-verdict__text">Same attacker. Same credential. No path exists.</div>
+      <AttackCommandLadder mode="defense" />
+
+      <div class="is-attack__verdict is-good" data-defense-verdict>
+        <div class="is-verdict__text" data-verdict-text>Same attacker. Same credential. No path exists.</div>
         <div class="is-verdict__stats">
           <div>
-            <div class="is-verdict__stat-num">0</div>
+            <div class="is-verdict__stat-num" data-stat="calls">1 of 7</div>
             <div class="is-verdict__stat-label">API calls succeeded</div>
           </div>
           <div>
-            <div class="is-verdict__stat-num">0</div>
+            <div class="is-verdict__stat-num" data-stat="data">0</div>
             <div class="is-verdict__stat-label">data exposed</div>
           </div>
           <div>
-            <div class="is-verdict__stat-num">∞</div>
-            <div class="is-verdict__stat-label">attempts withstood</div>
+            <div class="is-verdict__stat-num" data-stat="layers">4</div>
+            <div class="is-verdict__stat-label">guardrail layers enforced</div>
           </div>
         </div>
       </div>
@@ -405,6 +425,22 @@
     box-shadow: 0 0 0 1px var(--is-accent-green), 0 0 12px rgba(45, 212, 168, 0.3);
   }
 
+  /* The account the action has moved on from. Deliberately NOT opacity: the
+     tiles inside carry their own dimming, and nesting the two compounds to
+     ~0.14 and washes the card out. Dropping the glow and muting the border is
+     enough to move the eye, and the account's state colour stays readable. */
+  .is-account.is-compromised.is-past,
+  .is-account.is-defended.is-past {
+    box-shadow: none;
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  .is-account.is-past .is-account__name { color: rgba(255, 255, 255, 0.55); }
+  .is-account.is-compromised.is-past .is-account__badge,
+  .is-account.is-defended.is-past .is-account__badge {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--is-ink-faint);
+  }
+
   .is-account__header {
     display: flex;
     align-items: center;
@@ -479,6 +515,33 @@
     background: rgba(45, 212, 168, 0.08);
     color: white;
   }
+  /* Step focus. Once several tiles are lit they all read the same and it stops
+     being obvious which one the current step is about — so everything the chain
+     has already passed recedes, and only the tile in play stays at full strength.
+     Opacity only: the is-active / is-blocked colours still carry the outcome. */
+  .is-asset.is-past,
+  .is-exfil.is-past { opacity: 0.38; }
+  /* The crossing itself. Scoped to the arrow and its pill rather than the whole
+     .is-link node, because the guardrail wall icon lives in the same SVG and
+     reflects the control, not the step being read — it must not fade with it. */
+  .is-link.is-past .is-link__path,
+  .is-link.is-past .is-link__label { opacity: 0.34; }
+  .is-link__path, .is-link__label { transition: opacity 0.35s ease; }
+  .is-asset.is-focus {
+    opacity: 1;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  }
+  .is-asset.is-active.is-focus { box-shadow: inset 0 0 0 1px rgba(255, 84, 112, 0.55); }
+  .is-asset.is-blocked.is-focus { box-shadow: inset 0 0 0 1px rgba(45, 212, 168, 0.55); }
+  /* Step 01 has no tile — the attacker themself is the subject. */
+  .is-attacker.is-focus { box-shadow: 0 0 0 4px rgba(255, 84, 112, 0.16); }
+  .is-attack__stage[data-stage="defense"] .is-attacker.is-focus {
+    box-shadow: 0 0 0 4px rgba(45, 212, 168, 0.16);
+  }
+  /* The snap-reset already suppresses transitions; keep opacity in that contract. */
+  .is-attack__stage.is-resetting .is-asset,
+  .is-attack__stage.is-resetting .is-exfil { transition: none; }
+
   .is-asset__icon {
     width: 20px;
     height: 20px;
@@ -739,6 +802,43 @@
   }
 
   /* Replay button — lives in the controls toolbar */
+  /* Auto / Manual — a segmented pair matching the Replay button's height so the
+     toolbar row reads as one control group. */
+  .is-attack__mode {
+    display: inline-flex;
+    padding: 2px;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .is-attack__mode-btn {
+    background: transparent;
+    border: none;
+    color: var(--is-ink-faint);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .is-attack__mode-btn:hover { color: rgba(255, 255, 255, 0.85); }
+  .is-attack__mode-btn.is-active {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+  .is-attack__mode-btn:focus-visible {
+    outline: 2px solid var(--is-brand-light);
+    outline-offset: 1px;
+  }
+
+  /* In manual mode the rail is the driver, not a readout — make it look clickable. */
+  .is-attack.is-manual .is-cmd__step { cursor: pointer; }
+  .is-attack.is-manual .is-cmd__step:hover { border-color: var(--is-brand); }
+
   .is-attack__replay {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -853,6 +953,9 @@
 
       var activeTimers = [];
       var observer = null;
+      // 'auto'   — plays itself on scroll; the rail is a readout.
+      // 'manual' — no timers; the six rail buttons drive the scene.
+      var playbackMode = 'auto';
 
       function clearTimers() {
         activeTimers.forEach(clearTimeout);
@@ -863,7 +966,17 @@
         activeTimers.push(id);
       }
 
-      function resetStage(stage) {
+      // The command ladder listens on the stage. Keeping this one-way (scene
+      // emits, ladder renders) means the animation code below never has to know
+      // which layers the visitor has switched off.
+      function emit(stage, name, detail) {
+        stage.dispatchEvent(new CustomEvent(name, { detail: detail || {} }));
+      }
+
+      // Wipe every play-state class without touching the ladder. Scrubbing in
+      // manual mode rebuilds state from a clean base, and must NOT clear the
+      // visitor's peeled layers the way a full reset does.
+      function clearScene(stage) {
         // Snap-reset: disable transitions, remove all play-state classes,
         // force reflow, then re-enable on the next frame. Without this the
         // simultaneous reversal of border-color, box-shadow, transform,
@@ -883,15 +996,17 @@
         var wall = stage.querySelector('[data-wall]');
 
         if (attacker) {
-          attacker.classList.remove('is-visible', 'is-jumped');
+          attacker.classList.remove('is-visible', 'is-jumped', 'is-focus');
           if (attackerLabel) attackerLabel.textContent = 'Attacker · stolen credential';
         }
-        if (devAccount) devAccount.classList.remove('is-compromised', 'is-defended');
-        if (prodAccount) prodAccount.classList.remove('is-compromised', 'is-defended');
-        assets.forEach(function (a) { a.classList.remove('is-active', 'is-blocked'); });
+        if (devAccount) devAccount.classList.remove('is-compromised', 'is-defended', 'is-past');
+        if (prodAccount) prodAccount.classList.remove('is-compromised', 'is-defended', 'is-past');
+        assets.forEach(function (a) { a.classList.remove('is-active', 'is-blocked', 'is-focus', 'is-past'); });
         if (linkPath) linkPath.classList.remove('is-drawn');
         if (linkLabel) linkLabel.classList.remove('is-visible');
-        if (exfil) exfil.classList.remove('is-visible');
+        var linkWrap = stage.querySelector('.is-link');
+        if (linkWrap) linkWrap.classList.remove('is-past');
+        if (exfil) exfil.classList.remove('is-visible', 'is-past');
         if (wall) wall.setAttribute('opacity', '0');
 
         // Force layout to commit the snap-back, then re-enable transitions
@@ -900,6 +1015,112 @@
         requestAnimationFrame(function () {
           stage.classList.remove('is-resetting');
         });
+      }
+
+      function resetStage(stage) {
+        clearScene(stage);
+        // Reset the command ladder too — the rail's is-current / is-done classes
+        // and the visible pane are play state like everything else above. Missing
+        // this leaves stale command output on screen after Replay.
+        emit(stage, 'is:reset');
+      }
+
+      // Cumulative diagram state for step n on the ATTACK stage — the same beats
+      // playAttack fires on timers, expressed as a pure function of n so the rail
+      // can scrub to any point. The defense stage needs no equivalent: its diagram
+      // is a function of which guardrail layers are switched on, not of step.
+      function applyAttackState(stage, n) {
+        clearScene(stage);
+        var attacker = stage.querySelector('[data-attacker]');
+        var attackerLabel = stage.querySelector('[data-attacker-label]');
+        var devAccount = stage.querySelector('[data-account="dev"]');
+        var prodAccount = stage.querySelector('[data-account="prod"]');
+        var iamAsset = stage.querySelector('[data-asset="iam"]');
+        var roleAsset = stage.querySelector('[data-asset="role"]');
+        var adminAsset = stage.querySelector('[data-asset="admin"]');
+        var s3Asset = stage.querySelector('[data-asset="s3"]');
+        var linkPath = stage.querySelector('[data-link-path]');
+        var linkLabel = stage.querySelector('[data-link-label]');
+        var exfil = stage.querySelector('[data-exfil]');
+
+        if (n >= 1 && attacker) attacker.classList.add('is-visible');
+        if (n >= 2) {
+          if (devAccount) devAccount.classList.add('is-compromised');
+          if (iamAsset) iamAsset.classList.add('is-active');
+        }
+        if (n >= 3 && roleAsset) roleAsset.classList.add('is-active');
+        if (n >= 4) {
+          if (linkPath) linkPath.classList.add('is-drawn');
+          if (linkLabel) linkLabel.classList.add('is-visible');
+          if (attacker) attacker.classList.add('is-jumped');
+          if (prodAccount) prodAccount.classList.add('is-compromised');
+          if (adminAsset) adminAsset.classList.add('is-active');
+          if (attackerLabel) attackerLabel.textContent = 'Attacker · in production';
+        }
+        if (n >= 5 && s3Asset) s3Asset.classList.add('is-active');
+        if (n >= 6 && exfil) exfil.classList.add('is-visible');
+
+        setFocus(stage, n);
+      }
+
+      // Put a stage into its manual-mode starting state.
+      function showManual(stage, n) {
+        clearTimers();
+        if (stage.getAttribute('data-stage') === 'attack') {
+          applyAttackState(stage, n);
+        } else {
+          // The defense diagram is owned entirely by the ladder's peel state.
+          emit(stage, 'is:repaint');
+        }
+        emit(stage, 'is:step', { n: n });
+      }
+
+      // Which diagram tile each step is *about*. Drives the focus treatment:
+      // the tile in play stays at full strength, everything already passed
+      // recedes. Kept in step with SCENE_ASSETS on the data side.
+      var STEP_FOCUS = {
+        1: { tiles: [],        account: 'dev' },
+        2: { tiles: ['iam'],   account: 'dev' },
+        3: { tiles: ['role'],  account: 'dev' },
+        4: { tiles: ['admin'], account: 'prod' },
+        5: { tiles: ['s3'],    account: 'prod' },
+        6: { tiles: ['s3'],    account: 'prod' }
+      };
+
+      var LATERAL_STEP = (function () {
+        for (var k in STEP_FOCUS) if (STEP_FOCUS[k].account === 'prod') return Number(k);
+        return 4;
+      })();
+
+      function setFocus(stage, n) {
+        var spec = STEP_FOCUS[n] || { tiles: [], account: 'dev' };
+        stage.querySelectorAll('.is-asset').forEach(function (a) {
+          var lit = a.classList.contains('is-active') || a.classList.contains('is-blocked');
+          var focused = spec.tiles.indexOf(a.getAttribute('data-asset')) !== -1;
+          a.classList.toggle('is-focus', focused);
+          a.classList.toggle('is-past', lit && !focused);
+        });
+        // The account the action has left stops glowing.
+        stage.querySelectorAll('[data-account]').forEach(function (acct) {
+          acct.classList.toggle('is-past', acct.getAttribute('data-account') !== spec.account);
+        });
+        // The arrow + "Lateral move" pill belong to the crossing step; they
+        // recede once the chain is past it. The wall icon shares the node and is
+        // left alone — it reflects the guardrail, not the step being read.
+        var link = stage.querySelector('.is-link');
+        if (link) link.classList.toggle('is-past', n > LATERAL_STEP);
+        var exfil = stage.querySelector('[data-exfil]');
+        if (exfil) exfil.classList.remove('is-past');
+        // Step 01 has no tile — the attacker themself is the subject.
+        var bubble = stage.querySelector('[data-attacker]');
+        if (bubble) bubble.classList.toggle('is-focus', n === 1);
+      }
+
+      // Announce the step AND move the focus with it — the two always travel
+      // together, so no beat can advance one without the other.
+      function step(stage, n) {
+        setFocus(stage, n);
+        emit(stage, 'is:step', { n: n });
       }
 
       function playAttack(stage) {
@@ -919,28 +1140,28 @@
         var exfil = stage.querySelector('[data-exfil]');
 
         if (reduceMotion) {
-          if (attacker) attacker.classList.add('is-visible', 'is-jumped');
-          if (devAccount) devAccount.classList.add('is-compromised');
-          if (prodAccount) prodAccount.classList.add('is-compromised');
-          [iamAsset, roleAsset, adminAsset, s3Asset].forEach(function (a) { if (a) a.classList.add('is-active'); });
-          if (linkPath) linkPath.classList.add('is-drawn');
-          if (linkLabel) linkLabel.classList.add('is-visible');
-          if (exfil) exfil.classList.add('is-visible');
+          applyAttackState(stage, 6);
+          emit(stage, 'is:step', { n: 6 });
           return;
         }
 
         // 0.4s: attacker appears at dev account
-        later(function () { if (attacker) attacker.classList.add('is-visible'); }, 400);
+        later(function () {
+          if (attacker) attacker.classList.add('is-visible');
+          step(stage, 1);
+        }, 400);
 
         // 1.5s: dev account compromised, IAM asset activates
         later(function () {
           if (devAccount) devAccount.classList.add('is-compromised');
           if (iamAsset) iamAsset.classList.add('is-active');
+          step(stage, 2);
         }, 1500);
 
         // 2.9s: role discovered
         later(function () {
           if (roleAsset) roleAsset.classList.add('is-active');
+          step(stage, 3);
         }, 2900);
 
         // 4.4s: lateral move begins — line draws + label appears
@@ -948,25 +1169,30 @@
           if (linkPath) linkPath.classList.add('is-drawn');
           if (linkLabel) linkLabel.classList.add('is-visible');
           if (attackerLabel) attackerLabel.textContent = 'Lateral move in progress';
+          step(stage, 4);
         }, 4400);
 
-        // 5.5s: attacker jumps once line is fully drawn (line transition is 1s)
+        // 5.5s: the jump lands once the line is fully drawn (1s transition) —
+        // still step 4: assume-role *is* the lateral move.
         later(function () {
           if (attacker) attacker.classList.add('is-jumped');
-        }, 5500);
-
-        // 7.0s: prod account compromised, admin asset activates
-        later(function () {
           if (prodAccount) prodAccount.classList.add('is-compromised');
           if (adminAsset) adminAsset.classList.add('is-active');
           if (attackerLabel) attackerLabel.textContent = 'Attacker · in production';
+          setFocus(stage, 4);
+        }, 5500);
+
+        // 7.0s: the customer data is located
+        later(function () {
+          if (s3Asset) s3Asset.classList.add('is-active');
+          step(stage, 5);
         }, 7000);
 
-        // 8.5s: S3 read
-        later(function () { if (s3Asset) s3Asset.classList.add('is-active'); }, 8500);
-
-        // 10.0s: exfil callout
-        later(function () { if (exfil) exfil.classList.add('is-visible'); }, 10000);
+        // 8.5s: exfil callout — the copy out of the org
+        later(function () {
+          if (exfil) exfil.classList.add('is-visible');
+          step(stage, 6);
+        }, 8500);
       }
 
       function playDefense(stage) {
@@ -991,16 +1217,22 @@
           [iamAsset, roleAsset, adminAsset, s3Asset].forEach(function (a) { if (a) a.classList.add('is-blocked'); });
           if (linkLabel) linkLabel.classList.add('is-visible');
           if (wall) wall.setAttribute('opacity', '1');
+          emit(stage, 'is:wall');
           return;
         }
 
-        // 0.4s: attacker appears
-        later(function () { if (attacker) attacker.classList.add('is-visible'); }, 400);
+        // 0.4s: attacker appears — step 01 always runs, even fully defended
+        later(function () {
+          if (attacker) attacker.classList.add('is-visible');
+          emit(stage, 'is:step', { n: 1 });
+        }, 400);
 
         // 1.5s: dev account is the foothold but it's protected — show defended state
         later(function () {
           if (devAccount) devAccount.classList.add('is-defended');
           if (iamAsset) iamAsset.classList.add('is-blocked');
+          // Not a fixed step — whichever layer the visitor has left enforced.
+          emit(stage, 'is:wall');
         }, 1500);
 
         // 3.0s: credential blocked at perimeter
@@ -1054,7 +1286,8 @@
             resetStage(stage);
             if (match) {
               stage.removeAttribute('hidden');
-              playStage(stage);
+              if (playbackMode === 'manual') showManual(stage, 1);
+              else playStage(stage);
             } else {
               stage.setAttribute('hidden', '');
             }
@@ -1070,7 +1303,10 @@
         btn.addEventListener('click', function (e) {
           if (e.currentTarget && e.currentTarget.blur) e.currentTarget.blur();
           var stage = btn.closest('.is-attack__stage') || getActiveStage();
-          if (stage) playStage(stage);
+          if (!stage) return;
+          // In manual mode there is nothing to replay — rewind to step 01 instead.
+          if (playbackMode === 'manual') { resetStage(stage); showManual(stage, 1); }
+          else playStage(stage);
         });
       });
 
@@ -1089,6 +1325,7 @@
         observer = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
             if (!entry.isIntersecting) return;
+            if (playbackMode !== 'auto') return;
             var active = getActiveStage();
             if (!active) return;
             playStage(active);
@@ -1103,6 +1340,51 @@
         var initial = getActiveStage();
         if (initial) playStage(initial);
       }
+
+      // Auto / Manual selector.
+      var modeButtons = section.querySelectorAll('[data-mode-btn]');
+      modeButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var next = btn.getAttribute('data-mode-btn');
+          if (next === playbackMode) return;
+          playbackMode = next;
+
+          modeButtons.forEach(function (b) {
+            var on = b === btn;
+            b.classList.toggle('is-active', on);
+            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+          section.classList.toggle('is-manual', playbackMode === 'manual');
+
+          var stage = getActiveStage();
+          if (!stage) return;
+          if (playbackMode === 'manual') {
+            resetStage(stage);
+            showManual(stage, 1);
+          } else {
+            playStage(stage);
+          }
+        });
+      });
+
+      // Manual mode: a rail click is the driver. The ladder emits is:goto; the
+      // attack stage scrubs its diagram to match. (The defense diagram tracks
+      // peeled layers, not steps, so it needs nothing here.)
+      stages.forEach(function (stage) {
+        stage.addEventListener('is:goto', function (e) {
+          if (playbackMode !== 'manual') return;
+          if (stage.getAttribute('data-stage') !== 'attack') return;
+          clearTimers();
+          applyAttackState(stage, e.detail.n);
+        });
+      });
+
+      // The visitor switching a guardrail layer on or off takes over from the
+      // autoplay. Without this, a beat still queued from playDefense repaints the
+      // diagram back to "defended" a few seconds after they peeled a layer.
+      stages.forEach(function (stage) {
+        stage.addEventListener('is:takeover', clearTimers);
+      });
 
       // Stop timers + observer if Astro view-transitions away
       document.addEventListener('astro:before-swap', function () {

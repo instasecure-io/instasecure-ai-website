@@ -201,6 +201,13 @@ export const REPRESENTATIVE_CONTROLS: RepControl[] = [
     "group": "identity_and_resource_perimeter"
   },
   {
+    "id": "IS-PERIMETER-PV-4",
+    "name": "Network perimeter (VpceOrgID) — deny resource access from unexpected networks",
+    "sev": "high",
+    "tier": "strongly_recommended",
+    "group": "identity_and_resource_perimeter"
+  },
+  {
     "id": "IS-PERIMETER-PV-9",
     "name": "Resource perimeter — restrict org principals to trusted resources",
     "sev": "high",
