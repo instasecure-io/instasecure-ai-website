@@ -1,0 +1,747 @@
+---
+// Step rail + terminal pane for the "A Tuesday in 2026" scene.
+// Rendered twice — once per stage — with mode switching what each pane shows.
+//
+//   mode="attack"   every command succeeds; the rail is a readout of the animation.
+//   mode="defense"  the chain stops at the outermost enforced wall. Each wall can be
+//                   switched off ("assume this control isn't implemented"), and the
+//                   attack advances to the next one. Switch them all off and you are
+//                   looking at the attack tab — which is the point of the section.
+//
+// All variants are rendered into the DOM and toggled by the controller, so the page
+// stays static and the panes need no client-side templating.
+import {
+  ATTACK_STEPS,
+  DEFENSE_LAYERS,
+  firstSurvivingWall,
+} from '@/data/attack-sequence';
+
+interface Props { mode: 'attack' | 'defense' }
+const { mode } = Astro.props;
+const isDefense = mode === 'defense';
+
+// Server-render the default state — nothing switched off — so the ladder reads
+// correctly with JavaScript disabled and never flashes the wrong pane.
+const initialWall = isDefense ? firstSurvivingWall() : null;
+const wallN = initialWall?.n ?? null;
+
+/** 'ran' | 'blocked' | 'unreached' for a step at the default state. */
+function initialState(n: number): 'ran' | 'blocked' | 'unreached' {
+  if (!isDefense || wallN === null) return 'ran';
+  if (n < wallN) return 'ran';
+  return n === wallN ? 'blocked' : 'unreached';
+}
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<div class="is-cmd" data-cmd data-mode={mode}>
+  <ol class="is-cmd__rail" role="tablist" aria-label="Attack sequence">
+    {ATTACK_STEPS.map((s) => (
+      <li class="is-cmd__rail-item">
+        <button
+          type="button"
+          class="is-cmd__step"
+          data-step={s.n}
+          role="tab"
+          aria-selected={s.n === 1 ? 'true' : 'false'}
+        >
+          <span class="is-cmd__step-n">{String(s.n).padStart(2, '0')}</span>
+          <span class="is-cmd__step-label">{s.label}</span>
+          <span class="is-cmd__step-phase">{s.phase}</span>
+        </button>
+      </li>
+    ))}
+  </ol>
+
+  <div class="is-cmd__term">
+    {ATTACK_STEPS.map((s) => (
+      <div class="is-cmd__pane" data-pane={s.n} hidden={s.n !== 1}>
+        <pre class="is-cmd__cmd"><span class="is-cmd__prompt">$</span> {s.cmd}</pre>
+
+        {/* Ran and succeeded — undefended, or this layer switched off. */}
+        <pre class="is-cmd__out is-cmd__out--ok" data-out="ran" hidden={initialState(s.n) !== 'ran'}>{s.attackOut}</pre>
+
+        {isDefense && s.wall && (
+          <pre class="is-cmd__out is-cmd__out--deny" data-out="deny" hidden={initialState(s.n) !== 'blocked'}>{s.wall.denyOut}</pre>
+        )}
+
+        {isDefense && (
+          <div class="is-cmd__out is-cmd__out--unreached" data-out="unreached" hidden={initialState(s.n) !== 'unreached'}>
+            Never reached — the chain already ended at step <span data-stopped-at>{wallN ? pad(wallN) : '—'}</span>.
+          </div>
+        )}
+
+        {/* Only meaningful opposite a guardrail. The attack tab is the attacker's
+            kill chain — talking about which controls don't apply belongs on the
+            defense tab, where controls are the subject. */}
+        {isDefense && !s.wall && s.noWallReason && (
+          <div class="is-cmd__note" data-note="nowall">
+            <span class="is-cmd__note-tag">No guardrail here</span>
+            <p>{s.noWallReason}</p>
+          </div>
+        )}
+
+        {isDefense && s.wall && (
+          <div
+            class:list={['is-cmd__control', { 'is-latent': initialState(s.n) === 'unreached' }]}
+            data-control={s.wall.control}
+            data-sev={s.wall.sev}
+          >
+            <div class="is-cmd__control-head">
+              <span class="is-cmd__control-id">{s.wall.control}</span>
+              <span class="is-cmd__control-kind">{s.wall.kind}</span>
+              <span class="is-cmd__control-sev">{s.wall.sev}</span>
+              <span class="is-cmd__control-state" data-control-state>
+                {initialState(s.n) === 'blocked' ? 'Enforced' : 'Would deny here'}
+              </span>
+            </div>
+            <div class="is-cmd__control-name">{s.wall.name}</div>
+            <dl class="is-cmd__control-lever">
+              <dt>Lever</dt>
+              <dd>{s.wall.lever}</dd>
+            </dl>
+            <p class="is-cmd__control-why">{s.wall.why}</p>
+            <button
+              type="button"
+              class="is-cmd__peel"
+              data-peel={s.wall.control}
+              hidden={initialState(s.n) !== 'blocked'}
+            >
+              Assume this control isn’t implemented
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+
+  {isDefense && (
+    <div class="is-cmd__depth" data-depth>
+      <div class="is-cmd__depth-text" data-depth-text>
+        Layer 1 of {DEFENSE_LAYERS.length} — <strong>{initialWall?.wall?.control}</strong> ends the
+        chain at step {wallN ? pad(wallN) : '—'}. Switch it off to see what stands behind it.
+      </div>
+      <button type="button" class="is-cmd__restore" data-restore hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Restore all layers
+      </button>
+    </div>
+  )}
+</div>
+
+<script>
+  import {
+    ATTACK_STEPS,
+    DEFENSE_LAYERS,
+    firstSurvivingWall,
+    isBreached,
+    callsSucceeded,
+    layersEnforced,
+    dataExposed,
+    TOTAL_CALLS,
+    SCENE_ASSETS,
+    stepSucceeded,
+    STEP_FOCUS,
+    LATERAL_STEP,
+  } from '@/data/attack-sequence';
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  /** Controls the visitor has assumed away, per ladder root. */
+  const peeled = new WeakMap<HTMLElement, Set<string>>();
+  const off = (root: HTMLElement) => {
+    let s = peeled.get(root);
+    if (!s) { s = new Set(); peeled.set(root, s); }
+    return s;
+  };
+
+  function show(el: Element | null, visible: boolean) {
+    if (el) (el as HTMLElement).hidden = !visible;
+  }
+
+  /** The step currently on screen. */
+  function currentStep(root: HTMLElement): number {
+    const btn = root.querySelector<HTMLElement>('[data-step].is-current');
+    return btn ? Number(btn.dataset.step) : 1;
+  }
+
+  /**
+   * Highlight the tile the given step is about and recede the ones behind it, so
+   * the progression can be followed. Keyed off step position rather than whether
+   * a tile is lit: on the defense stage every tile is lit from the start (green
+   * when held, red once taken), so "lit" carries no ordering.
+   */
+  function applyFocus(root: HTMLElement, n: number) {
+    const stage = root.closest('.is-attack__stage');
+    if (!stage) return;
+    const spec = STEP_FOCUS[n] ?? { tiles: [], account: 'dev' as const };
+    stage.querySelectorAll<HTMLElement>('.is-asset').forEach((tile) => {
+      const key = tile.dataset.asset!;
+      const step = SCENE_ASSETS.find(a => a.key === key)?.step;
+      const focused = spec.tiles.includes(key);
+      tile.classList.toggle('is-focus', focused);
+      tile.classList.toggle('is-past', !focused && step !== undefined && step < n);
+    });
+    // The account the action has moved on from stops glowing — otherwise both
+    // cards stay lit and the crossing into prod reads as nothing having happened.
+    stage.querySelectorAll<HTMLElement>('[data-account]').forEach((acct) => {
+      acct.classList.toggle('is-past', acct.dataset.account !== spec.account);
+    });
+    // The connecting arrow and its pill are the lateral move — they belong to
+    // that step and recede once the chain is past it. The wall icon lives in the
+    // same node and is deliberately left alone; it reflects the guardrail, not
+    // the step being read.
+    stage.querySelector('.is-link')?.classList.toggle('is-past', n > LATERAL_STEP);
+    // Step 01 has no tile — it is the attacker themself.
+    stage.querySelector('[data-attacker]')?.classList.toggle('is-focus', n === 1);
+  }
+
+  /** Paint the defense ladder for its current peel state. */
+  function renderDefense(root: HTMLElement) {
+    const disabled = off(root);
+    const ids = [...disabled];
+    const wall = firstSurvivingWall(ids);
+    const wallN = wall ? wall.n : null;
+    const breached = isBreached(ids);
+
+    for (const s of ATTACK_STEPS) {
+      const pane = root.querySelector<HTMLElement>(`[data-pane="${s.n}"]`);
+      const rail = root.querySelector<HTMLElement>(`[data-step="${s.n}"]`);
+      if (!pane || !rail) continue;
+
+      const state = wallN === null || s.n < wallN ? 'ran' : s.n === wallN ? 'blocked' : 'unreached';
+
+      show(pane.querySelector('[data-out="ran"]'), state === 'ran');
+      show(pane.querySelector('[data-out="deny"]'), state === 'blocked');
+      show(pane.querySelector('[data-out="unreached"]'), state === 'unreached');
+
+      const stoppedAt = pane.querySelector('[data-stopped-at]');
+      if (stoppedAt && wallN !== null) stoppedAt.textContent = pad(wallN);
+
+      const card = pane.querySelector<HTMLElement>('[data-control]');
+      if (card) {
+        const id = card.dataset.control!;
+        const isOff = disabled.has(id);
+        card.classList.toggle('is-peeled', isOff);
+        card.classList.toggle('is-latent', !isOff && state === 'unreached');
+        const label = card.querySelector('[data-control-state]');
+        if (label) {
+          label.textContent = isOff ? 'Assumed not implemented'
+            : state === 'blocked' ? 'Enforced'
+            : 'Would deny here';
+        }
+        show(card.querySelector('[data-peel]'), state === 'blocked');
+      }
+
+      rail.classList.toggle('is-wall', s.n === wallN);
+      rail.classList.toggle('is-peeled', s.wall !== null && disabled.has(s.wall.control));
+      rail.classList.toggle('is-unreached', wallN !== null && s.n > wallN);
+    }
+
+    // Depth summary
+    const depth = root.querySelector<HTMLElement>('[data-depth]');
+    const text = root.querySelector<HTMLElement>('[data-depth-text]');
+    if (depth && text) {
+      depth.classList.toggle('is-breached', breached);
+      if (breached) {
+        text.innerHTML =
+          `<strong>All ${DEFENSE_LAYERS.length} layers switched off.</strong> ` +
+          `This is the “Without InstaSecure” tab — the same ${TOTAL_CALLS} calls, the same 4.2 GB. ` +
+          `No single control was the answer; the depth was.`;
+      } else {
+        const n = DEFENSE_LAYERS.length - layersEnforced(ids) + 1;
+        text.innerHTML =
+          `Layer ${n} of ${DEFENSE_LAYERS.length} — <strong>${wall!.wall!.control}</strong> ends the ` +
+          `chain at step ${pad(wallN!)}. Switch it off to see what stands behind it.`;
+      }
+    }
+    show(root.querySelector('[data-restore]'), disabled.size > 0);
+    applyFocus(root, currentStep(root));
+
+    // Verdict row and the scene diagram live outside the ladder, in the same stage.
+    const stage = root.closest('.is-attack__stage');
+
+    // Keep the diagram honest: it sits directly above the ladder, so every tile,
+    // badge and label has to reflect the wall that is actually standing.
+    if (stage) {
+      for (const a of SCENE_ASSETS) {
+        const tile = stage.querySelector<HTMLElement>(`.is-asset[data-asset="${a.key}"]`);
+        if (!tile) continue;
+        const gone = stepSucceeded(a.step, ids);
+        const copy = gone ? a.lost : a.held;
+        const name = tile.querySelector('.is-asset__name');
+        const tag = tile.querySelector('.is-asset__tag');
+        if (name) name.textContent = copy.name;
+        if (tag) tag.textContent = copy.tag;
+        tile.classList.toggle('is-active', gone);
+        tile.classList.toggle('is-blocked', !gone);
+      }
+
+      const crossed = stepSucceeded(4, ids); // the lateral move landed
+      const dev = stage.querySelector<HTMLElement>('[data-account="dev"]');
+      const prod = stage.querySelector<HTMLElement>('[data-account="prod"]');
+      const footholdLost = stepSucceeded(2, ids);
+      dev?.classList.toggle('is-compromised', footholdLost);
+      dev?.classList.toggle('is-defended', !footholdLost);
+      prod?.classList.toggle('is-compromised', crossed);
+      prod?.classList.toggle('is-defended', !crossed);
+
+      const prodBadge = prod?.querySelector('[data-badge]');
+      if (prodBadge) prodBadge.textContent = crossed ? 'Compromised' : 'Protected';
+
+      const linkLabel = stage.querySelector<HTMLElement>('[data-link-label]');
+      if (linkLabel) {
+        linkLabel.textContent = crossed ? 'Lateral move' : 'Blocked at perimeter';
+        linkLabel.classList.toggle('is-defended', !crossed);
+        // renderDefense owns the whole defense diagram — manual mode never runs
+        // the 4.5s beat that used to be the only thing revealing this pill.
+        linkLabel.classList.add('is-visible');
+      }
+      // The wall icon only makes sense while something still stops the crossing.
+      stage.querySelector('[data-wall]')?.setAttribute('opacity', crossed ? '0' : '1');
+
+      const attackerLabel = stage.querySelector('[data-attacker-label]');
+      if (attackerLabel) {
+        attackerLabel.textContent = breached
+          ? 'Attacker · data exfiltrated'
+          : crossed
+            ? 'Attacker · in production'
+            : 'Attacker · denied at perimeter';
+      }
+      const bubble = stage.querySelector<HTMLElement>('[data-attacker]');
+      bubble?.classList.toggle('is-jumped', crossed);
+      // renderDefense owns the whole defense diagram, including whether the
+      // attacker is on screen at all — manual mode never runs the 400ms beat.
+      bubble?.classList.add('is-visible');
+      stage.querySelector<HTMLElement>('[data-exfil]')?.classList.toggle('is-visible', breached);
+    }
+
+    const verdict = stage?.querySelector<HTMLElement>('[data-defense-verdict]');
+    if (verdict) {
+      const set = (k: string, v: string) => {
+        const el = verdict.querySelector(`[data-stat="${k}"]`);
+        if (el) el.textContent = v;
+      };
+      set('calls', `${callsSucceeded(ids)} of ${TOTAL_CALLS}`);
+      set('data', dataExposed(ids));
+      set('layers', String(layersEnforced(ids)));
+      verdict.classList.toggle('is-good', !breached);
+      const vt = verdict.querySelector('[data-verdict-text]');
+      if (vt) {
+        vt.textContent = breached
+          ? 'Every layer off — and the Tuesday ends the way it started.'
+          : 'Same attacker. Same credential. No path exists.';
+      }
+    }
+  }
+
+  /** Attack ladder: pure readout, every command succeeds. */
+  function renderAttack(root: HTMLElement, upTo: number) {
+    for (const s of ATTACK_STEPS) {
+      const rail = root.querySelector<HTMLElement>(`[data-step="${s.n}"]`);
+      rail?.classList.toggle('is-done', s.n <= upTo);
+    }
+  }
+
+  function select(root: HTMLElement, n: number, isDefense = root.dataset.mode === 'defense') {
+    if (isDefense) applyFocus(root, n);
+    for (const s of ATTACK_STEPS) {
+      const pane = root.querySelector<HTMLElement>(`[data-pane="${s.n}"]`);
+      const rail = root.querySelector<HTMLElement>(`[data-step="${s.n}"]`);
+      if (pane) pane.hidden = s.n !== n;
+      if (rail) {
+        rail.classList.toggle('is-current', s.n === n);
+        rail.setAttribute('aria-selected', s.n === n ? 'true' : 'false');
+      }
+    }
+  }
+
+  function initLadder(root: HTMLElement) {
+    if (root.dataset.ladderInit === '1') return;
+    root.dataset.ladderInit = '1';
+    const isDefense = root.dataset.mode === 'defense';
+
+    root.querySelectorAll<HTMLElement>('[data-step]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const n = Number(btn.dataset.step);
+        select(root, n);
+        if (!isDefense) renderAttack(root, n);
+        // Manual mode listens for this and scrubs the diagram to match.
+        root.closest('.is-attack__stage')?.dispatchEvent(
+          new CustomEvent('is:goto', { detail: { n } }),
+        );
+      });
+    });
+
+    root.querySelectorAll<HTMLElement>('[data-peel]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        root.closest('.is-attack__stage')?.dispatchEvent(new CustomEvent('is:takeover'));
+        off(root).add(btn.dataset.peel!);
+        renderDefense(root);
+        const next = firstSurvivingWall([...off(root)]);
+        select(root, next ? next.n : ATTACK_STEPS.length);
+      });
+    });
+
+    root.querySelector<HTMLElement>('[data-restore]')?.addEventListener('click', () => {
+      root.closest('.is-attack__stage')?.dispatchEvent(new CustomEvent('is:takeover'));
+      off(root).clear();
+      renderDefense(root);
+      const wall = firstSurvivingWall();
+      select(root, wall ? wall.n : 1);
+    });
+
+    // The scene's animation drives which step is showing.
+    const stage = root.closest('.is-attack__stage');
+    stage?.addEventListener('is:step', (e) => {
+      select(root, (e as CustomEvent).detail.n);
+      if (!isDefense) renderAttack(root, (e as CustomEvent).detail.n);
+    });
+    stage?.addEventListener('is:repaint', () => {
+      if (isDefense) renderDefense(root);
+    });
+    stage?.addEventListener('is:wall', () => {
+      const wall = firstSurvivingWall([...off(root)]);
+      select(root, wall ? wall.n : ATTACK_STEPS.length);
+    });
+    stage?.addEventListener('is:reset', () => {
+      select(root, 1);
+      if (isDefense) { off(root).clear(); renderDefense(root); }
+      renderAttack(root, 0);
+    });
+
+    if (isDefense) renderDefense(root);
+  }
+
+  function initAll() {
+    document.querySelectorAll<HTMLElement>('[data-cmd]').forEach(initLadder);
+  }
+
+  document.addEventListener('astro:page-load', initAll);
+  if (document.readyState !== 'loading') initAll();
+  else document.addEventListener('DOMContentLoaded', initAll);
+</script>
+
+<style is:global>
+  /* Anchored at .is-cmd, which only ever renders inside .is-attack — the section's
+     CSS custom properties inherit down, so colours stay in one place. */
+  .is-cmd {
+    --is-mono: ui-monospace, "IBM Plex Mono", "JetBrains Mono", SFMono-Regular, Menlo, monospace;
+    margin-top: 28px;
+  }
+
+  /* ---- step rail ---- */
+  .is-cmd__rail {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    counter-reset: none;
+  }
+  .is-cmd__rail-item { min-width: 0; }
+
+  .is-cmd__step {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--is-line-dark);
+    border-radius: 8px;
+    border-top: 2px solid var(--is-line-dark);
+    color: var(--is-ink-faint);
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .is-cmd__step:hover { background: rgba(255, 255, 255, 0.06); }
+  .is-cmd__step:focus-visible {
+    outline: 2px solid var(--is-brand-light);
+    outline-offset: 2px;
+  }
+  .is-cmd__step-n {
+    font-family: var(--is-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    opacity: 0.65;
+  }
+  .is-cmd__step-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.25;
+  }
+  .is-cmd__step-phase {
+    font-size: 11px;
+    line-height: 1.3;
+    opacity: 0.6;
+  }
+
+  /* Reached during playback / clicked. */
+  .is-cmd__step.is-current {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: var(--is-brand);
+    border-top-color: var(--is-brand-light);
+  }
+  .is-cmd__step.is-current .is-cmd__step-label { color: #fff; }
+
+  /* Per-mode outcome tint on the rail. */
+  .is-cmd[data-mode="attack"] .is-cmd__step.is-done { border-top-color: var(--is-accent-red); }
+  .is-cmd[data-mode="attack"] .is-cmd__step.is-done .is-cmd__step-n { color: var(--is-accent-red); opacity: 1; }
+
+  .is-cmd[data-mode="defense"] .is-cmd__step.is-wall { border-top-color: var(--is-accent-green); }
+  .is-cmd[data-mode="defense"] .is-cmd__step.is-wall .is-cmd__step-n { color: var(--is-accent-green); opacity: 1; }
+  .is-cmd[data-mode="defense"] .is-cmd__step.is-peeled { border-top-color: var(--is-accent-amber); }
+  .is-cmd[data-mode="defense"] .is-cmd__step.is-peeled .is-cmd__step-n { color: var(--is-accent-amber); opacity: 1; }
+  .is-cmd[data-mode="defense"] .is-cmd__step.is-unreached { opacity: 0.5; }
+
+  /* ---- terminal ---- */
+  .is-cmd__term {
+    background: #05061a;
+    border: 1px solid var(--is-line-dark);
+    border-radius: 10px;
+    padding: 18px 20px;
+    min-height: 232px;
+  }
+  .is-cmd__pane[hidden] { display: none; }
+
+  .is-cmd__cmd,
+  .is-cmd__out {
+    font-family: var(--is-mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    margin: 0;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .is-cmd__cmd {
+    color: #fff;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--is-line-dark);
+    margin-bottom: 10px;
+  }
+  .is-cmd__prompt { color: var(--is-brand-light); user-select: none; }
+
+  .is-cmd__out--ok { color: var(--is-ink-faint); }
+  .is-cmd__out--deny { color: var(--is-accent-green); white-space: pre-wrap; }
+  .is-cmd__out--unreached {
+    font-family: var(--is-mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--is-ink-faint);
+    opacity: 0.75;
+    white-space: normal;
+  }
+  /* The controller decides which single output is live. */
+  .is-cmd__out[hidden] { display: none; }
+
+  /* ---- "no guardrail here" note ---- */
+  .is-cmd__note {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-left: 2px solid var(--is-accent-amber);
+    background: rgba(245, 166, 35, 0.06);
+    border-radius: 0 6px 6px 0;
+  }
+  .is-cmd__note-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--is-accent-amber);
+    margin-bottom: 5px;
+  }
+  .is-cmd__note p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--is-ink-faint);
+  }
+
+  /* ---- control card ---- */
+  .is-cmd__control {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border: 1px solid rgba(45, 212, 168, 0.28);
+    background: rgba(45, 212, 168, 0.05);
+    border-radius: 8px;
+  }
+  .is-cmd__control-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+  .is-cmd__control-id {
+    font-family: var(--is-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--is-accent-green);
+  }
+  .is-cmd__control-kind,
+  .is-cmd__control-sev,
+  .is-cmd__control-state {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    border: 1px solid var(--is-line-dark);
+    color: var(--is-ink-faint);
+  }
+  .is-cmd__control-sev { color: var(--is-accent-amber); border-color: rgba(245, 166, 35, 0.35); }
+  .is-cmd__control[data-sev="critical"] .is-cmd__control-sev {
+    color: var(--is-accent-red);
+    border-color: rgba(255, 84, 112, 0.4);
+  }
+  .is-cmd__control-state {
+    margin-left: auto;
+    color: var(--is-accent-green);
+    border-color: rgba(45, 212, 168, 0.4);
+  }
+  .is-cmd__control-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.35;
+    margin-bottom: 9px;
+  }
+  .is-cmd__control-lever {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 9px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .is-cmd__control-lever dt {
+    flex: none;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 10px;
+    color: var(--is-ink-faint);
+    padding-top: 2px;
+  }
+  .is-cmd__control-lever dd {
+    margin: 0;
+    font-family: var(--is-mono);
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.72);
+    overflow-x: auto;
+  }
+  .is-cmd__control-why {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.62;
+    color: var(--is-ink-faint);
+  }
+
+  /* Switched-off layer reads as amber and loses the "enforced" framing. */
+  .is-cmd__control.is-peeled {
+    border-color: rgba(245, 166, 35, 0.3);
+    background: rgba(245, 166, 35, 0.05);
+  }
+  .is-cmd__control.is-peeled .is-cmd__control-id { color: var(--is-accent-amber); }
+  .is-cmd__control.is-peeled .is-cmd__control-state {
+    color: var(--is-accent-amber);
+    border-color: rgba(245, 166, 35, 0.4);
+  }
+  /* A wall the chain never got to — real, but not what stopped this run. */
+  .is-cmd__control.is-latent {
+    border-color: var(--is-line-dark);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .is-cmd__control.is-latent .is-cmd__control-id { color: rgba(255, 255, 255, 0.72); }
+  .is-cmd__control.is-latent .is-cmd__control-state {
+    color: var(--is-ink-faint);
+    border-color: var(--is-line-dark);
+  }
+
+  .is-cmd__peel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 11px;
+    padding: 7px 12px;
+    background: transparent;
+    border: 1px solid var(--is-line-dark);
+    border-radius: 6px;
+    color: var(--is-ink-faint);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+  .is-cmd__peel:hover {
+    color: var(--is-accent-amber);
+    border-color: rgba(245, 166, 35, 0.45);
+    background: rgba(245, 166, 35, 0.07);
+  }
+  .is-cmd__peel:focus-visible { outline: 2px solid var(--is-brand-light); outline-offset: 2px; }
+  .is-cmd__peel svg { width: 13px; height: 13px; }
+  .is-cmd__peel[hidden] { display: none; }
+
+  /* ---- depth summary ---- */
+  .is-cmd__depth {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border: 1px solid var(--is-line-dark);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .is-cmd__depth-text {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--is-ink-faint);
+  }
+  .is-cmd__depth-text strong { color: #fff; font-weight: 600; }
+  .is-cmd__depth.is-breached { border-color: rgba(255, 84, 112, 0.4); background: rgba(255, 84, 112, 0.07); }
+  .is-cmd__depth.is-breached .is-cmd__depth-text strong { color: var(--is-accent-red); }
+
+  .is-cmd__restore {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+    padding: 7px 12px;
+    background: transparent;
+    border: 1px solid var(--is-line-dark);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.8);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .is-cmd__restore:hover { color: var(--is-accent-green); border-color: rgba(45, 212, 168, 0.45); }
+  .is-cmd__restore:focus-visible { outline: 2px solid var(--is-brand-light); outline-offset: 2px; }
+  .is-cmd__restore svg { width: 13px; height: 13px; }
+  .is-cmd__restore[hidden] { display: none; }
+
+  @media (max-width: 900px) {
+    .is-cmd__rail { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .is-cmd__step-phase { display: none; }
+  }
+  @media (max-width: 560px) {
+    .is-cmd__rail { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+    .is-cmd__term { padding: 14px; min-height: 0; }
+    .is-cmd__cmd, .is-cmd__out, .is-cmd__out--unreached { font-size: 11.5px; }
+    .is-cmd__depth { flex-direction: column; align-items: stretch; }
+  }
+</style>
